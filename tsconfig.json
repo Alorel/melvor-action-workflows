@@ -1,10 +1,29 @@
 {
-  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "sourceMap": false,
-    "module": "es2015"
+    "module": "ESNext",
+    "rootDir": "src",
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "jsxFactory": "h",
+    "newLine": "lf",
+    "target": "ES2021",
+    "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "strictBindCallApply": true,
+    "resolveJsonModule": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "stripInternal": true,
+    "importHelpers": true
   },
   "files": [
-    "projects/core/index.ts"
+    "src/index.mts"
   ]
 }

@@ -15,7 +15,7 @@ module.exports = {
   ],
   root: true,
   parserOptions: {
-    project: require('path').join(__dirname, 'tsconfig.test.json')
+    project: require('path').join(__dirname, 'tsconfig.json')
   },
   rules: {
     '@typescript-eslint/consistent-type-imports': ['error', {prefer: 'type-imports'}],
