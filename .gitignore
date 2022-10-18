@@ -1,0 +1,10 @@
+node_modules/
+*.log
+/dist/
+/.nyc_output
+/coverage
+
+/tmp.js
+/tmp.ts
+/tmp
+*.bundleinfo.json

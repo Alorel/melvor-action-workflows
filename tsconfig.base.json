@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "rootDir": "projects",
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "jsxFactory": "h",
+    "newLine": "lf",
+    "target": "es2017",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "strictBindCallApply": true,
+    "resolveJsonModule": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "stripInternal": true,
+    "importHelpers": true
+  }
+}

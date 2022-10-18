@@ -1,0 +1,20 @@
+inputs:
+  node-version:
+    description: Node version
+    required: true
+  gh-token:
+    description: GH token
+    required: true
+name: Lint
+description: Run the linter
+runs:
+  using: composite
+  steps:
+    - name: NPM Init
+      uses: ./.github/actions/init-npm
+      with:
+        node-version: ${{ inputs.node-version }}
+        gh-token: ${{ inputs.gh-token }}
+    - name: Lint
+      shell: bash
+      run: npm run lint
