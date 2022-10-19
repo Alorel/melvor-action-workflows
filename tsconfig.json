@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "module": "ESNext",
-    "rootDir": "src",
     "allowSyntheticDefaultImports": true,
     "declaration": false,
     "noUnusedParameters": true,
@@ -21,9 +20,15 @@
     "resolveJsonModule": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "stripInternal": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "sourceMap": false,
+    "paths": {
+      "*": ["./types/*"]
+    }
   },
   "files": [
+    "declarations.d.ts",
+    "types/melvor/global.d.ts",
     "src/index.mts"
   ]
 }
