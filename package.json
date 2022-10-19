@@ -10,7 +10,8 @@
   "author": "Arturas Molcanovas <a.molcanovas@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "rollup": "del-cli -f dist && rollup -c",
+    "rollup": "rollup -c",
+    "rollup:prod": "NODE_ENV=production npm run rollup",
     "rollup:watch": "npm run rollup -- --watch",
     "lint": "eslint . --ext .ts,.mts,.js,.mjs",
     "lint:fix": "npm run lint -- --fix"
@@ -23,8 +24,8 @@
     "@types/node": "^18.7.13",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
-    "del-cli": "^5.0.0",
     "eslint": "^8.22.0",
+    "jszip": "^3.10.1",
     "rollup": "^2.78.1",
     "rollup-plugin-typescript2": "^0.33.0",
     "tslib": "^2.4.0",

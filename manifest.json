@@ -1,0 +1,4 @@
+{
+  "namespace": "ActionWorkflows",
+  "setup": "setup.mjs"
+}
