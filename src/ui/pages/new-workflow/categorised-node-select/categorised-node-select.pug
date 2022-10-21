@@ -1,0 +1,8 @@
+include ../../common
+
+.input-group
+  +btn('danger', 'sm')(v-if="deletable", @click="onDelete") ×
+  +btn('default', 'sm')(v-if="clearable", @click="clear", v-scope="ClearBtn()")
+  select.form-control.form-control-sm(:value="value?.id ?? ''", @change="onSelectChange($event.target.value)")
+    optgroup(v-for="group in values", :key="group.category", :label="group.category")
+      option(v-for="item in group.items", :key="item.id", :value="item.id") {{item.def.label}}
