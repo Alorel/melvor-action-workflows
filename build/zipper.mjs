@@ -1,22 +1,28 @@
 import JSZip from "jszip";
-import * as fs from 'fs';
-import {join} from 'path';
 
-export default function zipperPlugin() {
+export default function zipperPlugin({
+  compressionLevel = 1,
+                                     } = {}) {
+
   return {
     name: 'zipper',
-    async writeBundle({dir}, bundle) {
+    async generateBundle(_, bundle) {
       const zip = new JSZip();
 
       for (const {code, fileName, source, type} of Object.values(bundle)) {
         zip.file(fileName, type === 'chunk' ? code : source);
       }
 
-      await new Promise(function zipperPromise(resolve, reject) {
-        zip.generateNodeStream()
-          .pipe(fs.createWriteStream(join(dir, 'mod.zip')))
-          .once('error', reject)
-          .once('close', () => resolve());
+      const source = await zip.generateAsync({
+        compression: 'DEFLATE',
+        compressionOptions: {level: compressionLevel},
+        type: 'nodebuffer',
+      });
+
+      this.emitFile({
+        fileName: 'mod.zip',
+        source,
+        type: 'asset',
       });
     },
   };

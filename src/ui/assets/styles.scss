@@ -1,0 +1,25 @@
+.ActionWorkflowsCore- {
+  &font-sized {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &mw- {
+    &50 {
+      max-width: 50%;
+    }
+  }
+
+  &d-tbl {
+    display: table;
+    width: 100%;
+
+    > div {
+      display: table-row;
+
+      > div {
+        display: table-cell;
+      }
+    }
+  }
+}

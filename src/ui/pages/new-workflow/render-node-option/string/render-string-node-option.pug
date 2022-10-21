@@ -1,0 +1,9 @@
+include ../../../common
+
+- const ATTRS = {':value': "value ?? ''", ':required': "required"};
+
+.input-group(v-if="enumOpts")
+  +btn('danger', 'sm')(v-if="!required", type="button", v-scope="ClearBtn()")
+  select.form-control.form-contorl-sm(@change="onInput($event.target.value)")&attributes(ATTRS)
+    option(v-for="(value, key) in enumOpts", :value="key") {{value}}
+input.form-control.form-control-sm(v-else, @input="onInput($event.target.value)")&attributes(ATTRS)

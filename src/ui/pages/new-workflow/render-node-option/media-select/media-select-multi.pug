@@ -1,0 +1,13 @@
+include ../../../common
+
+mixin addBtn
+  +btn('success', 'sm')(@click="add")&attributes(attributes) +
+
+.ActionWorkflowsCore-d-tbl(v-if="value.length")
+  div(v-for="(item, idx) in value")
+    div
+      .btn-group(role='group')
+        +btn('danger', 'sm')(type="button", v-if="idx !== 0", @click="rm(idx)") ×
+        +addBtn()(v-if="canAddAfter(idx)")
+    div(v-scope="renderSingleInsideMulti(idx, item)")
++addBtn()(v-else='')

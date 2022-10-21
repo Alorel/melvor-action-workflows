@@ -1,36 +1,69 @@
-import type {ModContext} from 'melvor';
+import './actions/actions.mjs';
+import {TRIGGER_REGISTRY} from './lib/registries/trigger-registry.mjs';
+import WorkflowRegistry from './lib/registries/workflow-registry.mjs';
+import {debugLog, errorLog} from './lib/util/log.mjs';
+import './triggers/index.mjs';
+import {initUi} from './ui/ui.mjs';
 
-declare const ctx: ModContext;
+// ctx.api<Readonly<Api>>(api); // rollup will freeze it
 
-const {
-  accountStorage,
-  onCharacterLoaded,
-} = ctx;
+let workflowRegistry: WorkflowRegistry;
 
-onCharacterLoaded(() => {
-  console.debug('##toon loaded');
-  console.debug('##', accountStorage.getItem('mfoo'));
-  accountStorage.setItem('mfoo', Date.now());
-  console.debug('##', accountStorage.getItem('mfoo'));
+ctx.onCharacterLoaded(function actionWorkflowsOnCharacterLoadedCallback() {
+  try {
+    workflowRegistry = WorkflowRegistry.fromStorage();
+  } catch (e) {
+    errorLog('Error initialising workflow registry from storage', e);
+
+    workflowRegistry = new WorkflowRegistry([]);
+  }
+
+  debugLog('Initialised workflow registry', workflowRegistry);
 });
 
-// ctx.patch(Skill, 'addXP').after(function(leveledUp) {
-//   if (!leveledUp) {
-//     return;
-//   }
-//
-//
-// });
+ctx.onInterfaceReady(function actionWorkflowsOnInterfaceReadyCallback() {
+  for (const {def: {enabled}, id} of TRIGGER_REGISTRY.registeredObjects.values()) {
+    try {
+      enabled?.();
+      debugLog('Trigger initialised:', id);
+    } catch (e) {
+      errorLog(`Failed to initialise trigger ${id}:`, e);
+    }
+  }
 
-// ctx.onInterfaceReady(ctx => {
-//   ctx.settings.section('Potato Section').add({
-//     label: 'Pot@t:',
-//     name: 'potat',
-//     options: [...game.skills.registeredObjects.values()]
-//       .map((value): ModDropdownOption<MelvorSkill> => ({
-//         display: value.localID,
-//         value,
-//       })),
-//     type: ModSettingType.DROPDOWN,
-//   });
-// });
+  initUi(workflowRegistry);
+
+  // new WorkflowExecution([
+  //   {
+  //     actions: [{
+  //       action: ACTION_REGISTRY.getObjectByID('ActionWorkflows:startFishing')!,
+  //       listId: 0,
+  //       opts: {
+  //         recipe: game.fishing.actions.firstObject,
+  //       },
+  //     }],
+  //     trigger: TRIGGER_REGISTRY.getObjectByID('ActionWorkflows:lvGained')!,
+  //     triggerOptions: {
+  //       skill: game.woodcutting,
+  //       level: 2,
+  //     },
+  //   },
+  //   {
+  //     actions: [{
+  //       action: ACTION_REGISTRY.getObjectByID('ActionWorkflows:startWoodcutting')!,
+  //       listId: 1,
+  //       opts: {
+  //         recipes: [
+  //           game.woodcutting.actions.firstObject,
+  //         ],
+  //       },
+  //     }],
+  //     trigger: TRIGGER_REGISTRY.getObjectByID('ActionWorkflows:itemQty')!,
+  //     triggerOptions: {
+  //       item: game.items.getObjectByID('melvorD:Raw_Shrimp')!,
+  //       comparator: '>=',
+  //       qty: 3,
+  //     },
+  //   },
+  // ]).start();
+});

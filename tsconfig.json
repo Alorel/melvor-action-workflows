@@ -10,15 +10,17 @@
     "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "strictNullChecks": true,
+    "strictPropertyInitialization": true,
     "jsxFactory": "h",
     "newLine": "lf",
-    "target": "ES2021",
+    "target": "ES2020",
     "noImplicitAny": true,
     "noImplicitReturns": false,
     "noImplicitThis": true,
+    "suppressImplicitAnyIndexErrors": true,
     "strictBindCallApply": true,
     "resolveJsonModule": true,
-    "assumeChangesOnlyAffectDirectDependencies": true,
+    "assumeChangesOnlyAffectDirectDependencies": false,
     "stripInternal": true,
     "importHelpers": true,
     "sourceMap": false,
@@ -26,9 +28,9 @@
       "*": ["./types/*"]
     }
   },
-  "files": [
+  "include": [
     "declarations.d.ts",
-    "types/melvor/global.d.ts",
+    "types/",
     "src/index.mts"
   ]
 }

@@ -1,10 +1,11 @@
+/api-token
 node_modules/
 *.log
 /dist/
 /.nyc_output
 /coverage
 
-/tmp.js
+/tmp.mjs
 /tmp.ts
 /tmp
 *.bundleinfo.json

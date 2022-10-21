@@ -1,4 +1,11 @@
-declare module '*.html' {
-  const templateContents: string;
-  export default templateContents;
+declare module '*.pug' {
+  const url: string;
+  export default url;
 }
+
+declare module '*.png' {
+  const url: string;
+  export default url;
+}
+
+declare module '*.scss' {}

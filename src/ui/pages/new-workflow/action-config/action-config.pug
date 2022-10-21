@@ -1,0 +1,7 @@
+include ../../common
+
++bordered-block('woodcutting', 2)
+  div(v-scope="renderActionSelect()")
+
+  .ActionWorkflowsCore-d-tbl(v-if="opts.length")
+    div(v-for="opt in opts", :key="optKey(opt)", v-scope="renderNodeOption(opt)")
