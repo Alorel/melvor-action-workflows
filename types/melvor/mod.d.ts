@@ -33,7 +33,15 @@ export interface ModContext {
 export interface ModGameData {
   /** @see https://melvoridle.com/assets/schema/gameData.json */
   addPackage(pkg: string | Record<string, any>): Promise<void>;
+
+  // builder(callback: (builder: ModPkgBuilderCtx) => void): ModPkgBuilder;
 }
+
+// export interface ModPkgBuilder {
+//   package: Obj<any>;
+//
+//   add(): Promise<void>;
+// }
 
 export type ModLifecycleCallback = (callback: (ctx: ModContext) => void | Promise<void>) => void;
 

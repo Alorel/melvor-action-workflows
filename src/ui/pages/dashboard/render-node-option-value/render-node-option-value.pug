@@ -1,0 +1,4 @@
+include ../../../common
+
++td()(v-if="show && showLabel") {{init.option.label}}
++td()(class='text-right', v-if="show", :colspan="showLabel ? 1 : 2", v-scope="component(init)")

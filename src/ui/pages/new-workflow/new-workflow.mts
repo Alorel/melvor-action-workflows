@@ -1,32 +1,24 @@
-import type {WorkflowStep} from '../../../lib/data/workflow-step.mjs';
 import {Workflow} from '../../../lib/data/workflow.mjs';
+import WorkflowRegistry from '../../../lib/registries/workflow-registry.mjs';
 import {makeComponent} from '../../common.mjs';
-import AutoId from '../../directives/auto-id.mjs';
-import type {GlobalUiState} from '../../ui.mjs';
-import NewStepComponent from './new-step/new-step.mjs';
+import WorkflowEditor from '../../components/workflow-editor/workflow-editor.mjs';
+import {sidebarItems} from '../../sidebar-mgr.mjs';
 import tplId from './new-workflow.pug';
 
-type This = ReturnType<typeof NewWorkflowComponent>;
+export default function NewWorkflowComponent() {
+  const workflow = new Workflow();
 
-function renderNewStep(this: This, step: WorkflowStep, idx: number) {
-  return NewStepComponent({
-    removable: idx !== 0,
-    showAdd: idx === this.workflow.steps.length - 1,
-    step,
-    workflow: this.workflow,
-  });
-}
-
-export default function NewWorkflowComponent({workflows}: GlobalUiState) {
   return makeComponent(`#${tplId}`, {
-    AutoId,
-    renderNewStep,
-    save() {
-      this.workflows.add(this.workflow);
-      this.workflows.store();
-      this.workflow = new Workflow();
+    editor() {
+      return WorkflowEditor({
+        onSave: () => {
+          WorkflowRegistry.inst.add(Workflow.fromJSON(JSON.parse(JSON.stringify(workflow)))!);
+          this.workflow.reset();
+          sidebarItems.value.dashboard.click();
+        },
+        workflow: this.workflow,
+      });
     },
-    workflow: new Workflow(),
-    workflows,
+    workflow,
   });
 }

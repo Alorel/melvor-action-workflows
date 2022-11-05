@@ -1,17 +1,9 @@
 import {startCase} from 'lodash-es';
-import type {UiContext} from 'melvor';
-import type WorkflowRegistry from '../lib/registries/workflow-registry.mjs';
-import {debugLog} from '../lib/util/log.mjs';
 import {namespace} from '../manifest.json';
 import './assets/styles.scss';
 import {createPageContainerId} from './common.mjs';
-
-import NewWorkflowComponent from './pages/new-workflow/new-workflow.mjs';
+import workflowsDashboardTplId from './pages/dashboard/workflows-dashboard.pug';
 import newWorkflowTplId from './pages/new-workflow/new-workflow.pug';
-
-export interface GlobalUiState {
-  workflows: WorkflowRegistry;
-}
 
 interface BaseCat {
   categoryID: string;
@@ -19,60 +11,46 @@ interface BaseCat {
   itemID: string;
 }
 
-function cat<T extends object = {}>(config?: T): T & BaseCat {
-  return {
-    categoryID: 'Modding',
+export const mainIcon = game.items.getObject('melvorD', 'Rubber_Ducky')!.media;
+
+// Init package
+{
+  const cat = <T extends object = {}>(config?: T): T & BaseCat => ({
+    categoryID: '',
     itemID: startCase(namespace),
     ...config as T,
-  };
-}
-
-const mainIcon = game.pages.getObjectByID('melvorD:Statistics')!.media;
-
-await ctx.gameData.addPackage({
-  data: {
-    pages: [
-      {
-        canBeDefault: false,
-        containerID: createPageContainerId(newWorkflowTplId),
-        customName: 'New Action Workflow',
-        hasGameGuide: false,
-        headerBgClass: 'bg-lore',
-        id: 'newActionWorkflow',
-        media: mainIcon,
-        sidebarSubItems: [
-          cat({name: 'New Action Workflow'}),
-        ],
-      },
-    ],
-  },
-  namespace,
-});
-
-export function initUi(workflowRegistry: WorkflowRegistry): void {
-  /** @return The created HTML element */
-  function newPage(id: string, ...args: Parameters<UiContext['create']>): HTMLDivElement {
-    const page = ui.create(...args).lastChild as HTMLDivElement;
-    page.id = id;
-    page.classList.add('d-none');
-
-    return page;
-  }
-
-  debugLog('Initialising UI');
-  sidebar
-    .category('Modding')
-    .item('Action Workflows', {
-      after: 'Mod Manager',
-      icon: mainIcon,
-    });
-
-  const globalUiState = ui.createStore<GlobalUiState>({
-    workflows: workflowRegistry,
   });
 
-  const host = document.getElementById('main-container')!;
+  const pageCommon = {
+    canBeDefault: false,
+    hasGameGuide: false,
+    headerBgClass: 'bg-lore',
+    media: mainIcon,
+  };
 
-  newPage(createPageContainerId(newWorkflowTplId), NewWorkflowComponent(globalUiState), host);
+  await ctx.gameData.addPackage({
+    data: {
+      pages: [
+        {
+          ...pageCommon,
+          containerID: createPageContainerId(workflowsDashboardTplId),
+          customName: 'Action Workflows Dashboard',
+          id: 'actionWorkflowsDashboard',
+          sidebarSubItems: [
+            cat({name: 'Dashboard'}),
+          ],
+        },
+        {
+          ...pageCommon,
+          containerID: createPageContainerId(newWorkflowTplId),
+          customName: 'New Action Workflow',
+          id: 'newActionWorkflow',
+          sidebarSubItems: [
+            cat({name: 'New Action Workflow'}),
+          ],
+        },
+      ],
+    },
+    namespace,
+  });
 }
-

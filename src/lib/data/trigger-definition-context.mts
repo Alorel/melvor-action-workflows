@@ -3,10 +3,9 @@ import type {Obj, TriggerDefinitionContext as ITriggerDefinitionContext, Trigger
 import type {FromJSON} from '../decorators/to-json.mjs';
 import {Serialisable} from '../decorators/to-json.mjs';
 import {NamespacedDefinition} from '../namespaced-definition.mjs';
-import {TRIGGER_REGISTRY} from '../registries/trigger-registry.mjs';
-import {TriggerListener} from '../registries/trigger-registry/trigger-listener.mjs';
+import {TRIGGER_REGISTRY, TriggerListener} from '../registries/trigger-registry.mjs';
 import {debugLog} from '../util/log.mjs';
-import {getFromRegistryOrLog} from '../util/registry-utils.mjs';
+import {getFromRegistryOrLog} from '../util/registry-utils/get-from-registry-or-log.mjs';
 
 @Serialisable<TriggerDefinitionContext<any>, string | undefined>({
   from(id) {
@@ -17,7 +16,7 @@ import {getFromRegistryOrLog} from '../util/registry-utils.mjs';
   override: true,
 })
 export class TriggerDefinitionContext<T extends object = {}>
-  extends NamespacedDefinition<TriggerNodeDefinition>
+  extends NamespacedDefinition<TriggerNodeDefinition<T>>
   implements ITriggerDefinitionContext<T> {
 
   /** @internal */
@@ -33,6 +32,10 @@ export class TriggerDefinitionContext<T extends object = {}>
       debugLog(`Starting trigger listener ${this.id} with`, data);
       listeners.add(listener);
 
+      if (listener.check()) {
+        listener.notify();
+      }
+
       return () => {
         debugLog(`Stopping trigger listener ${this.id} with`, data);
         listeners.delete(listener);
@@ -41,9 +44,8 @@ export class TriggerDefinitionContext<T extends object = {}>
   }
 
   /** @inheritDoc */
-  public notifyListeners(filter?: (listenerData: Readonly<T>) => any): void {
-    const listeners = this.#listeners.values();
-    doNotifyListeners(filter ? filteredListeners(filter, listeners) : listeners);
+  public notifyListeners(filter: (listenerData: Readonly<T>) => any = this.def.check): void {
+    doNotifyListeners(filteredListeners(filter, this.#listeners.values()));
   }
 }
 

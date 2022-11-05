@@ -1,0 +1,6 @@
+include ../../../common
+
++td()(v-if="hasLabel")
+  i.fa.fa-question-circle.mr-1(v-if="init.option.description", @vue:mounted="onDescMount($el)")
+  span {{init.option.label}}
++td()(:colspan="hasLabel ? 1 : 2", v-scope="component(init)")

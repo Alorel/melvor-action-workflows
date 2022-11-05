@@ -1,5 +1,5 @@
 import type {Obj} from '../../public_api';
-import {allActions} from '../../ui/pages/new-workflow/categorised-node-select/action-select.mjs';
+import {allActions} from '../../ui/components/workflow-editor/categorised-node-select/action-select.mjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
 import {FormatDeepToJsonObject} from '../decorators/to-json-formatters/format-deep-to-json-object.mjs';
 import type {CompressedJsonArray} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
@@ -8,7 +8,7 @@ import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
 import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
 import {ActionNodeDefinitionImpl} from '../registries/action-registry.mjs';
 import {EMPTY_OBJ} from '../util.mjs';
-import {formatOptionDefinitions} from '../util/registry-utils.mjs';
+import {formatOptionDefinitions} from '../util/registry-utils/format-option-definitions.mjs';
 
 type Init = Partial<Pick<ActionConfigItem, 'action' | 'opts'>>;
 

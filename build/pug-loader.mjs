@@ -11,8 +11,13 @@ export default function pugLoader({prod = false, watch = false} = {}) {
   let cache = new Map();
   const dependents = new Map();
 
-  const extractHtml = watch
-    ? ((code, opts, ctx) => {
+  const locals = {
+    dev_build: !prod,
+    prod_build: prod,
+  };
+  let extractHtml;
+  if (watch) {
+    extractHtml = (code, opts, ctx) => {
       const cmp = pug.compile(code, opts);
       for (const dep of cmp.dependencies) {
         const existingDeps = dependents.get(dep);
@@ -24,9 +29,13 @@ export default function pugLoader({prod = false, watch = false} = {}) {
         ctx.addWatchFile(dep);
       }
 
-      return cmp();
-    })
-    : (code, opts) => pug.render(code, opts);
+      return cmp(locals);
+    };
+  } else {
+    defaultOpts.prod = prod;
+    // drop 3rd arg & don't pass it to pug
+    extractHtml = (code, opts) => pug.render(code, opts);
+  }
 
   async function doLoad(ctx, id) {
     const code = await fs.readFile(id, 'utf8');

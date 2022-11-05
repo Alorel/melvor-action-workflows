@@ -1,3 +1,4 @@
+import {ComponentProps, Item} from 'melvor';
 import {ObservableInput} from 'rxjs';
 
 export type Obj<T> = object & Record<string, T>;
@@ -5,7 +6,40 @@ export type Obj<T> = object & Record<string, T>;
 export interface Api {
   defineAction<T extends object = {}>(definition: ActionNodeDefinition<T>): void;
 
+  defineOption<Val, Interface extends NodeOptionBase>(opt: OptionDefinition<Val, Interface>): void;
+
   defineTrigger<T extends object = {}>(definition: TriggerNodeDefinition): TriggerDefinitionContext<T>;
+}
+
+export interface OptionRenderEditCtx<Val, Interface> {
+  initialValue?: Val;
+
+  option: Interface;
+
+  otherValues: Obj<any>;
+
+  onChange(value?: Val): void;
+}
+
+export interface OptionRenderViewCtx<Val, Interface> {
+  option: Interface;
+
+  otherValues: Obj<any>;
+
+  value?: Val;
+}
+
+export interface OptionDefinition<Val, Interface extends NodeOptionBase> {
+  /** @default true */
+  hasLabel?: boolean;
+
+  token: Interface['type'];
+
+  is(v: NodeOptionBase & Obj<any>): v is Interface;
+
+  renderEdit(ctx: OptionRenderEditCtx<Val, Interface>): ComponentProps;
+
+  renderView(ctx: OptionRenderViewCtx<Val, Interface>): ComponentProps;
 }
 
 export class TriggerDefinitionContext<T extends object = {}> {
@@ -13,7 +47,7 @@ export class TriggerDefinitionContext<T extends object = {}> {
 
   readonly id: string;
 
-  private constructor();
+  private constructor(nope: never);
 
   public notifyListeners(filter?: (listenerData: T) => any): void;
 }
@@ -28,6 +62,14 @@ export interface StringNodeOption extends NodeOptionBase {
   type: StringConstructor;
 }
 
+export interface BooleanNodeOption extends NodeOptionBase {
+  type: BooleanConstructor;
+}
+
+export interface EquipmentSetOption extends NodeOptionBase {
+  type: 'EquipmentSet';
+}
+
 export interface NumberNodeOption extends NodeOptionBase {
   max?: number;
 
@@ -36,6 +78,15 @@ export interface NumberNodeOption extends NodeOptionBase {
   step?: number;
 
   type: NumberConstructor;
+}
+
+export interface AltRecipeCostNodeOption extends NodeOptionBase {
+  /** Name of the option holding the main recipe */
+  recipeOption: string;
+
+  type: 'AltRecipeCost';
+
+  getAltCostItems(recipe: any): Item[] | undefined;
 }
 
 export interface MediaItemNodeOptionMultiConfig {
@@ -52,12 +103,19 @@ export interface MediaItemNodeOption extends NodeOptionBase {
    *
    * The items in this registry must be compatible with the {@link MediaSelectable} interface.
    */
-  registry: string;
+  registry: string | string[] | ((optionValues: Obj<any>) => string | string[]);
 
   type: 'MediaItem';
+
+  mediaFilter?(item: any, optionValues: Obj<any>): boolean;
 }
 
-export type NodeOption = NumberNodeOption | StringNodeOption | MediaItemNodeOption;
+export type NodeOption = AltRecipeCostNodeOption
+  | NumberNodeOption
+  | StringNodeOption
+  | MediaItemNodeOption
+  | EquipmentSetOption
+  | BooleanNodeOption;
 
 export interface MediaSelectable {
   id: string;
@@ -67,22 +125,30 @@ export interface MediaSelectable {
   name: string;
 }
 
-export interface TriggerNodeDefinition extends NodeDefinition {
+export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefinition<T> {
+  /**
+   * Check if the given data passes the trigger. Called when a trigger node activates.
+   * @param data Node data
+   */
+  check(data: T): boolean;
+
   /** Called when the mod gets enabled */
-  enabled?(): void;
+  init(): void;
 }
 
-export interface ActionNodeDefinition<T> extends NodeDefinition {
+export interface ActionNodeDefinition<T extends object> extends NodeDefinition<T> {
   execute(data: T): void | ObservableInput<void>;
 }
 
-export interface NodeDefinition extends Referenceable {
+export interface NodeDefinition<T extends object = {}> extends Referenceable {
   category?: string;
+
+  media: string;
 
   options?: NodeOption[];
 
   /** Options to set by default when building workflows */
-  initOptions?(): Obj<any>;
+  initOptions?(): Partial<T>;
 }
 
 export interface Referenceable {
@@ -93,20 +159,16 @@ export interface Referenceable {
   namespace: string;
 }
 
-interface NodeOptionBase extends Omit<Referenceable, 'namespace'> {
-  required?: boolean;
-}
+export interface NodeOptionBase extends Omit<Referenceable, 'namespace'> {
+  /** Info tooltip */
+  description?: string;
 
-type DeepReadonlyObj<T> = { readonly [P in keyof T]: DeepReadonly<T[P]> };
-export type DeepReadonlyArray<T> = readonly DeepReadonly<T>[];
-export type DeepReadonly<T> = T extends Function
-  ? T
-  : T extends Array<infer E>
-    ? DeepReadonlyArray<E>
-    : T extends Set<infer E>
-      ? ReadonlySet<E>
-      : T extends Map<infer K, infer V>
-        ? ReadonlyMap<K, V>
-        : T extends object
-          ? DeepReadonlyObj<T>
-          : T;
+  required?: boolean;
+
+  type: any;
+
+  showIf?(optionValues: Obj<any>): boolean;
+
+  /** Key used to re-render the component */
+  uiKey?(optionValues: Obj<any>): string | number;
+}

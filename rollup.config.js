@@ -2,7 +2,6 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
 import {copyPlugin} from "@alorel/rollup-plugin-copy";
 import modWrapPlugin from "./build/mod-wrap.mjs";
-import zipperPlugin from "./build/zipper.mjs";
 import replacePlugin from "@rollup/plugin-replace";
 import iifeWrapPlugin from "./build/iife-wrap.mjs";
 import {threadedTerserPlugin} from "@alorel/rollup-plugin-threaded-terser";
@@ -30,14 +29,14 @@ export default function (opts) {
   const prod = Boolean(getOpt(opts, 'prod'));
 
   return {
-    input: 'src/index.mts',
+    input: 'src/setup.mts',
     output: {
       dir: 'dist',
       entryFileNames: 'setup.mjs',
       format: 'es',
       preferConst: true,
       preserveModules: false,
-      sourcemap: prod ? false : 'inline',
+      sourcemap: false,
     },
     plugins: [
       cleanPlugin(),
@@ -82,23 +81,24 @@ export default function (opts) {
       }),
       prod && iifeWrapPlugin({
         vars: [
-          'game',
-          'Object',
           'Array',
+          'Boolean',
+          'console',
           'Error',
+          'game',
+          'JSON',
           'Map',
-          'WeakMap',
+          'NamespacedObject',
+          'NamespaceRegistry',
+          'Number',
+          'Object',
+          'Promise',
+          'RegExp',
+          'String',
           'Symbol',
           'TypeError',
-          'Promise',
-          'console',
-          'RegExp',
-          'Number',
-          'String',
-          'Boolean',
           'undefined',
-          'NamespaceRegistry',
-          'NamespacedObject',
+          'WeakMap',
         ],
       }),
       modWrapPlugin({prod}),
@@ -121,9 +121,6 @@ export default function (opts) {
           emitNameKind: 'fileName',
         },
         watch,
-      }),
-      zipperPlugin({
-        compressionLevel: prod ? 9 : 1,
       }),
     ],
     watch: {

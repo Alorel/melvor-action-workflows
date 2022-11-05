@@ -30,7 +30,7 @@ export class Workflow {
   public name: string;
 
   @JsonProp({format: FormatToJsonArrayCompressed(WorkflowStep.fromJSON)})
-  public readonly steps: WorkflowStep[];
+  public steps: WorkflowStep[];
 
   public constructor({name, steps}: Init = {}) {
     this.name = name ?? '';
@@ -39,6 +39,11 @@ export class Workflow {
 
   public addStep(): void {
     this.steps.push(new WorkflowStep());
+  }
+
+  public reset(): void {
+    this.name = '';
+    this.steps = [new WorkflowStep()];
   }
 
   public rmStep(step: WorkflowStep): void {

@@ -31,6 +31,9 @@
   "include": [
     "declarations.d.ts",
     "types/",
-    "src/index.mts"
+    "src/setup.mts",
+    "src/actions/",
+    "src/triggers/",
+    "src/option-types/"
   ]
 }

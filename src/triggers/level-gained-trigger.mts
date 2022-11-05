@@ -1,8 +1,6 @@
 import type {Skill as TSkill} from 'melvor';
-import {defineLocalTrigger} from '../lib/define-local.mjs';
 import {InternalCategory} from '../lib/registries/action-registry.mjs';
-import {InternalTriggerId} from '../lib/registries/trigger-registry.mjs';
-import {debugLog} from '../lib/util/log.mjs';
+import {defineLocalTrigger} from '../lib/util/define-local.mjs';
 
 export interface LevelGainedTriggerData {
   level: number;
@@ -12,20 +10,15 @@ export interface LevelGainedTriggerData {
 
 const triggerCtx = defineLocalTrigger<LevelGainedTriggerData>({
   category: InternalCategory.CORE,
-  enabled() {
+  check: ({level, skill}) => skill.level >= level,
+  init() {
     ctx.patch(Skill, 'onLevelUp').after(function (this: TSkill): void {
-      const leveledSkill = this.id;
-      const levelReached = this.level;
-
-      debugLog(leveledSkill, 'leveled up to', levelReached, '- notifying level gained trigger subscribers');
-
-      triggerCtx.notifyListeners(({level, skill}) => level <= levelReached && skill.id === leveledSkill);
+      triggerCtx.notifyListeners();
     });
-
-    triggerCtx.notifyListeners(({level, skill}) => skill.level >= level);
   },
   label: 'Level gained',
-  localID: InternalTriggerId.LEVEL_GAINED,
+  localID: 'lvGained',
+  media: game.pages.getObject('melvorD', 'Statistics')!.media,
   options: [
     {
       label: 'Skill',

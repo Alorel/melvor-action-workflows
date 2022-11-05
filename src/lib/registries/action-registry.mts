@@ -3,16 +3,8 @@ import type {FromJSON} from '../decorators/to-json.mjs';
 import {Serialisable} from '../decorators/to-json.mjs';
 import {NamespacedDefinition} from '../namespaced-definition.mjs';
 
-export const enum InternalActionId {
-  WOODCUTTING = 'startWoodcutting',
-  FISHING = 'startFishing',
-  FIREMAKING = 'startFiremaking',
-  COOKING = 'startCooking',
-}
-
 export const enum InternalCategory {
-  GATHERING = 'Gathering',
-  CRAFTING = 'Crafting',
+  START_SKILL = 'Start skill',
   COMBAT = 'Combat',
   CORE = 'Core',
   COMBINATION = 'Combination',
@@ -22,7 +14,7 @@ export const enum InternalCategory {
   from: id => ACTION_REGISTRY.getObjectByID(id),
   override: true,
 })
-export class ActionNodeDefinitionImpl<T> extends NamespacedDefinition<ActionNodeDefinition<T>> {
+export class ActionNodeDefinitionImpl<T extends object> extends NamespacedDefinition<ActionNodeDefinition<T>> {
 
   /** @internal */
   public static fromJSON: FromJSON<ActionNodeDefinitionImpl<any>>['fromJSON'];

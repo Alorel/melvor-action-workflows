@@ -21,10 +21,15 @@ export default function templateLoadPlugin({prod = true} = {}) {
     doctype: 'html',
     pretty: !prod,
     self: true,
-  })
+  });
+
+  const dupeSet = new Set();
 
   return {
     name: 'template-loader',
+    buildStart() {
+      dupeSet.clear();
+    },
     generateBundle() {
       if (!cacheClean) {
         cachedHtml = compiledTpl({templates: [...templates.values()]});
@@ -39,6 +44,11 @@ export default function templateLoadPlugin({prod = true} = {}) {
       }
 
       const id = `${namespace}_core_${basename(path, extname(path))}`;
+      if (dupeSet.has(id)) {
+        throw new Error(`Duplicate template ID: ${id}`);
+      }
+
+      dupeSet.add(id);
       templates.set(path, {id, html});
       cacheClean = false;
 

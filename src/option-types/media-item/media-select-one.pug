@@ -1,0 +1,19 @@
+include ../../ui/common
+
++btn('primary', 'sm')(v-if="value", @click="unselect", @vue:mounted="onBtnInit($el)")
+  img.ActionWorkflowsCore-font-sized.mr-1(:src="value.media")
+  span {{value.name}}
+div(v-else)
+  input.form-control.form-control-sm(
+    v-model="filterText",
+    @keyup="onKeyup",
+    @vue:mounted="onInputInit($el)",
+    placeholder="Search by name…"
+  )
+  a(
+    v-for="item in results",
+    :key="item.id",
+    role='button',
+    @click="selectItem(item, $event)"
+  )
+    img.skill-icon-xs(:src="item.media", @vue:mounted="onItemInit($el, item)")

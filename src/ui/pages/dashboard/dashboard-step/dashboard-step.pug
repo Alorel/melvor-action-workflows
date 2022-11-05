@@ -1,0 +1,17 @@
+.block.block-rounded.border-top.border-2x(
+  @vue:mounted="onMount",
+  @vue:unmounted="onUnmount",
+  :class="hostClass"
+)
+  .block-content.pt-2.pr-2.pl-2
+    div(v-scope="DashboardNodeDefSection({node: step.trigger.trigger.def, config: step.trigger.opts})")
+
+    hr.mt-1.mb-1(v-if="step.actions.length")
+    ul.list-group(v-if="step.actions.length")
+      li.list-group-item.pt-0.pb-0.pl-1.pr-1(
+        v-for="action in step.actions",
+        :key="action.listId",
+        v-scope="DashboardNodeDefSection({node: action.action.def, config: action.opts})",
+        @vue:mounted="onActionMount($el, action.listId)",
+        @vue:unmounted="onActionUnmount(action.listId)"
+      )
