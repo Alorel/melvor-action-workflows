@@ -1,0 +1,13 @@
+include ../../../common
+
++bordered-block('woodcutting', 2)
+  div(v-scope="renderActionSelect()")
+
+  table.table-sm.table.font-size-sm(v-if="opts.length")
+    tbody
+      tr(
+        v-for="opt in opts",
+        :key="optKey(opt)",
+        v-scope="renderNodeOption(opt)",
+        @vue:mounted="onActionMount(opt, $el)"
+      )

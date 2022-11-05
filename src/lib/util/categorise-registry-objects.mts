@@ -9,7 +9,7 @@ export interface CategorisedObject<T> {
   items: T[];
 }
 
-export default function categoriseRegistryObjects<T extends NodeDefinition, D extends NamespacedDefinition<T>>(
+export default function categoriseRegistryObjects<T extends NodeDefinition<any>, D extends NamespacedDefinition<T>>(
   registry: NamespaceRegistry<D>
 ): Array<CategorisedObject<D>> {
   let out: Array<CategorisedObject<D>>;

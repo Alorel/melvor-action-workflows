@@ -11,9 +11,11 @@ export interface UiContext {
 }
 
 export interface ComponentProps {
-  props?: string[];
-  emits?: string[];
   $template?: string;
+
+  emits?: string[];
+
+  props?: string[];
 }
 
 export type ComponentStore<T extends object> = T;
@@ -69,6 +71,8 @@ export class CategoryItem extends SidenavItem {
   subitem(id: string, config?: CategorySubmitemConfig, builder?: (v: CategorySubitem) => void): CategorySubitem;
 
   subitem(id: string, builder?: (v: CategorySubitem) => void): CategorySubitem;
+
+  subitems(): CategorySubitem[];
 }
 
 export class CategorySubitem extends SidenavItem {

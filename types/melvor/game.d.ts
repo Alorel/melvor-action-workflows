@@ -49,6 +49,8 @@ export class Bank {
 
   getQty<T extends Item>(item: T | undefined): number;
 
+  processItemSale(item: Item, qty: number): void;
+
   removeItemQuantity<T extends Item>(item: T, quantity: number, removeItemCharges?: number): void;
 }
 
@@ -72,6 +74,62 @@ export class BankItem<T extends Item = Item> {
   get stackValue(): number;
 }
 
+export interface ItemCost {
+  item: Item;
+
+  quantity: number;
+}
+
+export interface FletchingAlternativeCosts {
+  itemCosts: ItemCost[];
+
+  quantityMultiplier: number;
+}
+
+export class FletchingRecipe extends SingleProductArtisanSkillRecipe {
+  public alternativeCosts?: FletchingAlternativeCosts[];
+}
+
+export class Fletching extends ArtisanSkill<FletchingRecipe> {
+}
+
+export class ThievingNPC extends BasicSkillRecipe {
+}
+
+export class Crafting extends ArtisanSkill<SingleProductArtisanSkillRecipe> {
+
+}
+
+export class Runecrafting extends ArtisanSkill<SingleProductArtisanSkillRecipe> {
+
+}
+
+export class AstrologyRecipe extends BasicSkillRecipe {
+}
+
+export class Astrology extends GatheringSkill<AstrologyRecipe> {
+  public studyConstellationOnClick(constellation: AstrologyRecipe): void;
+}
+
+export class Agility extends GatheringSkill<object> {
+}
+
+export class HerbloreRecipe extends CategorizedArtisanRecipe {
+}
+
+export class Herblore extends ArtisanSkill<HerbloreRecipe> {
+}
+
+export class ThievingArea extends NamespacedObject {
+  public npcs: ThievingNPC[];
+}
+
+export class Thieving extends GatheringSkill<ThievingNPC> {
+  public areas: NamespaceRegistry<ThievingArea>;
+
+  public startThieving(area: ThievingArea, npc: ThievingNPC): void;
+}
+
 export class Skill extends NamespacedObject {
   actionTimer: Timer;
 
@@ -85,6 +143,8 @@ export class Skill extends NamespacedObject {
 
   get levelCap(): number;
 
+  get media(): string;
+
   get xp(): number;
 
   addXP(xp: number): boolean;
@@ -96,10 +156,26 @@ export class Skill extends NamespacedObject {
   onLevelUp(oldLevel: number, newLevel: number): void;
 }
 
-export class GatheringSkill<T> extends Skill {
+export class SkillWithMastery<T> extends Skill {
+  actionMastery: Map<T, {level: number; xp: number;}>;
+
+  get masteryLevelCap(): number;
+
+  get masteryPoolProgress(): number;
+
+  addMasteryPoolXP(xp: number): void;
+
+  addMasteryXP(action: T, xp: number): void;
+
+  onMasteryLevelUp(action: T, oldLvl: number, newLvl: number): void;
+}
+
+export class GatheringSkill<T> extends SkillWithMastery<T> {
   actions: NamespaceRegistry<T>;
 
   isActive: boolean;
+
+  start(): void;
 
   stop(): boolean;
 }
@@ -134,6 +210,135 @@ export class FishingArea extends NamespacedObject {
   specialChange: number;
 }
 
+export class MiningRock extends SingleProductRecipe {
+}
+
+export class ArtisanSkill<T> extends GatheringSkill<T> {
+  createButtonOnClick(): void;
+
+  public selectAltRecipeOnClick(altCostIdx: number): void;
+
+  selectRecipeOnClick(recipe: T): void;
+}
+
+export class SingleProductArtisanSkillRecipe extends CategorizedArtisanRecipe {
+}
+
+export const enum EquipSlotType {
+  Amulet = 'Amulet',
+  Boots = 'Boots',
+  Cape = 'Cape',
+  Consumable = 'Consumable',
+  Gloves = 'Gloves',
+  Helmet = 'Helmet',
+  Passive = 'Passive',
+  Platebody = 'Platebody',
+  Platelegs = 'Platelegs',
+  Quiver = 'Quiver',
+  Ring = 'Ring',
+  Shield = 'Shield',
+  Summon1 = 'Summon1',
+  Summon2 = 'Summon2',
+  Weapon = 'Weapon',
+}
+
+export class Equipment {
+  slotArray: EquipSlot[];
+
+  slotMap: Map<EquipmentItem, string>;
+
+  slots: Record<EquipSlotType, EquipSlot>;
+}
+
+export class EquipSlot {
+  emptyItem: EquipmentItem;
+
+  item: EquipmentItem;
+
+  occupiedBy: string;
+
+  occupies: any[];
+
+  type: EquipSlotType;
+}
+
+export class EquipmentSet {
+  equipment: Equipment;
+}
+
+export type EquipItemArgSlot = EquipSlotType | 'Default';
+
+export class Player extends Character {
+  equipToSet: number;
+
+  equipmentSets: EquipmentSet[];
+
+  get equipment(): Equipment;
+
+  get numEquipSets(): number;
+
+  get selectedEquipmentSet(): number;
+
+  changeEquipToSet(setIdx: number): void;
+
+  changeEquipmentSet(setId: number): void;
+
+  equipFood(food: Item, quantity: number): void;
+
+  /**
+   * @param item
+   * @param set
+   * @param [slot='Default']
+   * @param [quantity=1]
+   */
+  equipItem(item: EquipmentItem, set: number, slot?: EquipItemArgSlot, quantity?: number): void;
+
+  isEquipmentSlotUnlocked(slot: EquipSlotType | undefined): boolean;
+}
+
+export class Enemy extends Character {
+
+}
+
+export class Character {
+}
+
+export class CombatManager {
+  enemy: Enemy;
+
+  player: Player;
+}
+
+export class SummoningRecipe extends CategorizedArtisanRecipe {
+  gpCost: number;
+
+  itemCosts: Item[];
+
+  nonShardItemCosts: Item[];
+
+  scCost: number;
+
+  tier: number;
+}
+
+export class Summoning extends ArtisanSkill<SummoningRecipe> {
+}
+
+export class Smithing extends ArtisanSkill<SingleProductArtisanSkillRecipe> {
+}
+
+export class CategorizedArtisanRecipe extends ArtisanSkillRecipe {
+}
+
+export class ArtisanSkillRecipe extends BasicSkillRecipe {
+}
+
+export class Mining extends GatheringSkill<MiningRock> {
+  canMineOre(rock: MiningRock): boolean;
+
+  onRockClick(rock: MiningRock): void;
+}
+
 export class Woodcutting extends GatheringSkill<WoodcuttingTree> {
   activeTrees: Set<WoodcuttingTree>;
 
@@ -142,6 +347,13 @@ export class Woodcutting extends GatheringSkill<WoodcuttingTree> {
 
 export class WoodcuttingTree extends SingleProductRecipe {
   canDropRavenNest: boolean;
+}
+
+export class WeaponItem extends Item {
+}
+
+export class EquipmentItem extends Item {
+  validSlots: EquipSlotType[];
 }
 
 export class Item extends NamespacedObject {
@@ -202,7 +414,6 @@ export class SkillCategory extends NamespacedObject {
 }
 
 export class CraftingSkill<R> extends GatheringSkill<R> {
-  get media(): string;
 }
 
 export class BasicSkillRecipe extends NamespacedObject {
@@ -281,23 +492,45 @@ export class Page extends NamespacedObject {
 export class Game {
   activeAction?: Skill;
 
+  agility: Agility;
+
+  astrology: Astrology;
+
   bank: Bank;
 
+  combat: CombatManager;
+
   cooking: Cooking;
+
+  crafting: Crafting;
 
   firemaking: Firemaking;
 
   fishing: Fishing;
 
+  fletching: Fletching;
+
+  herblore: Herblore;
+
   items: ItemRegistry;
+
+  mining: Mining;
 
   pages: NamespaceRegistry<Page>;
 
   registeredNamespaces: NamespaceMap;
 
+  runecrafting: Runecrafting;
+
   shop: Shop;
 
   skills: NamespaceRegistry<Skill>;
+
+  smithing: Smithing;
+
+  summoning: Summoning;
+
+  thieving: Thieving;
 
   woodcutting: Woodcutting;
 }

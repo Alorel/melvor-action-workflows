@@ -1,14 +1,15 @@
 import {Memoise} from '@aloreljs/memoise-decorator';
 import {identity} from 'rxjs';
 import type {NodeOption, Obj} from '../../public_api';
-import {allTriggerSelectGroups} from '../../ui/pages/new-workflow/categorised-node-select/trigger-select.mjs';
+import {allTriggerSelectGroups} from '../../ui/components/workflow-editor/categorised-node-select/trigger-select.mjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
 import {FormatDeepToJsonObject} from '../decorators/to-json-formatters/format-deep-to-json-object.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
 import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
 import {TRIGGER_REGISTRY} from '../registries/trigger-registry.mjs';
 import {EMPTY_ARR, EMPTY_OBJ} from '../util.mjs';
-import {formatOptionDefinitions, getFromRegistryOrLog} from '../util/registry-utils.mjs';
+import {formatOptionDefinitions} from '../util/registry-utils/format-option-definitions.mjs';
+import {getFromRegistryOrLog} from '../util/registry-utils/get-from-registry-or-log.mjs';
 import type {TriggerDefinitionContext} from './trigger-definition-context.mjs';
 
 type Init = Partial<Pick<WorkflowTrigger, 'trigger' | 'opts'>>;

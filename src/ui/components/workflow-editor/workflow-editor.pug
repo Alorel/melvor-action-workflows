@@ -1,0 +1,27 @@
+include ../../common
+
+- const SECTION_CLASS = ['col-12', 'col-xl-11', 'm-auto'];
+
+.row
+  div(class=SECTION_CLASS)
+    +bordered-block('agility', 2)
+      .row.mb-3
+        .font-size-sm.pr-1.col-auto Workflow name
+        .col-auto
+          input.form-control.form-control-sm(v-model="workflow.name", required)
+      .text-right
+        +btn('danger', 'sm')(v-if="cancellable", @click="onCancel") Cancel
+        +btn('success', 'sm')(@click="onSave") Save
+
+.row.row-deck
+  div(
+    v-for="(step, idx) in workflow.steps",
+    :key="keyFn(step, idx)",
+    v-scope="renderNewStep(step, idx === lastStepIdx)",
+    class=SECTION_CLASS
+  )
+
+if self.dev_build
+  +bordered-block('fletching', 4)
+    +btn('info', 'sm')(@click="$el.nextElementSibling.hidden = !$el.nextElementSibling.hidden") Toggle debug view
+    pre.font-size-sm.text-light(hidden) {{JSON.stringify(workflow, null, 2)}}

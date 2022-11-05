@@ -1,0 +1,8 @@
+input.form-control.form-control-sm(
+  type="number",
+  v-model="value",
+  :max="opt.max ?? ''",
+  :min="opt.min ?? ''",
+  :step="opt.step ?? ''",
+  :required="opt.required"
+)

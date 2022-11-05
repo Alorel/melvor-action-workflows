@@ -1,8 +1,10 @@
-import {createReadStream, promises as fs} from 'node:fs';
+import {createReadStream, createWriteStream} from 'node:fs';
 import FormData from 'form-data';
 import axios, {AxiosError} from 'axios';
 import {join} from 'node:path';
 import yargs from 'yargs';
+import JSZip from "jszip";
+import {readdir, readFile} from "node:fs/promises";
 
 const processArgs = process.argv.slice(2);
 
@@ -27,7 +29,7 @@ async function loadToken(rawToken) {
   }
 
   try {
-    return (await fs.readFile('./api-token', 'utf8')).trim();
+    return (await readFile('./api-token', 'utf8')).trim();
   } catch {
     throw new Error('API token local file not found');
   }
@@ -77,16 +79,37 @@ yargs(processArgs)
           throw new Error(`mod-version input required`);
         }
 
+        const distDir = new URL('../dist', import.meta.url).pathname;
+
+        const zip = new JSZip();
+        await Promise.all(
+          (await readdir(distDir, 'utf8'))
+            .map(async f => {
+              const contents = await readFile(join(distDir, f));
+              zip.file(f, contents);
+            })
+        );
+
         const tmp = await import('tmp');
         tmp.setGracefulCleanup();
 
         const tmpDir = tmp.dirSync({discardDescriptor: true}).name;
-        const copyTo = join(tmpDir, `action-workflows-${modVersion}.zip`);
+        const modFileLocation = join(tmpDir, `action-workflows-${modVersion}.zip`);
 
-        await fs.copyFile(new URL('../dist/mod.zip', import.meta.url), copyTo);
+        await new Promise((resolve, reject) => {
+          zip
+            .generateNodeStream({
+              compression: 'DEFLATE',
+              compressionOptions: {level: 9},
+              type: 'nodebuffer',
+            })
+            .pipe(createWriteStream(modFileLocation))
+            .once('error', reject)
+            .once('close', resolve);
+        });
 
         const form = new FormData();
-        form.append('filedata', createReadStream(copyTo));
+        form.append('filedata', createReadStream(modFileLocation));
         form.append('version', modVersion);
         form.append('active', String(active));
 

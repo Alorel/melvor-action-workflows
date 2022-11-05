@@ -1,11 +1,18 @@
-import {defineProp} from './define-prop.mjs';
+import {LazyGetter} from 'lazy-get-decorator';
 
-export function lazyValue<T>(factory: () => T): {readonly value: T;} {
-  const out = {
-    get value(): T {
-      return defineProp(out, 'value', factory());
-    },
-  };
+export default class LazyValue<T> {
+  private readonly f: () => T;
 
-  return out;
+  public constructor(factory: () => T) {
+    this.f = factory;
+  }
+
+  @LazyGetter()
+  public get value(): T {
+    return this.f();
+  }
+
+  public get(): T {
+    return this.value;
+  }
 }
