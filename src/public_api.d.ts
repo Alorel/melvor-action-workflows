@@ -40,6 +40,8 @@ export interface OptionDefinition<Val, Interface extends NodeOptionBase> {
   renderEdit(ctx: OptionRenderEditCtx<Val, Interface>): ComponentProps;
 
   renderView(ctx: OptionRenderViewCtx<Val, Interface>): ComponentProps;
+
+  validate?(value: any | undefined, def: Interface, fullOptsObject: Obj<any>): string[];
 }
 
 export class TriggerDefinitionContext<T extends object = {}> {
@@ -62,7 +64,7 @@ export interface StringNodeOption extends NodeOptionBase {
   type: StringConstructor;
 }
 
-export interface BooleanNodeOption extends NodeOptionBase {
+export interface BooleanNodeOption extends Omit<NodeOptionBase, 'required'> {
   type: BooleanConstructor;
 }
 

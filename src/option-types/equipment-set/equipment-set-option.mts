@@ -1,5 +1,6 @@
 import {range} from 'lodash-es';
 import {defineOption} from '../../lib/api.mjs';
+import {EMPTY_ARR} from '../../lib/util.mjs';
 import type {EquipmentSetOption} from '../../public_api';
 import {makeComponent} from '../../ui/common.mjs';
 import {RenderValueDirect} from '../../ui/pages/dashboard/render-node-option-value/render-node-option-value.mjs';
@@ -39,4 +40,9 @@ defineOption<number, EquipmentSetOption>({
   },
   renderView: ({value}) => RenderValueDirect(value == null ? '' : (value + 1).toLocaleString()),
   token: 'EquipmentSet',
+  validate: (value: number | undefined): string[] => (
+    value != null && value >= game.combat.player.numEquipSets
+      ? [`Out of bounds! Max value: ${game.combat.player.numEquipSets}`]
+      : EMPTY_ARR
+  ),
 });

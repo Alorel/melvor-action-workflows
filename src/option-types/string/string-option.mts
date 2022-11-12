@@ -1,5 +1,6 @@
 import {isPlainObject} from 'lodash-es';
 import {defineOption} from '../../lib/api.mjs';
+import {EMPTY_ARR} from '../../lib/util.mjs';
 import type {StringNodeOption} from '../../public_api';
 import {makeComponent} from '../../ui/common.mjs';
 import ClearBtn from '../../ui/components/clear-btn/clear-btn.mjs';
@@ -35,4 +36,9 @@ defineOption<string, StringNodeOption>({
     )
   ),
   token: String,
+  validate: (value: string | undefined, {enum: dEnum}: StringNodeOption): string[] => (
+    value != null && dEnum && !(value in dEnum)
+      ? [`Value should be one of the following: "${Object.values(dEnum).join('", "')}"`]
+      : EMPTY_ARR
+  ),
 });
