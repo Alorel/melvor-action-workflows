@@ -18,7 +18,7 @@ include ../../../common
     .font-size-sm.font-w600 Actions
 
     .row.row-deck
-      .col-12.col-xl-auto(v-for="(action, idx) in step.actions", :key="actionOptKey(action)", v-scope="renderAction(action, step.actions.length > 1)")
+      .col-12.col-xl-auto(v-for="(action, idx) in step.actions", :key="actionOptKey(action, step.actions.length, idx)", v-scope="renderAction(action, step.actions.length, idx)")
 
     .text-right
       .btn-group.btn-group-sm

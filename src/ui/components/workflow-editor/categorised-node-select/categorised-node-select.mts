@@ -1,5 +1,6 @@
 import type {NamespaceRegistry} from 'melvor';
 import type {NamespacedDefinition} from '../../../../lib/namespaced-definition.mjs';
+import {EMPTY_ARR} from '../../../../lib/util.mjs';
 import type {CategorisedObject} from '../../../../lib/util/categorise-registry-objects.mjs';
 import {errorLog} from '../../../../lib/util/log.mjs';
 import type {Referenceable} from '../../../../public_api';
@@ -7,10 +8,20 @@ import {makeComponent} from '../../../common.mjs';
 import ClearBtn from '../../clear-btn/clear-btn.mjs';
 import tplId from './categorised-node-select.pug';
 
-interface Props<T extends NamespacedDefinition<Referenceable>> {
-  clearable?: boolean;
+export interface CategorisedNodeSelectBtn {
+  css: `btn-outline-${string}`;
 
-  deletable?: boolean;
+  key: string;
+
+  text: string;
+
+  onClick(evt: Event): void;
+}
+
+interface Props<T extends NamespacedDefinition<Referenceable>> {
+  buttons?: CategorisedNodeSelectBtn[];
+
+  clearable?: boolean;
 
   value: T | undefined;
 
@@ -18,14 +29,13 @@ interface Props<T extends NamespacedDefinition<Referenceable>> {
 
   onChange(value?: T): void;
 
-  onDelete?(): void;
-
   registry(): NamespaceRegistry<T>;
 }
 
+export {Props as CategorisedNodeSelectProps};
+
 type Def = NamespacedDefinition<Referenceable>;
 type This<T extends Def> = ReturnType<typeof CategorisedNodeSelect<T>>;
-
 
 function clear<T extends Def>(this: This<T>): void {
   if (this.clearable && this.value) {
@@ -35,20 +45,19 @@ function clear<T extends Def>(this: This<T>): void {
 }
 
 export default function CategorisedNodeSelect<T extends Def>({
-  clearable,
-  deletable,
+  buttons = EMPTY_ARR,
+  clearable = false,
   onChange,
-  onDelete,
   registry,
   value,
   values,
 }: Props<T>
 ) {
   return makeComponent(`#${tplId}`, {
+    buttons,
     clear,
-    clearable: Boolean(clearable),
+    clearable,
     ClearBtn,
-    deletable: Boolean(deletable),
     get id() {
       return this.value?.id;
     },
@@ -71,7 +80,6 @@ export default function CategorisedNodeSelect<T extends Def>({
       }
     },
     onChange,
-    onDelete,
     registry,
     value,
     values,

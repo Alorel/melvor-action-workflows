@@ -2,15 +2,12 @@ import type {ActionNodeDefinitionImpl} from '../../../../lib/registries/action-r
 import {ACTION_REGISTRY} from '../../../../lib/registries/action-registry.mjs';
 import categoriseRegistryObjects from '../../../../lib/util/categorise-registry-objects.mjs';
 import LazyValue from '../../../../lib/util/lazy-value.mjs';
+import type {CategorisedNodeSelectProps} from './categorised-node-select.mjs';
 import CategorisedNodeSelect from './categorised-node-select.mjs';
 
 export const allActions = new LazyValue(() => categoriseRegistryObjects(ACTION_REGISTRY));
 
-interface Props {
-  deletable?: boolean;
-
-  onDelete?(): void;
-
+interface Props extends Pick<CategorisedNodeSelectProps<ActionNodeDefinitionImpl<any>>, 'buttons'> {
   value: ActionNodeDefinitionImpl<any>;
 
   onChange(value: ActionNodeDefinitionImpl<any>): void;
