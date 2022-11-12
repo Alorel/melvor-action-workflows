@@ -17,7 +17,7 @@ include ../../common
   div(
     v-for="(step, idx) in workflow.steps",
     :key="keyFn(step, idx)",
-    v-scope="renderNewStep(step, idx === lastStepIdx)",
+    v-scope="renderNewStep(step, idx === workflow.lastStepIdx, workflow.canRemoveSteps)",
     class=SECTION_CLASS
   )
 

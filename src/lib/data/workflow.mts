@@ -37,6 +37,14 @@ export class Workflow {
     this.steps = steps?.length ? steps : [new WorkflowStep()];
   }
 
+  public get canRemoveSteps(): boolean {
+    return this.steps.length > 1;
+  }
+
+  public get lastStepIdx(): number {
+    return this.steps.length - 1;
+  }
+
   public addStep(): void {
     this.steps.push(new WorkflowStep());
   }
@@ -47,11 +55,14 @@ export class Workflow {
   }
 
   public rmStep(step: WorkflowStep): void {
-    const idx = this.steps.indexOf(step);
-    if (idx < 1) {
+    if (!this.canRemoveSteps) {
       return;
     }
-    this.steps.splice(idx, 1);
+
+    const idx = this.steps.indexOf(step);
+    if (idx !== -1) {
+      this.steps.splice(idx, 1);
+    }
   }
 }
 

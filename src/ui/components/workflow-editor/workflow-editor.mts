@@ -8,12 +8,13 @@ import tplId from './workflow-editor.pug';
 type This = ReturnType<typeof WorkflowEditor>;
 
 function keyFn(this: This, step: WorkflowStep, idx: number) {
-  return `${step.listId}|${idx === this.lastStepIdx ? 1 : 0}`;
+  return `${step.listId}|${idx === this.workflow.lastStepIdx ? 1 : 0}|${this.workflow.canRemoveSteps ? 1 : 0}`;
 }
 
-function renderNewStep(this: This, step: WorkflowStep, showAdd: boolean) {
+function renderNewStep(this: This, step: WorkflowStep, showAdd: boolean, showRemove: boolean) {
   return NewStepComponent({
     showAdd,
+    showRemove,
     step,
     workflow: this.workflow,
   });
@@ -36,9 +37,6 @@ export default function WorkflowEditor({cancellable = false, workflow, onSave, o
   return makeComponent(`#${tplId}`, {
     cancellable,
     keyFn,
-    get lastStepIdx(): number {
-      return this.workflow.steps.length - 1;
-    },
     onCancel,
     onSave,
     renderNewStep,

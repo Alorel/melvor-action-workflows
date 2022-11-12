@@ -24,4 +24,4 @@ include ../../../common
       .btn-group.btn-group-sm
         +btn('success')(@click="step.addAction") Add Action
         +btn('success')(v-if="showAdd", @click="workflow.addStep") Add step
-        +btn('danger')(v-if="workflow.steps.length > 1", @click="workflow.rmStep(step)") Remove Step
+        +btn('danger')(v-if="showRemove", @click="workflow.rmStep(step)") Remove Step
