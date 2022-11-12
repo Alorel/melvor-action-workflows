@@ -56,7 +56,7 @@ export default abstract class SkillAction<T extends object, S extends GatheringS
     }
 
     const shopReq = recipe.shopItemPurchased;
-    if (shopReq && !game.shop.upgradesPurchased.get(shopReq)) {
+    if (shopReq && !game.shop.getPurchaseCount(shopReq)) {
       throw new Error(`Requirement not met: ${shopReq.name}`);
     }
 

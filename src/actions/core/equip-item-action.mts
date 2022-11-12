@@ -1,5 +1,5 @@
 import type {EquipItemArgSlot, EquipmentItem as TEquipmentItem} from 'melvor';
-import {EquipSlotType} from 'melvor';
+import {EquipmentItem, EquipSlotType} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 
@@ -10,9 +10,48 @@ interface Props {
 }
 
 function *summoningSlots(): IterableIterator<EquipSlotType> {
+  {
+    const {Summon1, Summon2} = game.combat.player.equipment.slots;
+    const emptyId = game.emptyEquipmentItem.id;
+
+    if (Summon1.item.id !== emptyId && Summon2.item.id === emptyId) {
+      yield EquipSlotType.Summon2;
+    }
+  }
+
   yield EquipSlotType.Summon1;
   while (true) {
     yield EquipSlotType.Summon2;
+  }
+}
+
+function equipPassive(item: EquipmentItem | undefined): void {
+  const player = game.combat.player;
+  if (!item?.validSlots?.includes(EquipSlotType.Passive) || !player.isEquipmentSlotUnlocked(EquipSlotType.Passive)) {
+    return;
+  }
+
+  const qty = game.bank.getQty(item);
+  if (qty) {
+    player.equipItem(item, player.equipToSet, EquipSlotType.Passive, qty);
+  }
+}
+
+function equipNonPassive(items: EquipmentItem[]): void {
+  const player = game.combat.player;
+  const summonSlot = summoningSlots();
+
+  for (const item of items) {
+    const qty = game.bank.getQty(item);
+    if (!qty) {
+      continue;
+    }
+
+    const slot: EquipItemArgSlot = item.validSlots.includes(EquipSlotType.Summon1)
+      ? summonSlot.next().value
+      : 'Default';
+
+    player.equipItem(item, player.equipToSet, slot, qty);
   }
 }
 
@@ -24,29 +63,9 @@ defineLocalAction<Props>({
     player.changeEquipToSet(player.selectedEquipmentSet);
 
     if (passive) {
-      const item = items[0];
-      if (item?.validSlots?.includes(EquipSlotType.Passive) && player.isEquipmentSlotUnlocked(EquipSlotType.Passive)) {
-        const qty = game.bank.getQty(item);
-        if (qty) {
-          player.equipItem(item, player.equipToSet, EquipSlotType.Passive, qty);
-        }
-      }
-
-      return;
-    }
-
-    const baseSlot: EquipItemArgSlot = 'Default';
-    const summonSlot = summoningSlots();
-
-    for (const item of items) {
-      const qty = game.bank.getQty(item);
-      if (qty) {
-        const slot = item.validSlots.includes(EquipSlotType.Summon1)
-          ? summonSlot.next().value as EquipSlotType
-          : baseSlot;
-
-        player.equipItem(item, player.equipToSet, slot, qty);
-      }
+      equipPassive(items[0]);
+    } else {
+      equipNonPassive(items);
     }
   },
   initOptions: () => ({items: [undefined as any]}),
@@ -72,7 +91,7 @@ defineLocalAction<Props>({
         items?.length === 1 && Boolean(items[0]?.validSlots?.includes(EquipSlotType.Passive))
       ),
       type: Boolean,
-      uiKey: ({items}: Props) => items[0]?.id ?? '',
+      uiKey: ({items}: Props) => items[0].id,
     },
   ],
 });

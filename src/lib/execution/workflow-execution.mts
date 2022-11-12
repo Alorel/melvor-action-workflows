@@ -2,6 +2,7 @@ import {nextComplete, wasLogged} from '@aloreljs/rxutils';
 import type {Observer, Subscriber, Subscription, TeardownLogic} from 'rxjs';
 import {
   asapScheduler,
+  asyncScheduler,
   catchError,
   concat,
   defer,
@@ -11,6 +12,7 @@ import {
   map,
   Observable,
   of,
+  scheduled,
   startWith,
   throwError
 } from 'rxjs';
@@ -110,7 +112,7 @@ export class WorkflowExecution extends Observable<Out> {
       }
 
       return from(result).pipe(
-        last(),
+        last(null, null),
         map(() => {
           debugLog('Executed action', actionIdx, 'in workflow', this.workflow.name, 'step', stepIdx);
 
@@ -152,9 +154,10 @@ export class WorkflowExecution extends Observable<Out> {
       workflow: this.workflow,
     };
 
-    const exec$: Observable<Out> = step.trigger.trigger.listen(step.trigger.opts)
+    const trigger$ = step.trigger.trigger.listen(step.trigger.opts).pipe(take(1));
+
+    const exec$: Observable<Out> = scheduled(trigger$, asyncScheduler)
       .pipe(
-        take(1),
         switchMap(() => this.executeActions(step, idx)),
         catchError((e: Error) => {
           if (!wasLogged(e)) {
