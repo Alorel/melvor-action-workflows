@@ -20,6 +20,8 @@ defineAction(
       skillKey: 'astrology',
     })
     .exec(function startAstroExec({recipe}) {
-      this.skill.studyConstellationOnClick(recipe);
+      if (!this.skill.isActive || this.skill.activeConstellation?.id !== recipe.id) {
+        this.skill.studyConstellationOnClick(recipe);
+      }
     })
 );

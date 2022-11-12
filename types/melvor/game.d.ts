@@ -114,6 +114,8 @@ export class AstrologyRecipe extends BasicSkillRecipe {
 }
 
 export class Astrology extends GatheringSkill<AstrologyRecipe> {
+  activeConstellation?: AstrologyRecipe;
+
   public studyConstellationOnClick(constellation: AstrologyRecipe): void;
 }
 
@@ -132,6 +134,10 @@ export class ThievingArea extends NamespacedObject {
 
 export class Thieving extends GatheringSkill<ThievingNPC> {
   public areas: NamespaceRegistry<ThievingArea>;
+
+  public currentArea?: ThievingArea;
+
+  public currentNPC?: ThievingNPC;
 
   public startThieving(area: ThievingArea, npc: ThievingNPC): void;
 }
@@ -191,6 +197,8 @@ export class Fishing extends GatheringSkill<Fish> {
 
   areas: NamespaceRegistry<FishingArea>;
 
+  get activeFish(): Fish | never;
+
   onAreaFishSelection(area: FishingArea, fish: Fish): void;
 
   onAreaStartButtonClick(area: FishingArea): void;
@@ -220,6 +228,10 @@ export class MiningRock extends SingleProductRecipe {
 }
 
 export class ArtisanSkill<T> extends GatheringSkill<T> {
+  selectedRecipe?: T;
+
+  get activeRecipe(): T | never;
+
   createButtonOnClick(): void;
 
   public selectAltRecipeOnClick(altCostIdx: number): void;
@@ -340,6 +352,8 @@ export class ArtisanSkillRecipe extends BasicSkillRecipe {
 }
 
 export class Mining extends GatheringSkill<MiningRock> {
+  selectedRock?: MiningRock;
+
   canMineOre(rock: MiningRock): boolean;
 
   onRockClick(rock: MiningRock): void;
@@ -393,6 +407,8 @@ export class FiremakingLog extends BasicSkillRecipe {
 }
 
 export class Firemaking extends CraftingSkill<FiremakingLog> {
+  selectedRecipe?: FiremakingLog;
+
   burnLog(): void;
 
   selectLog(log: FiremakingLog): void;
@@ -403,11 +419,17 @@ export class CookingRecipe extends BasicSkillRecipe {
 }
 
 export class Cooking extends CraftingSkill<CookingRecipe> {
+  activeCookingCategory?: CookingCategory;
+
+  get activeRecipe(): CookingRecipe | never;
+
   onActiveCookButtonClick(category: CookingCategory): void;
 
   onPassiveCookButtonClick(category: CookingCategory): void;
 
   onRecipeSelectionClick(recipe: CookingRecipe): void;
+
+  passiveCookingAction(cat: CookingCategory): void;
 }
 
 export class CookingCategory extends SkillCategory {
@@ -420,6 +442,7 @@ export class SkillCategory extends NamespacedObject {
 }
 
 export class CraftingSkill<R> extends GatheringSkill<R> {
+
 }
 
 export class BasicSkillRecipe extends NamespacedObject {

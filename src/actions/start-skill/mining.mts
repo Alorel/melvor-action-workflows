@@ -19,10 +19,9 @@ defineAction(
       ],
       skillKey: 'mining',
     })
-    .checkRecipe(function startMiningCheck(rock) {
-      this.skill.canMineOre(rock);
-    })
     .exec(function startMiningExec({recipe: rock}) {
-      this.skill.onRockClick(rock);
+      if (this.skill.canMineOre(rock) && (!this.skill.isActive || this.skill.selectedRock?.id !== rock.id)) {
+        this.skill.onRockClick(rock);
+      }
     })
 );
