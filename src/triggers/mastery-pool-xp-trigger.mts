@@ -18,7 +18,7 @@ const triggerCtx = defineLocalTrigger<Data>({
   },
   label: 'Mastery pool %',
   localID: 'masteryPool',
-  media: 'https://melvoridle.com/assets/media/main/mastery_pool.svg',
+  media: cdnMedia('assets/media/main/mastery_pool.svg'),
   options: [
     {
       label: 'Skill',

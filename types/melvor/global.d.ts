@@ -13,6 +13,8 @@ declare const sidebar: import('./index').SidebarContext;
 
 declare const Swal: (typeof import('sweetalert2'))['default'];
 
+declare function cdnMedia(media: string): string;
+
 declare const tippy: import('tippy.js').Tippy;
 
 declare const mod: {

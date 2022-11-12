@@ -80,6 +80,12 @@ export interface ItemCost {
   quantity: number;
 }
 
+export interface Requirement {
+  type: string;
+
+  [k: string]: any;
+}
+
 export interface FletchingAlternativeCosts {
   itemCosts: ItemCost[];
 
@@ -429,12 +435,28 @@ export class BasicSkillRecipe extends NamespacedObject {
 }
 
 export class ShopPurchase extends NamespacedObject {
+  public allowQuantityPurchase: boolean;
+
+  purchaseRequirements: Requirement[];
+
+  unlockRequirements: Requirement[];
+
+  getBuyLimit(mode: Gamemode): number;
 }
 
 export class Shop extends NamespacedObject {
   buyQuantity: number;
 
+  purchases: NamespaceRegistry<ShopPurchase>;
+
   upgradesPurchased: Map<ShopPurchase, number>;
+
+  buyItemOnClick(purchase: ShopPurchase, confirmed?: boolean): void;
+
+  getPurchaseCount(purchase: ShopPurchase): number;
+}
+
+export class Gamemode extends NamespacedObject {
 }
 
 export class ItemRegistry extends NamespaceRegistry<Item> {
@@ -504,6 +526,10 @@ export class Game {
 
   crafting: Crafting;
 
+  readonly currentGamemode: Gamemode;
+
+  emptyEquipmentItem: EquipmentItem;
+
   firemaking: Firemaking;
 
   fishing: Fishing;
@@ -533,4 +559,6 @@ export class Game {
   thieving: Thieving;
 
   woodcutting: Woodcutting;
+
+  checkRequirement(req: Requirement): boolean;
 }

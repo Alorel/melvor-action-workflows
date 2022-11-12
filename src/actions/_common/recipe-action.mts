@@ -1,6 +1,6 @@
 import {nextComplete} from '@aloreljs/rxutils';
 import type {GatheringSkill} from 'melvor';
-import {asyncScheduler, map, noop, Observable, scheduled} from 'rxjs';
+import {noop, Observable} from 'rxjs';
 import type {Obj} from '../../public_api';
 import type {SkillActionInit} from './skill-action.mjs';
 import SkillAction from './skill-action.mjs';
@@ -77,13 +77,10 @@ export class RecipeAction<T extends object, S extends Gathering, R>
 
   /** @inheritDoc */
   public execute(data: T): Observable<void> {
-    const src$ = new Observable<R>(s => nextComplete(s, this.prepareExec(data)));
-
-    return scheduled(src$, asyncScheduler).pipe(
-      map(prepData => {
-        this.exec(data, prepData);
-      })
-    );
+    return new Observable<void>(s => {
+      this.exec(data, this.prepareExec(data));
+      nextComplete(s);
+    });
   }
 }
 

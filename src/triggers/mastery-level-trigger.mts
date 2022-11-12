@@ -20,7 +20,7 @@ const triggerCtx = defineLocalTrigger<Data<any>>({
   },
   label: 'Mastery level',
   localID: 'masteryLvl',
-  media: 'https://melvoridle.com/assets/media/main/mastery_header.svg',
+  media: cdnMedia('assets/media/main/mastery_header.svg'),
   options: [
     {
       label: 'Skill',
