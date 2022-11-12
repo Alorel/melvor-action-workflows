@@ -14,7 +14,8 @@ mixin bordered-block(kind, size)
     block
 
 mixin btn(kind, size)
-  - const CLASS = ['btn', `btn-outline-${kind}`];
+  - const CLASS = ['btn'];
+  - if (kind) CLASS.push(`btn-outline-${kind}`);
   - if (size) CLASS.push(`btn-${size}`);
   button(type='button', class=CLASS)&attributes(attributes)
     block

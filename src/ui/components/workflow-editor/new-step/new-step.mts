@@ -64,11 +64,25 @@ function removeAction(this: This, action: ActionConfigItem): void {
   }
 }
 
-function renderAction(this: This, action: ActionConfigItem) {
+function renderAction(this: This, action: ActionConfigItem, numActions: number, idx: number) {
+  const removable = numActions !== 1;
+  const idxMoves: Array<1 | -1> = [];
+
+  if (removable) {
+    if (idx !== 0) {
+      idxMoves.push(-1);
+    }
+    if (idx !== numActions - 1) {
+      idxMoves.push(1);
+    }
+  }
+
   return ActionConfig({
     action,
-    removable: this.step.actions.length !== 1,
+    idxMoves,
+    removable,
     remove: this.removeAction,
+    shiftIdx: this.shiftIdx,
   });
 }
 
@@ -82,10 +96,33 @@ interface Props {
   workflow: Workflow;
 }
 
-function actionOptKey(this: This, action: ActionConfigItem): string {
-  const rm = this.step.actions.length === 1 ? 0 : 1;
+function shiftIdx(this: This, action: ActionConfigItem, shift: 1 | -1): void {
+  const idx = this.step.actions.findIndex(a => a.listId === action.listId);
+  if (idx === -1) {
+    return;
+  }
 
-  return `${action.listId}:${rm}`;
+  if (shift === 1) {
+    if (idx === this.step.actions.length - 1) {
+      return;
+    }
+
+    const next = this.step.actions[idx + 1];
+    this.step.actions[idx + 1] = action;
+    this.step.actions[idx] = next;
+  } else {
+    if (idx === 0) {
+      return;
+    }
+
+    const prev = this.step.actions[idx - 1];
+    this.step.actions[idx - 1] = action;
+    this.step.actions[idx] = prev;
+  }
+}
+
+function actionOptKey(this: This, action: ActionConfigItem, numActions: number, idx: number): string {
+  return `${action.listId}:${idx}:${numActions}`;
 }
 
 export default function NewStepComponent({step, workflow, showAdd, showRemove}: Props) {
@@ -97,6 +134,7 @@ export default function NewStepComponent({step, workflow, showAdd, showRemove}: 
     removeAction,
     renderAction,
     renderNodeOption,
+    shiftIdx,
     shouldShow,
     showAdd,
     showRemove,

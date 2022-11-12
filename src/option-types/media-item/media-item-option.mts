@@ -98,6 +98,8 @@ export function RenderMediaItemOptionOneBase<T>( // eslint-disable-line @typescr
   let filterText = '';
 
   return makeComponent(`#${tplIdOne}`, {
+    focusBtn: false,
+    focusInput: false,
     ...init,
     get filterText() {
       return filterText;
@@ -110,8 +112,6 @@ export function RenderMediaItemOptionOneBase<T>( // eslint-disable-line @typescr
         ? []
         : filterFn(trimmed.toLowerCase());
     },
-    focusBtn: false,
-    focusInput: false,
     onBtnInit,
     onInputInit,
     onItemInit,
@@ -122,7 +122,7 @@ export function RenderMediaItemOptionOneBase<T>( // eslint-disable-line @typescr
   });
 }
 
-function RenderEditOne<T extends Item>(init: OptionRenderEditCtx<T, MediaItemNodeOption>) {
+function RenderEditOne<T extends Item>(init: OptionRenderEditCtx<T, MediaItemNodeOption> & {focusInput?: boolean;}) {
   const reg = get(
     game,
     typeof init.option.registry === 'function'
@@ -192,6 +192,7 @@ function multiRmAt<T extends Item>(this: ThisMulti<T>, idx: number): void {
 
 function renderSingleInsideMulti<T extends Item>(this: ThisMulti<T>, idx: number, value: T) {
   return RenderEditOne({
+    focusInput: idx !== 0,
     initialValue: value,
     onChange: v => {
       this.value[idx] = v!;
