@@ -14,7 +14,7 @@ defineLocalAction<Props>({
     game.shop.buyItemOnClick(item, true);
   },
   label: 'Buy item',
-  localID: 'sellItem',
+  localID: 'BuyItem',
   media: cdnMedia('assets/media/main/coins.svg'),
   options: [
     {

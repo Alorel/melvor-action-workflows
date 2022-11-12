@@ -19,9 +19,15 @@ export interface AltRecipeData<S extends Gathering> extends SingleRecipeData<S> 
 export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gathering, R>
   extends RecipeAction<T, S, R> {
 
-  public static artisanExec(this: BarebonesThis, {recipe}: Pick<SingleRecipeData<BarebonesSkill>, 'recipe'>): void {
-    this.skill.selectRecipeOnClick(recipe);
-    this.skill.createButtonOnClick();
+  public static artisanExec(this: BarebonesThis, {recipe}: Pick<SingleRecipeData<BarebonesSkill>, 'recipe'>): boolean {
+    if (!this.skill.isActive || this.skill.selectedRecipe?.id !== recipe.id) {
+      this.skill.selectRecipeOnClick(recipe);
+      this.skill.createButtonOnClick();
+
+      return true;
+    }
+
+    return false;
   }
 
   public static altArtisanExec(this: BarebonesThis, data: Pick<AltRecipeData<BarebonesSkill>, 'alt' | 'recipe'>): void {
@@ -29,7 +35,9 @@ export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gatheri
       this.skill.selectAltRecipeOnClick(data.alt);
     }
 
-    SingleRecipeAction.artisanExec.call(this, data);
+    if (!SingleRecipeAction.artisanExec.call(this, data) && data.alt != null) {
+      this.skill.createButtonOnClick();
+    }
   }
 
   public static new<S extends Gathering>(

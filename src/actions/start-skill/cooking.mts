@@ -1,12 +1,11 @@
 import type {Cooking, CookingRecipe} from 'melvor';
 import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import {warnLog} from '../../lib/util/log.mjs';
 import type {SingleRecipeData} from '../_common/single-recipe-action.mjs';
 import {SingleRecipeAction} from '../_common/single-recipe-action.mjs';
 
 interface Data extends SingleRecipeData<Cooking> {
-  passive?: this['recipe'];
+  passives: Array<this['recipe']>;
 }
 
 defineAction(
@@ -24,8 +23,11 @@ defineAction(
         },
         {
           label: 'Passive',
-          localID: 'passive',
+          localID: 'passives',
           mediaFilter: (passive: CookingRecipe, {recipe: active}: Data) => passive.category.id !== active.category.id,
+          multi: {
+            maxLength: 2,
+          },
           registry: ['cooking', 'actions'],
           type: 'MediaItem',
           uiKey: ({recipe}: Data) => recipe?.id ?? '',
@@ -33,31 +35,20 @@ defineAction(
       ],
       skillKey: 'cooking',
     })
-    .prep(function startCookingPrep(opts): Data {
-      if (opts.passive) {
-        if (opts.passive === opts.recipe) {
-          warnLog('Passive cook recipe is same as active cook:', opts.passive);
+    .exec(function startCookingExec({passives, recipe}) {
+      const skill = this.skill;
 
-          const out = {...opts};
-          out.passive = undefined;
-
-          return out;
-        }
-
-        this.checkRecipe(opts.passive);
+      if (!skill.isActive || !skill.activeCookingCategory || skill.activeRecipe.id !== recipe.id) {
+        skill.onRecipeSelectionClick(recipe);
+        skill.onActiveCookButtonClick(recipe.category);
       }
 
-      return opts;
-    })
-    .exec(function startCookingExec(_, {passive, recipe}) {
-      clickRecipe(this.skill, recipe, 'Active');
-      if (passive) {
-        clickRecipe(this.skill, passive, 'Passive');
+      if (passives?.length) {
+        for (const p of passives) {
+          skill.onRecipeSelectionClick(p);
+          skill.passiveCookingAction(p.category);
+        }
       }
     })
 );
 
-function clickRecipe(ctx: Cooking, recipe: CookingRecipe, type: 'Active' | 'Passive'): void {
-  ctx.onRecipeSelectionClick(recipe);
-  ctx[`on${type}CookButtonClick`](recipe.category);
-}

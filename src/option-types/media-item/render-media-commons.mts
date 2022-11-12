@@ -4,7 +4,7 @@ import type {MediaItemNodeOption, MediaItemNodeOptionMultiConfig, MediaSelectabl
 
 export const enum MediaItemNumbers {
   MIN_SEARCH_LENGTH = 2,
-  MAX_SEARCH_RESULTS = 10,
+  MAX_SEARCH_RESULTS = 20,
 }
 
 export function resolveMediaItemRegistry<T extends MediaSelectable>(
