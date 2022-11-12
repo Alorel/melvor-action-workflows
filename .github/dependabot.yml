@@ -19,7 +19,5 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     open-pull-requests-limit: 20
-    registries:
-      - *
     schedule:
       interval: "weekly"
