@@ -1,5 +1,5 @@
 import type {EquipItemArgSlot, EquipmentItem as TEquipmentItem} from 'melvor';
-import {EquipmentItem, EquipSlotType} from 'melvor';
+import {EquipSlotType} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 
@@ -25,7 +25,7 @@ function *summoningSlots(): IterableIterator<EquipSlotType> {
   }
 }
 
-function equipPassive(item: EquipmentItem | undefined): void {
+function equipPassive(item: TEquipmentItem | undefined): void {
   const player = game.combat.player;
   if (!item?.validSlots?.includes(EquipSlotType.Passive) || !player.isEquipmentSlotUnlocked(EquipSlotType.Passive)) {
     return;
@@ -37,7 +37,7 @@ function equipPassive(item: EquipmentItem | undefined): void {
   }
 }
 
-function equipNonPassive(items: EquipmentItem[]): void {
+function equipNonPassive(items: TEquipmentItem[]): void {
   const player = game.combat.player;
   const summonSlot = summoningSlots();
 

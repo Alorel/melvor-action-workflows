@@ -1,6 +1,6 @@
 import {get} from 'lodash-es';
 import type {NamespaceRegistry} from 'melvor';
-import {MediaItemOption} from '../../../option-types/media-item/media-item-option.mjs';
+import isMediaItemOption from '../../../option-types/media-item/media-item-option.mjs';
 import type {NodeOption, Obj} from '../../../public_api';
 import {errorLog} from '../log.mjs';
 
@@ -14,7 +14,7 @@ export function formatOptionDefinitions(
   }
 
   for (const opt of optDefinitions) {
-    if (!MediaItemOption.is(opt)) {
+    if (!isMediaItemOption(opt)) {
       continue;
     }
 

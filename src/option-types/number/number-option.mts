@@ -1,4 +1,5 @@
 import {defineOption} from '../../lib/api.mjs';
+import {EMPTY_ARR} from '../../lib/util.mjs';
 import {isUndefinedOr} from '../../lib/util/is-undefined-or.mjs';
 import type {NumberNodeOption} from '../../public_api';
 import {makeComponent} from '../../ui/common.mjs';
@@ -48,4 +49,20 @@ defineOption<number, NumberNodeOption>({
   },
   renderView: ({value}) => RenderValueDirect(value?.toLocaleString()),
   token: Number,
+  validate(value: number | undefined, {max, min}: NumberNodeOption): string[] {
+    if (value == null) {
+      return EMPTY_ARR;
+    }
+
+    const out: string[] = [];
+
+    if (min != null && value < min) {
+      out.push(`Min value: ${min.toLocaleString()}`);
+    }
+    if (max != null && value > max) {
+      out.push(`Max value: ${max.toLocaleString()}`);
+    }
+
+    return out.length ? out : EMPTY_ARR;
+  },
 });

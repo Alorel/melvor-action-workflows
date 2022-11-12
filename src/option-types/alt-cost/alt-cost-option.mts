@@ -1,7 +1,10 @@
 import type {BasicSkillRecipe, Item} from 'melvor';
 import {defineOption} from '../../lib/api.mjs';
-import type {AltRecipeCostNodeOption, OptionRenderViewCtx} from '../../public_api';
-import {findItems, MediaItemOption, RenderMediaItemOptionOneBase} from '../media-item/media-item-option.mjs';
+import {EMPTY_ARR} from '../../lib/util.mjs';
+import type {AltRecipeCostNodeOption, Obj, OptionRenderViewCtx} from '../../public_api';
+import {findItems} from '../media-item/render-media-commons.mjs';
+import {RenderMediaItemOptionOneBase} from '../media-item/render-media-edit.mjs';
+import RenderMediaSelectView from '../media-item/render-media-view.mjs';
 
 defineOption<number, AltRecipeCostNodeOption>({
   is: (v): v is AltRecipeCostNodeOption => (
@@ -70,7 +73,29 @@ defineOption<number, AltRecipeCostNodeOption>({
 
     const ctx: Partial<OptionRenderViewCtx<Item, any>> = {value: altCostItem};
 
-    return MediaItemOption.renderView(ctx as OptionRenderViewCtx<Item, any>);
+    return RenderMediaSelectView(ctx as OptionRenderViewCtx<Item, any>);
   },
   token: 'AltRecipeCost',
+  validate(
+    value: number | undefined,
+    {recipeOption, getAltCostItems}: AltRecipeCostNodeOption,
+    values: Obj<any>
+  ): string[] {
+    if (value == null) {
+      return EMPTY_ARR;
+    } else if (value < 0) {
+      return [`Invalid idx: ${value}`];
+    }
+
+    const mainRecipe = values[recipeOption];
+    if (mainRecipe == null) {
+      return EMPTY_ARR;
+    }
+
+    const options = getAltCostItems(mainRecipe);
+
+    return value < (options?.length ?? Number.NEGATIVE_INFINITY)
+      ? EMPTY_ARR
+      : [`Out of bounds. Max idx: ${options!.length}`];
+  },
 });
