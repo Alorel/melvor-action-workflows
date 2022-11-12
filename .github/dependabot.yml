@@ -5,6 +5,9 @@
 
 version: 2
 registries:
+  npm-npmjs:
+    type: npm-registry
+    url: https://registry.npmjs.org
   npm-github:
     type: npm-registry
     url: https://npm.pkg.github.com
@@ -12,12 +15,15 @@ registries:
     password: ${{ secrets.GITHUB_TOKEN }}
 
 updates:
-  - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "weekly"
   - package-ecosystem: "npm"
     directory: "/"
     open-pull-requests-limit: 20
+    schedule:
+      interval: "weekly"
+    registries:
+      - npm-npmjs
+      - npm-github
+  - package-ecosystem: "github-actions" # See documentation for possible values
+    directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
