@@ -24,7 +24,7 @@
     "@alorel/rollup-plugin-copy": "^1.0.2",
     "@alorel/rollup-plugin-threaded-terser": "^1.1.0",
     "@rollup/plugin-json": "^5.0.1",
-    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^4.0.0",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.11.9",
