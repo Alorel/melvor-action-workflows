@@ -54,10 +54,11 @@ function renderNodeOption(this: This, option: NodeOption) {
 }
 
 function removeAction(this: This, action: ActionConfigItem): void {
-  if (this.step.actions.length === -1) {
+  if (this.step.actions.length === 1) {
     return;
   }
-  const idx = this.step.actions.indexOf(action);
+
+  const idx = this.step.actions.findIndex(a => a.listId === action.listId);
   if (idx !== -1) {
     this.step.actions.splice(idx, 1);
   }
@@ -74,6 +75,8 @@ function renderAction(this: This, action: ActionConfigItem) {
 interface Props {
   showAdd: boolean;
 
+  showRemove: boolean;
+
   step: WorkflowStep;
 
   workflow: Workflow;
@@ -85,7 +88,7 @@ function actionOptKey(this: This, action: ActionConfigItem): string {
   return `${action.listId}:${rm}`;
 }
 
-export default function NewStepComponent({step, workflow, showAdd}: Props) {
+export default function NewStepComponent({step, workflow, showAdd, showRemove}: Props) {
   return makeComponent(`#${id}`, {
     actionOptKey,
     onOptionMount,
@@ -96,6 +99,7 @@ export default function NewStepComponent({step, workflow, showAdd}: Props) {
     renderNodeOption,
     shouldShow,
     showAdd,
+    showRemove,
     step,
     triggerOptions: step.trigger?.nodeOptions ?? EMPTY_ARR,
     TriggerSelect: renderTriggerSelect,
