@@ -9,5 +9,5 @@ mixin addBtn
       .btn-group(role='group')
         +btn('danger', 'sm')(type="button", v-if="idx !== 0", @click="rm(idx)") ×
         +addBtn()(v-if="canAddAfter(idx)")
-    div(v-scope="renderSingleInsideMulti(idx, item)")
+    div(v-scope="renderSingleInsideMulti(idx, item, validation)")
 +addBtn()(v-else='')

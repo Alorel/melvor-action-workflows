@@ -20,6 +20,17 @@ function renderNewStep(this: This, step: WorkflowStep, showAdd: boolean, showRem
   });
 }
 
+function onSave(this: This): void {
+  const wf = this.workflow;
+
+  // validate
+  if (wf.name.trim() && wf.steps.every(s => s.isValid)) {
+    this._onSave(this.workflow);
+  } else {
+    this.touched = true;
+  }
+}
+
 interface Props {
 
   /** @default false */
@@ -33,13 +44,15 @@ interface Props {
   onSave(workflow: Workflow): void;
 }
 
-export default function WorkflowEditor({cancellable = false, workflow, onSave, onCancel = noop}: Props) {
+export default function WorkflowEditor({cancellable = false, workflow, onSave: _onSave, onCancel = noop}: Props) {
   return makeComponent(`#${tplId}`, {
+    _onSave,
     cancellable,
     keyFn,
     onCancel,
     onSave,
     renderNewStep,
+    touched: false,
     workflow,
   });
 }

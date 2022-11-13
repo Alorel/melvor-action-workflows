@@ -9,11 +9,12 @@ defineOption<boolean, BooleanNodeOption>({
   is: (v): v is BooleanNodeOption => (
     v.type === Boolean
   ),
-  renderEdit({option: {label}, initialValue, onChange}) {
+  renderEdit({option: {label}, initialValue, onChange, validation}) {
     let val = Boolean(initialValue);
 
     return makeComponent(`#${idEdit}`, {
       label,
+      validation,
       get value(): boolean {
         return val;
       },

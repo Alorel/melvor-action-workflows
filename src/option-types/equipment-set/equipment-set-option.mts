@@ -10,13 +10,14 @@ defineOption<number, EquipmentSetOption>({
   is: (v): v is EquipmentSetOption => (
     v.type === 'EquipmentSet'
   ),
-  renderEdit({option, initialValue, onChange}) {
+  renderEdit({option, initialValue, onChange, validation}) {
     let val = initialValue ?? 0;
 
     return makeComponent(`#${id}`, {
       onChange,
       optRange: range(game.combat.player.numEquipSets),
       required: Boolean(option.required),
+      validation,
       get value(): number {
         return val;
       },

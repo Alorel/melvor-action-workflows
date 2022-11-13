@@ -1,13 +1,9 @@
+$colour-err: #e56767;
+
 .ActionWorkflowsCore- {
   &font-sized {
     width: 1rem;
     height: 1rem;
-  }
-
-  &mw- {
-    &50 {
-      max-width: 50%;
-    }
   }
 
   &d-tbl {
@@ -20,6 +16,26 @@
       > div {
         display: table-cell;
       }
+    }
+  }
+
+  &err-render {
+    display: none;
+  }
+
+  &touched {
+    .ActionWorkflowsCore-f-invalid {
+      .form-control {
+        border-color: $colour-err;
+      }
+
+      .ActionWorkflowsCore-form-control-text {
+        color: $colour-err;
+      }
+    }
+
+    .ActionWorkflowsCore-err-render {
+      display: block;
     }
   }
 }
