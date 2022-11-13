@@ -2,6 +2,7 @@ import {LazyGetter} from 'lazy-get-decorator';
 import type {Observable} from 'rxjs';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {Workflow} from '../data/workflow.mjs';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import {
   compressArray,
   instantiateCompressedToJsonArray
@@ -13,6 +14,7 @@ const enum Strings {
   CFG_KEY = 'workflows:v2',
 }
 
+@PersistClassName('WorkflowRegistry')
 export default class WorkflowRegistry {
 
   private readonly _added$ = new Subject<Workflow>();

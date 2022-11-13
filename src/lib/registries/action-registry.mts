@@ -1,4 +1,5 @@
 import type {ActionNodeDefinition} from '../../public_api';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {FromJSON} from '../decorators/to-json.mjs';
 import {Serialisable} from '../decorators/to-json.mjs';
 import {NamespacedDefinition} from '../namespaced-definition.mjs';
@@ -10,6 +11,7 @@ export const enum InternalCategory {
   COMBINATION = 'Combination',
 }
 
+@PersistClassName('ActionNodeDefinitionImpl')
 @Serialisable<ActionNodeDefinitionImpl<any>, string>({
   from: id => ACTION_REGISTRY.getObjectByID(id),
   override: true,

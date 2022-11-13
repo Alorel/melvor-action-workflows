@@ -1,4 +1,5 @@
 import AutoIncrement from '../decorators/auto-increment.mjs';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {CompressedJsonArray} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {FormatToJsonArrayCompressed} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
@@ -11,6 +12,7 @@ export interface WorkflowJson extends Pick<Workflow, 'name'> {
   steps: CompressedJsonArray<WorkflowStep>;
 }
 
+@PersistClassName('Workflow')
 @Serialisable<Workflow, Init | undefined>({
   from(init) {
     if (init?.steps?.length && init.name && init.steps.every(s => (s as any) instanceof WorkflowStep)) {

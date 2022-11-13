@@ -34,8 +34,6 @@ defineAction(
       return area;
     })
     .exec(function startThievingExec({recipe: npc}, area) {
-      if (!this.skill.isActive || this.skill.currentNPC?.id !== npc.id) {
-        this.skill.startThieving(area, npc);
-      }
+      this.skill.startThieving(area, npc);
     })
 );

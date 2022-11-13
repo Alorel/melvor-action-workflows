@@ -1,6 +1,7 @@
 import {nextComplete} from '@aloreljs/rxutils';
 import type {GatheringSkill} from 'melvor';
 import {noop, Observable} from 'rxjs';
+import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
 import type {Obj} from '../../public_api';
 import type {SkillActionInit} from './skill-action.mjs';
 import SkillAction from './skill-action.mjs';
@@ -37,6 +38,7 @@ export interface RecipeActionBuilder<T extends object, S extends Gathering, R = 
   prep<RR>(fn: (this: RecipeAction<T, S, RR> & Ctx, data: T) => RR): RecipeActionBuilder<T, S, RR, Ctx>;
 }
 
+@PersistClassName('RecipeAction')
 export class RecipeAction<T extends object, S extends Gathering, R>
   extends SkillAction<T, S>
   implements Reqd<T, S> {
@@ -78,7 +80,9 @@ export class RecipeAction<T extends object, S extends Gathering, R>
   /** @inheritDoc */
   public execute(data: T): Observable<void> {
     return new Observable<void>(s => {
-      this.exec(data, this.prepareExec(data));
+      const prep = this.prepareExec(data);
+      this.skill.stop();
+      this.exec(data, prep);
       nextComplete(s);
     });
   }

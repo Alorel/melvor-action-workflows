@@ -1,5 +1,6 @@
 import type {NodeOption, Obj} from '../../public_api';
 import AutoIncrement from '../decorators/auto-increment.mjs';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import {FormatDeepToJsonObject} from '../decorators/to-json-formatters/format-deep-to-json-object.mjs';
 import {JsonProp} from '../decorators/to-json.mjs';
 import {OPTION_REGISTRY} from '../registries/option-registry.mjs';
@@ -10,6 +11,7 @@ interface Init {
   opts?: Obj<any>;
 }
 
+@PersistClassName('OptsListItem')
 export default abstract class OptsListItem {
 
   @AutoIncrement()

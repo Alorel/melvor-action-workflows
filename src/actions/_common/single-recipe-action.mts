@@ -1,5 +1,6 @@
 import type {ArtisanSkill, GatheringSkill, SingleProductArtisanSkillRecipe} from 'melvor';
-import type {Observable} from 'rxjs';
+import {concat, Observable} from 'rxjs';
+import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
 import type {RecipeActionBuilder, RecipeOf} from './recipe-action.mjs';
 import {RecipeAction} from './recipe-action.mjs';
 import type {SkillActionInit} from './skill-action.mjs';
@@ -16,18 +17,13 @@ export interface AltRecipeData<S extends Gathering> extends SingleRecipeData<S> 
   alt?: number;
 }
 
+@PersistClassName('SingleRecipeAction')
 export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gathering, R>
   extends RecipeAction<T, S, R> {
 
-  public static artisanExec(this: BarebonesThis, {recipe}: Pick<SingleRecipeData<BarebonesSkill>, 'recipe'>): boolean {
-    if (!this.skill.isActive || this.skill.selectedRecipe?.id !== recipe.id) {
-      this.skill.selectRecipeOnClick(recipe);
-      this.skill.createButtonOnClick();
-
-      return true;
-    }
-
-    return false;
+  public static artisanExec(this: BarebonesThis, {recipe}: Pick<SingleRecipeData<BarebonesSkill>, 'recipe'>): void {
+    this.skill.selectRecipeOnClick(recipe);
+    this.skill.createButtonOnClick();
   }
 
   public static altArtisanExec(this: BarebonesThis, data: Pick<AltRecipeData<BarebonesSkill>, 'alt' | 'recipe'>): void {
@@ -35,9 +31,7 @@ export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gatheri
       this.skill.selectAltRecipeOnClick(data.alt);
     }
 
-    if (!SingleRecipeAction.artisanExec.call(this, data) && data.alt != null) {
-      this.skill.createButtonOnClick();
-    }
+    SingleRecipeAction.artisanExec.call(this, data);
   }
 
   public static new<S extends Gathering>(
@@ -56,7 +50,11 @@ export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gatheri
 
   /** @inheritDoc */
   public execute(data: T): Observable<void> {
-    this.checkRecipe(data.recipe);
-    return super.execute(data);
+    const check$ = new Observable<void>(subscriber => {
+      this.checkRecipe(data.recipe);
+      subscriber.complete();
+    });
+
+    return concat(check$, super.execute(data));
   }
 }

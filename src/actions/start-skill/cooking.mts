@@ -38,10 +38,8 @@ defineAction(
     .exec(function startCookingExec({passives, recipe}) {
       const skill = this.skill;
 
-      if (!skill.isActive || !skill.activeCookingCategory || skill.activeRecipe.id !== recipe.id) {
-        skill.onRecipeSelectionClick(recipe);
-        skill.onActiveCookButtonClick(recipe.category);
-      }
+      skill.onRecipeSelectionClick(recipe);
+      skill.onActiveCookButtonClick(recipe.category);
 
       if (passives?.length) {
         for (const p of passives) {
