@@ -4,7 +4,7 @@ import type {MediaItemNodeOption, MediaItemNodeOptionMultiConfig, MediaSelectabl
 
 export const enum MediaItemNumbers {
   MIN_SEARCH_LENGTH = 2,
-  MAX_SEARCH_RESULTS = 20,
+  MAX_SEARCH_RESULTS = 50,
 }
 
 export function resolveMediaItemRegistry<T extends MediaSelectable>(
@@ -31,7 +31,7 @@ export function *findItems<T extends MediaSelectable, V extends object>(
 ): Iterable<T> {
   let emitCounter = 0;
   for (const item of source) {
-    if (!filter(item, optionValues) || !item.name.toLowerCase().includes(query)) {
+    if (!item.name.toLowerCase().includes(query) || !filter(item, optionValues)) {
       continue;
     }
 

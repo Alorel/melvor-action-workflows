@@ -1,7 +1,9 @@
 import {Memoise} from '@aloreljs/memoise-decorator';
 import {identity} from 'rxjs';
 import type {NodeOption, Obj} from '../../public_api';
-import {allTriggerSelectGroups} from '../../ui/components/workflow-editor/categorised-node-select/trigger-select.mjs';
+import {
+  allTriggerSelectGroups
+} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
 import {JsonProp, Serialisable} from '../decorators/to-json.mjs';

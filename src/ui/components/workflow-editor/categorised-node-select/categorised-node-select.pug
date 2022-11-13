@@ -1,8 +1,0 @@
-include ../../../common
-
-.input-group
-  +btn(null, 'sm')(v-for="btn in buttons", :key="btn.key", @click="btn.onClick", :class="btn.css") {{btn.text}}
-  +btn('default', 'sm')(v-if="clearable", @click="clear", v-scope="ClearBtn()")
-  select.form-control.form-control-sm(v-model="id")
-    optgroup(v-for="group in values", :key="group.category", :label="group.category")
-      option(v-for="item in group.items", :key="item.id", :value="item.id") {{item.def.label}}

@@ -43,6 +43,12 @@ export class Workflow {
     return this.steps.length > 1;
   }
 
+  public get isValid(): boolean {
+    return this.name.trim().length !== 0
+      && this.steps.length !== 0
+      && this.steps.every(s => s.isValid);
+  }
+
   public get lastStepIdx(): number {
     return this.steps.length - 1;
   }
@@ -56,13 +62,8 @@ export class Workflow {
     this.steps = [new WorkflowStep()];
   }
 
-  public rmStep(step: WorkflowStep): void {
-    if (!this.canRemoveSteps) {
-      return;
-    }
-
-    const idx = this.steps.indexOf(step);
-    if (idx !== -1) {
+  public rmStep(idx: number): void {
+    if (this.canRemoveSteps) {
       this.steps.splice(idx, 1);
     }
   }

@@ -13,7 +13,7 @@ function validateBase(
     if (!value.length) {
       return ['At least one selection required'];
     }
-  } else if (value == null) {
+  } else if (value == null || (typeof value === 'string' && !value.trim())) {
     return ['Required'];
   }
 }

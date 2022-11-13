@@ -1,12 +1,14 @@
 import {nextComplete, wasLogged} from '@aloreljs/rxutils';
-import type {Observer, Subscriber, Subscription, TeardownLogic} from 'rxjs';
+import type {MonoTypeOperatorFunction, Observer, Subscription, TeardownLogic} from 'rxjs';
 import {
   asapScheduler,
   asyncScheduler,
+  BehaviorSubject,
   catchError,
   concat,
   defer,
   EMPTY,
+  filter,
   from,
   last,
   map,
@@ -14,6 +16,7 @@ import {
   of,
   scheduled,
   startWith,
+  takeUntil,
   throwError
 } from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
@@ -22,6 +25,7 @@ import type {Workflow} from '../data/workflow.mjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import {debugLog, errorLog} from '../util/log.mjs';
+import ShareReplayLike from '../util/share-replay-like-observable.mjs';
 import type {
   ActionExecutionEvent,
   StepCompleteEvent,
@@ -34,65 +38,76 @@ import {WorkflowEventType} from './workflow-event.mjs';
 type Out = WorkflowEvent;
 
 @PersistClassName('WorkflowTrigger')
-export class WorkflowExecution extends Observable<Out> {
+export class WorkflowExecution extends ShareReplayLike<Out> {
   @AutoIncrement()
   public readonly id!: number;
 
-  private _activeStepIdx = 0;
+  private readonly _activeStepIdx$ = new BehaviorSubject<number>(0);
 
-  private _events: Out[] = this.baseEvents;
+  private mainSub?: Subscription;
 
-  private _mainSub?: Subscription;
-
-  private readonly _subscribers = new Set<Subscriber<Out>>();
-
-  private readonly _mainSubObserver: Observer<Out> = {
+  private readonly mainSubObserver: Observer<Out> = {
     complete: () => {
-      ++this._activeStepIdx;
-      this._mainSub = asapScheduler.schedule(this.tick);
+      ++this.activeStepIdx;
+      this.mainSub = asapScheduler.schedule(this.tick);
     },
     error: (e: Error) => {
       const evt = this.mkCompleteEvent(false, e.message);
-      this._events.push(evt);
-      for (const sub of this._subscribers) {
+      this.events.push(evt);
+      errorLog('WorkflowExecution error', e);
+      for (const sub of this.subscribers) {
         sub.next(evt);
-        sub.error(e);
+        sub.complete();
       }
     },
     next: value => {
-      this._events.push(value);
-      for (const sub of this._subscribers) {
-        sub.next(value);
-      }
+      this.next(value);
     },
   };
 
   public constructor(public readonly workflow: Workflow) {
-    // Can't use the fn directly before calling super()
-    super(subscriber => this.init(subscriber));
-
+    super();
     this.tick = this.tick.bind(this);
   }
 
   public get activeStepIdx(): number {
-    return this._activeStepIdx;
+    return this._activeStepIdx$.value;
+  }
+
+  public set activeStepIdx(v: number) {
+    if (v === this.activeStepIdx) {
+      return;
+    }
+    this._activeStepIdx$.next(v);
   }
 
   private get activeStep(): WorkflowStep | undefined {
-    return this.workflow.steps[this._activeStepIdx];
+    return this.workflow.steps[this.activeStepIdx];
   }
 
-  private get baseEvents(): Out[] {
+  /** @inheritDoc */
+  protected override cleanup(): void {
+    this.mainSub?.unsubscribe();
+    this.mainSub = undefined;
+  }
+
+  /** @inheritDoc */
+  protected override getOnInitEvents(): Out[] {
     return [{
       type: WorkflowEventType.WORKFLOW_START,
       workflow: this.workflow,
     }];
   }
 
-  private complete(): void {
+  /** @inheritDoc */
+  protected override init(): TeardownLogic {
+    this.tick();
+  }
+
+  private end(): void {
     const evt = this.mkCompleteEvent(true);
-    this._events.push(evt);
-    for (const sub of this._subscribers) {
+    this.events.push(evt);
+    for (const sub of this.subscribers) {
       nextComplete(sub, evt);
     }
   }
@@ -187,24 +202,12 @@ export class WorkflowExecution extends Observable<Out> {
     });
 
     return concat(exec$, onSuccess$).pipe(
+      this.whileStepIs(idx),
       startWith<StepListeningEvent>({
         ...baseEvt,
         type: WorkflowEventType.STEP_LISTENING,
       })
     );
-  }
-
-  private init(subscriber: Subscriber<Out>): TeardownLogic {
-    this._subscribers.add(subscriber);
-    for (const evt of this._events) {
-      subscriber.next(evt);
-    }
-
-    if (!this._mainSub) {
-      this.tick();
-    }
-
-    return () => this.tearDown(subscriber);
   }
 
   private mkCompleteEvent(ok: true): WorkflowCompleteEvent;
@@ -221,22 +224,18 @@ export class WorkflowExecution extends Observable<Out> {
     return (ok ? base : {...base, err}) as WorkflowCompleteEvent;
   }
 
-  private tearDown(subscriber: Subscriber<Out>): void {
-    this._subscribers.delete(subscriber);
-    if (!this._subscribers.size) {
-      this._mainSub?.unsubscribe();
-      this._mainSub = undefined;
-    }
-  }
-
   private tick(): void {
     const step = this.activeStep;
     if (!step) {
       debugLog(`Completed workflow ${this.workflow.name}`);
-      return this.complete();
+      return this.end();
     }
 
-    this._mainSub = this.executeStep(step, this._activeStepIdx)
-      .subscribe(this._mainSubObserver);
+    this.mainSub = this.executeStep(step, this.activeStepIdx)
+      .subscribe(this.mainSubObserver);
+  }
+
+  private whileStepIs<T>(idx: number): MonoTypeOperatorFunction<T> {
+    return takeUntil(this._activeStepIdx$.pipe(filter(i => i !== idx)));
   }
 }

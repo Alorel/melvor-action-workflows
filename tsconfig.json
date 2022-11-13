@@ -11,7 +11,8 @@
     "experimentalDecorators": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "jsxFactory": "h",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "newLine": "lf",
     "target": "ES2020",
     "noImplicitAny": true,
@@ -20,7 +21,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictBindCallApply": true,
     "resolveJsonModule": true,
-    "assumeChangesOnlyAffectDirectDependencies": false,
+    "assumeChangesOnlyAffectDirectDependencies": true,
     "stripInternal": true,
     "importHelpers": true,
     "sourceMap": false,
@@ -31,9 +32,6 @@
   "include": [
     "declarations.d.ts",
     "types/",
-    "src/setup.mts",
-    "src/actions/",
-    "src/triggers/",
-    "src/option-types/"
+    "src/"
   ]
 }
