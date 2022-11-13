@@ -5,14 +5,12 @@ import modWrapPlugin from "./build/mod-wrap.mjs";
 import replacePlugin from "@rollup/plugin-replace";
 import iifeWrapPlugin from "./build/iife-wrap.mjs";
 import {threadedTerserPlugin} from "@alorel/rollup-plugin-threaded-terser";
-import pugLoader from "./build/pug-loader.mjs";
-import templateLoadPlugin from "./build/template-load.mjs";
 import {assetLoader} from "./build/asset-loader.mjs";
 import jsonPlugin from "@rollup/plugin-json";
 import cleanPlugin from "./build/clean-plugin.mjs";
 import scssLoader from "./build/scss-loader.mjs";
 
-const srcInclude = /src[\\/].+\.m?ts$/;
+const srcInclude = /src[\\/].+\.m?tsx?$/;
 const srcExclude = /node_modules[\\/]/;
 
 function getOpt(opts, opt) {
@@ -29,7 +27,7 @@ export default function (opts) {
   const prod = Boolean(getOpt(opts, 'prod'));
 
   return {
-    input: 'src/setup.mts',
+    input: 'src/setup.tsx',
     output: {
       dir: 'dist',
       entryFileNames: 'setup.mjs',
@@ -71,11 +69,6 @@ export default function (opts) {
           'process.env.PRODUCTION': String(prod),
         },
       }),
-      pugLoader({
-        prod,
-        watch,
-      }),
-      templateLoadPlugin({prod}),
       assetLoader({
         reg: /\.png$/,
       }),

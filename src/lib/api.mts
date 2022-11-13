@@ -10,17 +10,14 @@ import {isActionNodeDefinition, isOptionDefinition, isTriggerNodeDefinition} fro
 import {ACTION_REGISTRY, ActionNodeDefinitionImpl} from './registries/action-registry.mjs';
 import {OPTION_REGISTRY} from './registries/option-registry.mjs';
 import {TRIGGER_REGISTRY} from './registries/trigger-registry.mjs';
-import {debugLog, errorLog} from './util/log.mjs';
+import {errorLog} from './util/log.mjs';
 
 export function defineAction<T extends object = {}>(definition: ActionNodeDefinition<T>): void {
   if (!isActionNodeDefinition(definition)) {
     throw new Error('Invalid action node definition');
   }
 
-  const inst = new ActionNodeDefinitionImpl(definition);
-  ACTION_REGISTRY.registerObject(inst);
-
-  debugLog('Action defined:', inst.id);
+  ACTION_REGISTRY.registerObject(new ActionNodeDefinitionImpl(definition));
 }
 
 export function defineTrigger<T extends object = {}>(
@@ -32,8 +29,6 @@ export function defineTrigger<T extends object = {}>(
 
   const inst = new TriggerDefinitionContext<T>(definition);
   TRIGGER_REGISTRY.registerObject(inst);
-
-  debugLog('Trigger defined:', inst.id);
 
   return inst;
 }

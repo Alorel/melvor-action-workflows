@@ -1,9 +1,0 @@
-.text-center.font-size-sm.font-w600(v-scope="RenderNodeMedia(node)")
-
-table.font-size-sm.w-100(v-if="node.options?.length")
-  tbody
-    tr(
-      v-for="opt in node.options",
-      :key="optKey(opt)",
-      v-scope="renderTr(opt)"
-    )

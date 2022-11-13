@@ -1,4 +1,5 @@
-import {ComponentProps, Item} from 'melvor';
+import {Item} from 'melvor';
+import {ComponentType} from 'preact';
 import {ObservableInput} from 'rxjs';
 
 export type Obj<T> = object & Record<string, T>;
@@ -18,13 +19,11 @@ export interface NodeValidationStore {
 }
 
 export interface OptionRenderEditCtx<Val, Interface> {
-  initialValue?: Val;
+  value?: Val;
 
   option: Interface;
 
   otherValues: Obj<any>;
-
-  validation: NodeValidationStore;
 
   onChange(value?: Val): void;
 }
@@ -45,9 +44,9 @@ export interface OptionDefinition<Val, Interface extends NodeOptionBase> {
 
   is(v: NodeOptionBase & Obj<any>): v is Interface;
 
-  renderEdit(ctx: OptionRenderEditCtx<Val, Interface>): ComponentProps;
+  renderEdit: ComponentType<OptionRenderEditCtx<Val, Interface>>;
 
-  renderView(ctx: OptionRenderViewCtx<Val, Interface>): ComponentProps;
+  renderView: ComponentType<OptionRenderViewCtx<Val, Interface>>;
 
   validate?(value: Val | undefined, def: Interface, fullOptsObject: Obj<any>): string[];
 }

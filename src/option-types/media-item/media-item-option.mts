@@ -11,8 +11,8 @@ import type {
   Obj
 } from '../../public_api';
 import {resolveMediaItemRegistry, resolveMediaMulti} from './render-media-commons.mjs';
-import RenderMediaEdit from './render-media-edit.mjs';
-import RenderMediaSelectView from './render-media-view.mjs';
+import RenderMediaEdit from './render-media-edit';
+import RenderMediaSelectView from './render-media-view';
 
 export type MediaOptionValue = MediaSelectable | MediaSelectable[];
 

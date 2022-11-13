@@ -1,5 +1,5 @@
 import type {NodeOption} from '../../public_api';
-import {allActions} from '../../ui/components/workflow-editor/categorised-node-select/action-select.mjs';
+import {allActions} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {CompressedJsonArray} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {FormatToJson} from '../decorators/to-json-formatters/format-to-json.mjs';

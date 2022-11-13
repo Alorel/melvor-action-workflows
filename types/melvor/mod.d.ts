@@ -13,6 +13,8 @@ export interface ModContext {
   /** Execute code after the the character selection screen has fully loaded. */
   onCharacterSelectionLoaded: ModLifecycleCallback;
 
+  onInterfaceAvailable: ModLifecycleCallback;
+
   /** Execute code after offline progress has been calculated and all in-game user interface elements have been created. */
   onInterfaceReady: ModLifecycleCallback;
 

@@ -1,6 +1,5 @@
 import {LazyGetter} from 'lazy-get-decorator';
-import type {Observable} from 'rxjs';
-import {BehaviorSubject, Subject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {Workflow} from '../data/workflow.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import {
@@ -17,14 +16,12 @@ const enum Strings {
 @PersistClassName('WorkflowRegistry')
 export default class WorkflowRegistry {
 
-  private readonly _added$ = new Subject<Workflow>();
+  public readonly primaryExecution$ = new BehaviorSubject<undefined | WorkflowExecution>(undefined);
 
-  private readonly _primaryExecution$ = new BehaviorSubject<undefined | WorkflowExecution>(undefined);
-
-  private _workflows: Workflow[];
+  public readonly workflows$: BehaviorSubject<Workflow[]>;
 
   private constructor(workflows: Workflow[]) {
-    this._workflows = workflows;
+    this.workflows$ = new BehaviorSubject(workflows);
   }
 
   @LazyGetter()
@@ -42,22 +39,8 @@ export default class WorkflowRegistry {
     return out;
   }
 
-  @LazyGetter()
-  public get onAdd$(): Observable<Workflow> {
-    return this._added$.asObservable();
-  }
-
-  public get primaryExecution(): WorkflowExecution | undefined {
-    return this._primaryExecution$.value;
-  }
-
-  @LazyGetter()
-  public get primaryExecution$(): Observable<undefined | WorkflowExecution> {
-    return this._primaryExecution$.asObservable();
-  }
-
   public get workflows(): readonly Workflow[] {
-    return this._workflows;
+    return this.workflows$.value;
   }
 
   private static fromStorage(): WorkflowRegistry {
@@ -88,7 +71,6 @@ export default class WorkflowRegistry {
 
   public add(workflow: Workflow): void {
     this.setWorkflows([...this.workflows, workflow]);
-    this._added$.next(workflow);
   }
 
   public getWorkflow(listId: number): Workflow | undefined {
@@ -96,7 +78,7 @@ export default class WorkflowRegistry {
   }
 
   public patch(workflow: Workflow, idx: number): void {
-    if (idx >= this.workflows.length) {
+    if (idx < 0 || idx >= this.workflows.length) {
       return;
     }
 
@@ -105,26 +87,23 @@ export default class WorkflowRegistry {
     this.setWorkflows(out);
   }
 
-  public removeByListId(listId: number): void | never {
-    const idx = this.workflows.findIndex(wf => wf.listId === listId);
-    if (idx !== -1) {
-      const out = [...this.workflows];
-      out.splice(idx, 1);
-      store(out);
-      this._workflows = out;
-    }
+  public rmByIdx(idx: number): void {
+    const out = [...this.workflows];
+    out.splice(idx, 1);
+    store(out);
+    this.workflows$.next(out);
   }
 
   public setPrimaryExecution(workflow?: Workflow): void {
-    if (workflow?.listId !== this._primaryExecution$.value?.workflow.listId) {
-      this._primaryExecution$.next(workflow ? new WorkflowExecution(workflow) : undefined);
+    if (workflow?.listId !== this.primaryExecution$.value?.workflow.listId) {
+      this.primaryExecution$.next(workflow ? new WorkflowExecution(workflow) : undefined);
     }
   }
 
   private setWorkflows(workflows: Workflow[]): void | never {
     workflows.sort(({name: a}, {name: b}) => a > b ? 1 : a < b ? -1 : 0);
     store(workflows);
-    this._workflows = workflows;
+    this.workflows$.next(workflows);
   }
 }
 

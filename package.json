@@ -16,7 +16,7 @@
     "modio": "node build/modio.mjs",
     "modio:dev": "node build/modio.mjs --token auto",
     "publish:alpha:dev": "npm run modio:dev -- upload --mod-version $(node build/modio.mjs --token auto next-dev-version)",
-    "lint": "eslint --ext .ts,.mts,.js,.mjs .",
+    "lint": "eslint --ext .ts,.mts,.js,.mjs,.tsx,.jsx .",
     "lint:fix": "npm run lint -- --fix"
   },
   "devDependencies": {
@@ -39,7 +39,6 @@
     "jszip": "^3.10.1",
     "magic-string": "^0.26.7",
     "prompt": "^1.3.0",
-    "pug": "^3.0.2",
     "rollup": "^2.78.1",
     "rollup-plugin-typescript2": "^0.34.1",
     "sass": "^1.56.1",
@@ -58,12 +57,15 @@
     "registry": "https://npm.pkg.github.com"
   },
   "dependencies": {
+    "@alorel/preact-static-component": "^1.0.0",
     "@aloreljs/awesome-iter": "^1.0.3",
     "@aloreljs/bound-decorator": "^2.0.0",
     "@aloreljs/memoise-decorator": "^2.0.1",
-    "@aloreljs/rxutils": "^2.2.2",
+    "@aloreljs/rxutils": "^2.3.0",
+    "@preact/signals": "^1.1.2",
     "lazy-get-decorator": "^2.2.1",
     "lodash-es": "^4.17.21",
+    "preact": "^10.11.2",
     "rxjs": "^7.5.7"
   }
 }

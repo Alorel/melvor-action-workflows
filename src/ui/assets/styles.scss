@@ -6,9 +6,8 @@ $colour-err: #e56767;
     height: 1rem;
   }
 
-  &d-tbl {
-    display: table;
-    width: 100%;
+  &d-inline-tbl {
+    display: inline-table;
 
     > div {
       display: table-row;

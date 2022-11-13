@@ -1,9 +1,8 @@
 import {startCase} from 'lodash-es';
 import {namespace} from '../manifest.json';
 import './assets/styles.scss';
-import {createPageContainerId} from './common.mjs';
-import workflowsDashboardTplId from './pages/dashboard/workflows-dashboard.pug';
-import newWorkflowTplId from './pages/new-workflow/new-workflow.pug';
+import {NEW_WORKFLOW_PAGE_ID} from './pages/new-workflow';
+import {WORKFLOWS_DASHBOARD_ID} from './pages/workflows-dashboard';
 
 interface BaseCat {
   categoryID: string;
@@ -33,7 +32,7 @@ export const mainIcon = game.items.getObject('melvorD', 'Rubber_Ducky')!.media;
       pages: [
         {
           ...pageCommon,
-          containerID: createPageContainerId(workflowsDashboardTplId),
+          containerID: WORKFLOWS_DASHBOARD_ID,
           customName: 'Action Workflows Dashboard',
           id: 'actionWorkflowsDashboard',
           sidebarSubItems: [
@@ -42,7 +41,7 @@ export const mainIcon = game.items.getObject('melvorD', 'Rubber_Ducky')!.media;
         },
         {
           ...pageCommon,
-          containerID: createPageContainerId(newWorkflowTplId),
+          containerID: NEW_WORKFLOW_PAGE_ID,
           customName: 'New Action Workflow',
           id: 'newActionWorkflow',
           sidebarSubItems: [
