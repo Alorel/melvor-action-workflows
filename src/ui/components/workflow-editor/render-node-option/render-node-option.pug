@@ -2,5 +2,12 @@ include ../../../common
 
 +td()(v-if="hasLabel")
   i.fa.fa-question-circle.mr-1(v-if="init.option.description", @vue:mounted="onDescMount($el)")
+  span.mr-1(v-if="required") *
   span {{init.option.label}}
-+td()(:colspan="hasLabel ? 1 : 2", v-scope="component(init)")
++td()(
+  :colspan="hasLabel ? 1 : 2",
+  :class="{'ActionWorkflowsCore-touched': validation.touched}"
+)
+  div(v-scope="component(init)", :class="{'ActionWorkflowsCore-f-invalid': validation.errors.length}")
+  .text-danger.ActionWorkflowsCore-err-render(v-if="validation.errors.length")
+    div(v-for="err in validation.errors") {{err}}

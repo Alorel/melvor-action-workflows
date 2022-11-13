@@ -1,7 +1,7 @@
 import {isPlainObject} from 'lodash-es';
 import {defineOption} from '../../lib/api.mjs';
 import {EMPTY_ARR} from '../../lib/util.mjs';
-import type {StringNodeOption} from '../../public_api';
+import type {NodeValidationStore, StringNodeOption} from '../../public_api';
 import {makeComponent} from '../../ui/common.mjs';
 import ClearBtn from '../../ui/components/clear-btn/clear-btn.mjs';
 import {RenderValueDirect} from '../../ui/pages/dashboard/render-node-option-value/render-node-option-value.mjs';
@@ -12,13 +12,20 @@ defineOption<string, StringNodeOption>({
     v.type === String
     && (v.enum == null || isPlainObject(v.enum))
   ),
-  renderEdit({option: {enum: enumOpts, required}, initialValue, onChange}) {
+  renderEdit({
+    option: {enum: enumOpts, required},
+    initialValue,
+    onChange,
+    validation,
+  }) {
     let val = initialValue;
 
     return makeComponent(`#${id}`, {
       ClearBtn,
       enumOpts,
       required: Boolean(required),
+      touch,
+      validation,
       get value(): string {
         return val ?? '';
       },
@@ -42,3 +49,7 @@ defineOption<string, StringNodeOption>({
       : EMPTY_ARR
   ),
 });
+
+function touch(this: {validation: NodeValidationStore}): void {
+  this.validation.touched = true;
+}

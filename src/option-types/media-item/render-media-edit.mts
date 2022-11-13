@@ -3,6 +3,7 @@ import type {
   MediaItemNodeOption,
   MediaItemNodeOptionMultiConfig,
   MediaSelectable,
+  NodeValidationStore,
   Obj,
   OptionDefinition,
   OptionRenderEditCtx
@@ -81,7 +82,7 @@ function RenderEditOne<T extends MediaSelectable>(
 }
 
 function RenderEditMulti<T extends MediaSelectable>(
-  {option, onChange, initialValue, otherValues}: Required<OptionRenderEditCtx<T[], OptMulti>>
+  {option, onChange, initialValue, otherValues, validation}: Required<OptionRenderEditCtx<T[], OptMulti>>
 ) {
   return makeComponent(`#${tplIdMulti}`, {
     add: addMulti,
@@ -91,6 +92,7 @@ function RenderEditMulti<T extends MediaSelectable>(
     otherValues,
     renderSingleInsideMulti,
     rm: multiRmAt,
+    validation,
     value: initialValue!,
   });
 }
@@ -105,7 +107,12 @@ function multiRmAt<T extends MediaSelectable>(this: ThisMulti<T>, idx: number): 
   this.onChange(this.value);
 }
 
-function renderSingleInsideMulti<T extends MediaSelectable>(this: ThisMulti<T>, idx: number, value: T) {
+function renderSingleInsideMulti<T extends MediaSelectable>(
+  this: ThisMulti<T>,
+  idx: number,
+  value: T,
+  validation: NodeValidationStore
+) {
   return RenderEditOne({
     focusInput: idx !== 0,
     initialValue: value,
@@ -115,6 +122,7 @@ function renderSingleInsideMulti<T extends MediaSelectable>(this: ThisMulti<T>, 
     },
     option: this.option,
     otherValues: this.otherValues,
+    validation,
   });
 }
 
@@ -137,6 +145,10 @@ function selectItem<T extends MediaSelectable>(this: This<T>, item: T, event: Ev
   this.filterText = '';
   this.value = item;
   this.onChange(item);
+
+  if ((this as any).validation) {
+    ((this as any).validation as NodeValidationStore).touched = true;
+  }
 }
 
 function onItemInit<T extends MediaSelectable>(el: HTMLElement, item: T): void {

@@ -2,18 +2,22 @@ include ../../common
 
 - const SECTION_CLASS = ['col-12', 'col-xl-11', 'm-auto'];
 
-.row
+.row(:class="{'ActionWorkflowsCore-touched': touched}")
   div(class=SECTION_CLASS)
     +bordered-block('agility', 2)
       .row.mb-3
         .font-size-sm.pr-1.col-auto Workflow name
-        .col-auto
-          input.form-control.form-control-sm(v-model="workflow.name", required)
+        .col-auto(:class="{'ActionWorkflowsCore-f-invalid': !workflow.name}")
+          input.form-control.form-control-sm(
+            v-model="workflow.name",
+            required,
+            @blur="$el.parentElement.parentElement.classList.add('ActionWorkflowsCore-touched')"
+          )
       .text-right
         +btn('danger', 'sm')(v-if="cancellable", @click="onCancel") Cancel
         +btn('success', 'sm')(@click="onSave") Save
 
-.row.row-deck
+.row.row-deck(:class="{'ActionWorkflowsCore-touched': touched}")
   div(
     v-for="(step, idx) in workflow.steps",
     :key="keyFn(step, idx)",

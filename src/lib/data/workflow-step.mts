@@ -40,6 +40,11 @@ export class WorkflowStep {
     this.trigger = init.trigger ?? new WorkflowTrigger();
   }
 
+  public get isValid(): boolean {
+    return this.actions.length !== 0 && this.trigger.isValid
+      && this.actions.every(a => a?.isValid);
+  }
+
   public addAction(): void {
     this.actions.push(new ActionConfigItem());
   }

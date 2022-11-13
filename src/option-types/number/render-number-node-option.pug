@@ -1,5 +1,6 @@
 input.form-control.form-control-sm(
   type="number",
+  @blur="validation.touched = true",
   v-model="value",
   :max="opt.max ?? ''",
   :min="opt.min ?? ''",

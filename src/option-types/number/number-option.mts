@@ -13,12 +13,13 @@ defineOption<number, NumberNodeOption>({
     && isUndefinedOr(v.max, 'number')
     && isUndefinedOr(v.step, 'number')
   ),
-  renderEdit({option, initialValue, onChange}) {
+  renderEdit({option, initialValue, onChange, validation}) {
     let val = initialValue;
 
     return makeComponent(`#${id}`, {
       onChange,
       option,
+      validation,
       get value(): number | '' {
         return val ?? '';
       },

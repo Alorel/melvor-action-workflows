@@ -11,12 +11,20 @@ export interface Api {
   defineTrigger<T extends object = {}>(definition: TriggerNodeDefinition): TriggerDefinitionContext<T>;
 }
 
+export interface NodeValidationStore {
+  readonly errors: string[];
+
+  touched: boolean;
+}
+
 export interface OptionRenderEditCtx<Val, Interface> {
   initialValue?: Val;
 
   option: Interface;
 
   otherValues: Obj<any>;
+
+  validation: NodeValidationStore;
 
   onChange(value?: Val): void;
 }
@@ -41,7 +49,7 @@ export interface OptionDefinition<Val, Interface extends NodeOptionBase> {
 
   renderView(ctx: OptionRenderViewCtx<Val, Interface>): ComponentProps;
 
-  validate?(value: any | undefined, def: Interface, fullOptsObject: Obj<any>): string[];
+  validate?(value: Val | undefined, def: Interface, fullOptsObject: Obj<any>): string[];
 }
 
 export class TriggerDefinitionContext<T extends object = {}> {
