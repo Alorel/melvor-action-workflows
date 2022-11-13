@@ -113,7 +113,7 @@ yargs(processArgs)
         form.append('version', modVersion);
         form.append('active', String(active));
 
-        const rsp = await axios.post(`${baseUrl}/files`, form, {
+        const {data} = await axios.post(`${baseUrl}/files`, form, {
           headers: {
             ...form.getHeaders(),
             ...baseHeaders(await loadToken(token)),
@@ -121,12 +121,14 @@ yargs(processArgs)
         });
 
         console.log('OK');
-        console.log(rsp.data);
+        console.log(data.version);
+        console.log(data.download.binary_url);
       } catch (e) {
         onErr(e);
       }
     },
   })
+  // Remove modfile versions
   .command({
     builder: {
       versions: {
@@ -155,14 +157,38 @@ yargs(processArgs)
       }
     }
   })
-  // Fetch latest published version
+  // Calc next dev version
   .command({
-    command: 'current',
+    builder: {
+      tag: {
+        default: 'alpha',
+        type: 'string',
+      },
+    },
+    command: 'next-dev-version',
     describe: 'Fetch the latest published version',
-    async handler({token}) {
+    async handler({tag, token}) {
       try {
-        const rsp = await axios.get(baseUrl, {headers: baseHeaders(await loadToken(token))});
-        console.log(rsp.data.modfile.version);
+        const [inc, parse, rsp] = await Promise.all([
+          import('semver/functions/inc.js').then(v => v.default),
+          import('semver/functions/parse.js').then(v => v.default),
+          loadToken(token)
+            .then(tok => (
+              axios.get(`${baseUrl}/files?_sort=-date_added&_limit=1`, {headers: baseHeaders(tok)}))
+            )
+            .then(v => v.data.data[0].version)
+        ]);
+
+        const curr = parse(rsp);
+
+        const next = inc(
+          curr,
+          curr.prerelease.length ? 'prerelease' : 'preminor',
+          false,
+          tag
+        );
+
+        console.log(next);
       } catch (e) {
         onErr(e);
       }
