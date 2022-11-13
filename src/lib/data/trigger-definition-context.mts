@@ -1,5 +1,6 @@
 import {Observable} from 'rxjs';
 import type {Obj, TriggerDefinitionContext as ITriggerDefinitionContext, TriggerNodeDefinition} from '../../public_api';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {FromJSON} from '../decorators/to-json.mjs';
 import {Serialisable} from '../decorators/to-json.mjs';
 import {NamespacedDefinition} from '../namespaced-definition.mjs';
@@ -7,6 +8,7 @@ import {TRIGGER_REGISTRY, TriggerListener} from '../registries/trigger-registry.
 import {debugLog} from '../util/log.mjs';
 import {getFromRegistryOrLog} from '../util/registry-utils/get-from-registry-or-log.mjs';
 
+@PersistClassName('TriggerDefinitionContext')
 @Serialisable<TriggerDefinitionContext<any>, string | undefined>({
   from(id) {
     if (typeof id === 'string') {

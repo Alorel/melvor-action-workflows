@@ -2,6 +2,7 @@ import {Memoise} from '@aloreljs/memoise-decorator';
 import {identity} from 'rxjs';
 import type {NodeOption, Obj} from '../../public_api';
 import {allTriggerSelectGroups} from '../../ui/components/workflow-editor/categorised-node-select/trigger-select.mjs';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
 import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
 import {TRIGGER_REGISTRY} from '../registries/trigger-registry.mjs';
@@ -15,6 +16,7 @@ type Init = Partial<Pick<WorkflowTrigger, 'trigger' | 'opts'>>;
 
 export type WorkflowTriggerJson = Pick<WorkflowTrigger, 'opts' | 'id'>;
 
+@PersistClassName('WorkflowTrigger')
 @Serialisable<WorkflowTrigger, Partial<WorkflowTriggerJson> | undefined>({
   from(init) {
     if (!init?.id) {

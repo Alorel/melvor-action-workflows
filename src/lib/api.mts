@@ -6,11 +6,7 @@ import type {
   TriggerNodeDefinition
 } from '../public_api';
 import {TriggerDefinitionContext} from './data/trigger-definition-context.mjs';
-import {
-  isActionNodeDefinition,
-  isOptionDefinition,
-  isTriggerNodeDefinition
-} from './public-api-validation/public-api-validation.mjs';
+import {isActionNodeDefinition, isOptionDefinition, isTriggerNodeDefinition} from './public-api-validation.mjs';
 import {ACTION_REGISTRY, ActionNodeDefinitionImpl} from './registries/action-registry.mjs';
 import {OPTION_REGISTRY} from './registries/option-registry.mjs';
 import {TRIGGER_REGISTRY} from './registries/trigger-registry.mjs';

@@ -1,5 +1,7 @@
 import type {Referenceable} from '../public_api';
+import PersistClassName from './decorators/PersistClassName.mjs';
 
+@PersistClassName('NamespacedDefinition')
 export class NamespacedDefinition<T extends Referenceable> {
   public readonly def: T;
 

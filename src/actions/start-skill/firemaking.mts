@@ -20,9 +20,7 @@ defineAction(
       skillKey: 'firemaking',
     })
     .exec(function startFiremakingExec({recipe}) {
-      if (!this.skill.isActive || this.skill.selectedRecipe?.id !== recipe.id) {
-        this.skill.selectLog(recipe);
-        this.skill.burnLog();
-      }
+      this.skill.selectLog(recipe);
+      this.skill.burnLog();
     })
 );

@@ -1,5 +1,7 @@
 import {LazyGetter} from 'lazy-get-decorator';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 
+@PersistClassName('LazyValue')
 export default class LazyValue<T> {
   private readonly f: () => T;
 

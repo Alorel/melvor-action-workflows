@@ -20,6 +20,7 @@ import {switchMap, take} from 'rxjs/operators';
 import type {WorkflowStep} from '../data/workflow-step.mjs';
 import type {Workflow} from '../data/workflow.mjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import {debugLog, errorLog} from '../util/log.mjs';
 import type {
   ActionExecutionEvent,
@@ -32,6 +33,7 @@ import {WorkflowEventType} from './workflow-event.mjs';
 
 type Out = WorkflowEvent;
 
+@PersistClassName('WorkflowTrigger')
 export class WorkflowExecution extends Observable<Out> {
   @AutoIncrement()
   public readonly id!: number;

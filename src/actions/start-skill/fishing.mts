@@ -32,15 +32,7 @@ defineAction(
       return area;
     })
     .exec(function startFishingExec({recipe: fish}, area) {
-      if (!this.skill.isActive || isDifferent(area, fish)) {
-        this.skill.onAreaFishSelection(area, fish);
-        this.skill.onAreaStartButtonClick(area);
-      }
+      this.skill.onAreaFishSelection(area, fish);
+      this.skill.onAreaStartButtonClick(area);
     })
 );
-
-function isDifferent(area: FishingArea, fish: Fish): boolean {
-  const activeArea = game.fishing.activeFishingArea;
-
-  return activeArea?.id !== area.id || game.fishing.activeFish.id !== fish.id;
-}

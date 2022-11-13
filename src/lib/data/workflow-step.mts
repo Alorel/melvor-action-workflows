@@ -1,4 +1,5 @@
 import AutoIncrement from '../decorators/auto-increment.mjs';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import {FormatToJsonArrayCompressed} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {FormatToJson} from '../decorators/to-json-formatters/format-to-json.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
@@ -14,6 +15,7 @@ export interface WorkflowStepJson {
   actions: WorkflowTriggerJson[];
 }
 
+@PersistClassName('Workflow')
 @Serialisable<WorkflowStep, Partial<Init> | undefined>({
   from(init) {
     if (init?.actions?.length && init.trigger && init.actions.every(a => (a as any) instanceof ActionConfigItem)) {

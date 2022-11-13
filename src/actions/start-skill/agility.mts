@@ -2,11 +2,15 @@ import {nextComplete} from '@aloreljs/rxutils';
 import type {Agility} from 'melvor';
 import {Observable} from 'rxjs';
 import {defineAction} from '../../lib/api.mjs';
+import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import SkillAction from '../_common/skill-action.mjs';
 
+@PersistClassName('AgilityAction')
 class AgilityAction extends SkillAction<{}, Agility> {
-  public execute(): Observable<void> {
+
+  /** @inheritDoc */
+  public override execute(): Observable<void> {
     return new Observable(subscriber => {
       this.skill.start();
       nextComplete(subscriber);

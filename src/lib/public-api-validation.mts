@@ -9,9 +9,9 @@ import type {
   OptionDefinition,
   Referenceable,
   TriggerNodeDefinition
-} from '../../public_api';
-import {OPTION_REGISTRY} from '../registries/option-registry.mjs';
-import {isUndefinedOr} from '../util/is-undefined-or.mjs';
+} from '../public_api';
+import {OPTION_REGISTRY} from './registries/option-registry.mjs';
+import {isUndefinedOr} from './util/is-undefined-or.mjs';
 
 type IsBase = NodeOptionBase & Obj<any>;
 

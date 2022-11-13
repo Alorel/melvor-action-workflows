@@ -31,7 +31,6 @@ defineAction(
       recipes.forEach(this.checkRecipe, this);
     })
     .exec(function startWoodcuttingExec({recipes}) {
-      this.skill.stop();
       for (const tree of recipes) {
         this.skill.selectTree(tree);
       }

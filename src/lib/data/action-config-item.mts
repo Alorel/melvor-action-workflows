@@ -1,5 +1,6 @@
 import type {NodeOption} from '../../public_api';
 import {allActions} from '../../ui/components/workflow-editor/categorised-node-select/action-select.mjs';
+import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {CompressedJsonArray} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {FormatToJson} from '../decorators/to-json-formatters/format-to-json.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
@@ -11,6 +12,7 @@ import OptsListItem from './opts-list-item.mjs';
 
 type Init = Partial<Pick<ActionConfigItem, 'action' | 'opts'>>;
 
+@PersistClassName('ActionConfigItem')
 @Serialisable<ActionConfigItem, Partial<Init> | undefined>({
   from: init => {
     if (!(init?.action instanceof ActionNodeDefinitionImpl)) {
