@@ -58,7 +58,7 @@
     "@aloreljs/awesome-iter": "^1.0.3",
     "@aloreljs/bound-decorator": "^2.0.0",
     "@aloreljs/memoise-decorator": "^2.0.1",
-    "@aloreljs/rxutils": "^2.2.2",
+    "@aloreljs/rxutils": "^2.3.0",
     "lazy-get-decorator": "^2.2.1",
     "lodash-es": "^4.17.21",
     "rxjs": "^7.5.7"
