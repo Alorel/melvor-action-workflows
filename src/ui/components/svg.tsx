@@ -3,7 +3,7 @@ import type {VNode} from 'preact';
 import type {FunctionComponent} from 'preact/compat';
 import type {JSXInternal} from 'preact/src/jsx';
 
-type SvgProps = Omit<BaseProps, 'viewBox'>;
+type SvgProps = Omit<BaseProps, 'viewBox' | 'children'>;
 
 type ChevronProps = Omit<SvgProps, 'd'>;
 export const ChevronLeftSvg = staticComponent<ChevronProps>(props => (
@@ -21,7 +21,8 @@ const ChevronBase: FunctionComponent<ChevronProps & {d: string}> = ({d, ...rest}
   </BaseSvg>
 );
 
-export const BinSvg = staticComponent<Omit<SvgProps, 'xmlSpace'>>(props => (
+type NoSpaceProps = Omit<SvgProps, 'xmlSpace'>;
+export const BinSvg = staticComponent<NoSpaceProps>(props => (
   <BaseSvg xmlSpace={'preserve'} viewBox={'0 0 512 512'} {...props}>
     <path fill={'#6c994e'} d={'M314.412,113.127H197.588c-10.886,0-19.711-8.825-19.711-19.711v-38.72\tC177.877,24.536,202.413,0,232.573,0h46.854c30.159,0,54.697,24.536,54.697,54.695v38.719\tC334.123,104.302,325.298,113.127,314.412,113.127z M217.299,73.705h77.401V54.695c0-8.422-6.852-15.273-15.274-15.273h-46.854\tc-8.422,0-15.273,6.852-15.273,15.273L217.299,73.705L217.299,73.705z'}/>
     <path fill={'#7eb35b'} d={'M345.472,72.19H166.528c-31.038,0-56.198,25.16-56.198,56.198v22.857h291.341v-22.857\tC401.67,97.35,376.51,72.19,345.472,72.19z'}/>
@@ -30,6 +31,34 @@ export const BinSvg = staticComponent<Omit<SvgProps, 'xmlSpace'>>(props => (
     <path opacity={'.1'} d={'M170.993,474.174l-28.644-313.576H97.295l28.644,313.576\tC127.897,495.599,145.863,512,167.377,512h45.054C190.917,512,172.949,495.599,170.993,474.174z'}/>
     <path fill={'#6c994e'} d={'M401.67,119.558H110.33c-20.567,0-37.239,16.672-37.239,37.239v26.133h365.818v-26.133\tC438.909,136.23,422.237,119.558,401.67,119.558z'}/>
     <path opacity={'.1'} d={'M155.384,119.558H110.33c-20.567,0-37.239,16.672-37.239,37.239v26.133\th45.054v-26.133C118.145,136.23,134.817,119.558,155.384,119.558z'}/>
+  </BaseSvg>
+));
+
+export const TargetSvg = staticComponent<NoSpaceProps>(props => (
+  <BaseSvg xmlSpace={'preserve'} viewBox={'0 0 512 512'} {...props}>
+    <path fill={'#bfe4f8'} d={'M256,42.667C138.368,42.667,42.667,138.368,42.667,256S138.368,469.333,256,469.333\tS469.333,373.632,469.333,256S373.632,42.667,256,42.667z M256,432.762c-97.467,0-176.762-79.295-176.762-176.762\tS158.533,79.238,256,79.238S432.762,158.533,432.762,256S353.467,432.762,256,432.762z'}/>
+    <path fill={'#ff5023'} d={'M207 238H305V275H207z'}/>
+    <path fill={'#802812'} d={'M256 238H305V275H256z'}/>
+    <path fill={'#93c7ef'} d={'M256,42.667v36.571c97.467,0,176.762,79.295,176.762,176.762S353.467,432.762,256,432.762v36.571\tc117.632,0,213.333-95.701,213.333-213.333S373.632,42.667,256,42.667z'}/>
+    <path fill={'#ff5023'} d={'M238 0H275V134H238zM0 238H134V275H0zM238 378H275V512H238z'}/>
+    <path fill={'#802812'} d={'M256 0H274V134H256zM256 378H274V512H256zM378 238H512V275H378z'}/>
+  </BaseSvg>
+));
+
+export const PlaySvg = staticComponent<NoSpaceProps>(props => (
+  <BaseSvg xmlSpace={'preserve'} viewBox={'0 0 58 58'} {...props}>
+    <circle cx={29} cy={29} r={29} fill={'#30c78d'}/>
+    <g fill={'#fff'}>
+      <path d={'M44 29 22 44 22 29 22 14z'}/>
+      <path d={'M22,45c-0.16,0-0.321-0.038-0.467-0.116C21.205,44.711,21,44.371,21,44V14 c0-0.371,0.205-0.711,0.533-0.884c0.328-0.174,0.724-0.15,1.031,0.058l22,15C44.836,28.36,45,28.669,45,29s-0.164,0.64-0.437,0.826 l-22,15C22.394,44.941,22.197,45,22,45z M23,15.893v26.215L42.225,29L23,15.893z'}/>
+    </g>
+  </BaseSvg>
+));
+
+export const PauseSvg = staticComponent<NoSpaceProps>(props => (
+  <BaseSvg xmlSpace={'preserve'} viewBox={'0 0 496 496'} {...props}>
+    <path fill={'#e56767'} d={'M496.158,248.085c0-137.021-111.07-248.082-248.076-248.082C111.07,0.002,0,111.062,0,248.085\tc0,137.002,111.07,248.071,248.083,248.071C385.088,496.155,496.158,385.086,496.158,248.085z'}/>
+    <path fill={'#fff'} d={'M223 121h-60c-6 0-10 4-10 10v234c0 6 4 10 10 10h60c6 0 10-4 10-10V131C233 126 229 121 223 121zM333 121h-60c-6 0-10 4-10 10v234c0 6 4 10 10 10h60c6 0 10-4 10-10V131C343 126 339 121 333 121z'}/>
   </BaseSvg>
 ));
 

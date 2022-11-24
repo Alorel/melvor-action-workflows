@@ -5,7 +5,7 @@ import {batch, useComputed, useSignal} from '@preact/signals';
 import type {VNode} from 'preact';
 import {Fragment, h} from 'preact';
 import {memo} from 'preact/compat';
-import {useCallback, useEffect} from 'preact/hooks';
+import {useCallback, useEffect, useRef} from 'preact/hooks';
 import type {Observable} from 'rxjs';
 import {distinctUntilChanged, EMPTY, map, merge, of, skip, switchMap} from 'rxjs';
 import {Workflow} from '../../lib/data/workflow.mjs';
@@ -14,6 +14,7 @@ import {WorkflowEventType} from '../../lib/execution/workflow-event.mjs';
 import type {WorkflowExecution} from '../../lib/execution/workflow-execution.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
 import {EMPTY_ARR} from '../../lib/util.mjs';
+import swapElements from '../../lib/util/swap-elements.mjs';
 import {BorderedBlock} from '../components/block';
 import Btn from '../components/btn';
 import {EDITOR_CTX, useEditorCtxProvider} from '../components/workflow-editor/editor-ctx.mjs';
@@ -21,17 +22,18 @@ import WorkflowEditor from '../components/workflow-editor/workflow-editor';
 import useReRender from '../hooks/re-render';
 import {useBehaviourSubject} from '../hooks/use-subject.mjs';
 import autoId from '../id-gen.mjs';
-import {sidebarItems} from '../sidebar-mgr.mjs';
+import type {DashboardStepProps} from './workflows-dashboard/dashboard-step';
 import DashboardStep from './workflows-dashboard/dashboard-step';
+import {NoDashboardsDefined} from './workflows-dashboard/no-dashboards-defined';
+
+/* eslint-disable max-lines */
 
 export const WORKFLOWS_DASHBOARD_ID = autoId();
 
-function Inner(): VNode {
-  const workflows = useBehaviourSubject(WorkflowRegistry.inst.workflows$);
+function WithWorkflows({workflows}: {workflows: Workflow[]}): VNode {
+  const props = useEditorProps(workflows);
 
-  return workflows.length
-    ? (<WithWorkflows workflows={workflows}/>)
-    : (<NoDashboardsDefined/>);
+  return h<EditorProps>(props.editedWorkflow.value ? Editor : DashboardShell, props);
 }
 
 export default function WorkflowsDashboard(): VNode {
@@ -131,36 +133,24 @@ function getStepIdx(exec: WorkflowExecution, activeStepIdx: Signal<number>): Obs
 
 function DashboardShell({
   activeWorkflow,
+  activeStepIdx,
   borderClass,
   activeWorkflowId,
   running,
   editedWorkflow,
   workflows,
 }: EditorProps): VNode {
-  const reg = WorkflowRegistry.inst;
-  const onWorkflowChange = useCallback((e: Event) => {
-    const listId = parseInt((e.target as HTMLSelectElement).value);
-
-    batch(() => {
-      activeWorkflow.value = isNaN(listId) ? undefined : reg.getWorkflow(listId);
-      reg.setPrimaryExecution(); // unset, really
-    });
-  }, [workflows, activeWorkflow]);
-
   const reRender = useReRender();
+  const hasWorkflow = Boolean(activeWorkflow.value);
 
   return (
     <Fragment>
       <div className={'row'}>
-        <div className={'col-auto font-w600 font-size-sm pr-1'}>Active workflow</div>
-        <div className={'col-auto'}>
-          <select className={'form-control form-control-sm'} value={activeWorkflowId.value ?? ''}
-            onChange={onWorkflowChange}>
-            {workflows.map(wf => <option key={wf.listId} value={wf.listId}>{wf.name}</option>)}
-          </select>
-        </div>
+        <ActiveWorkflowSelect activeWorkflow={activeWorkflow}
+          workflows={workflows}
+          activeWorkflowId={activeWorkflowId}/>
 
-        {activeWorkflow.value && (
+        {hasWorkflow && (
           <SelectedWorkflowBtns running={running}
             refresh={reRender}
             editedWorkflow={editedWorkflow}
@@ -168,20 +158,91 @@ function DashboardShell({
         )}
       </div>
 
-      {activeWorkflow.value && <RenderSteps activeWorkflow={activeWorkflow} borderClass={borderClass}/>}
+      {hasWorkflow && (
+        <RenderSteps activeWorkflow={activeWorkflow}
+          activeStepIdx={activeStepIdx}
+          running={running}
+          borderClass={borderClass}/>
+      )}
     </Fragment>
   );
 }
 
-const RenderSteps = memo<Pick<EditorProps, 'activeWorkflow' | 'borderClass'>>(
-  ({activeWorkflow, borderClass}) => (
-    <BorderedBlock kind={borderClass.value} size={4} class={'mt-2'}>
-      <div class={'row row-deck'}>
-        {activeWorkflow.value!.steps.map(step => <DashboardStep key={step.listId} step={step}/>)}
-      </div>
-    </BorderedBlock>
-  )
+const RenderSteps = memo<Pick<EditorProps, 'activeWorkflow' | 'borderClass' | 'activeStepIdx' | 'running'>>(
+  ({activeStepIdx, activeWorkflow, borderClass, running}) => {
+    const reRender = useReRender();
+
+    type StepProps = Pick<DashboardStepProps, 'mvLeft' | 'mvRight' | 'setActive'>;
+    const stepProps = useComputed((): StepProps[] => {
+      const activeIdx = activeStepIdx.value;
+      const isRunning = running.value;
+
+      return activeWorkflow.value!.steps.map((_step, idx, arr): StepProps => ({
+        mvLeft: idx !== 0 && activeIdx !== idx && activeIdx !== idx - 1,
+        mvRight: idx !== (arr.length - 1) && activeIdx !== idx && activeIdx !== idx + 1,
+        setActive: isRunning && activeIdx !== idx,
+      }));
+    }).value;
+
+    const onShift = useCallback((idx: number, direction: 1 | -1): void => {
+      const workflow = activeWorkflow.peek()!;
+      const steps = [...workflow.steps];
+      swapElements(steps, idx, idx + direction);
+      workflow.steps = steps;
+      reRender();
+
+      WorkflowRegistry.inst.save();
+    }, [activeWorkflow]);
+
+    return (
+      <BorderedBlock kind={borderClass.value} size={4} class={'mt-2'}>
+        <div class={'row row-deck'}>
+          {activeWorkflow.value!.steps.map((step, idx) => (
+            <DashboardStep key={step.listId}
+              onShift={direction => {
+                onShift(idx, direction);
+              }}
+              onSetActive={() => {
+                WorkflowRegistry.inst.primaryExecution$.value!.setActiveStepIdx(idx);
+              }}
+              step={step}
+              {...stepProps[idx]}/>
+          ))}
+        </div>
+      </BorderedBlock>
+    );
+  }
 );
+
+function ActiveWorkflowSelect({
+  activeWorkflow,
+  activeWorkflowId,
+  workflows,
+}: Pick<EditorProps, 'activeWorkflow' | 'activeWorkflowId' | 'workflows'>) {
+  const wfsRef = useRef(workflows);
+  wfsRef.current = workflows;
+
+  const onWorkflowChange = useCallback((e: Event) => {
+    const listId = parseInt((e.target as HTMLSelectElement).value);
+
+    batch(() => {
+      activeWorkflow.value = isNaN(listId) ? undefined : wfsRef.current.find(wf => wf.listId === listId);
+      WorkflowRegistry.inst.setPrimaryExecution(); // unset, really
+    });
+  }, [activeWorkflow, wfsRef]);
+
+  return (
+    <Fragment>
+      <div className={'col-auto font-w600 font-size-sm pr-1'}>Active workflow</div>
+      <div className={'col-auto'}>
+        <select className={'form-control form-control-sm'} value={activeWorkflowId.value ?? ''}
+          onChange={onWorkflowChange}>
+          {workflows.map(wf => <option key={wf.listId} value={wf.listId}>{wf.name}</option>)}
+        </select>
+      </div>
+    </Fragment>
+  );
+}
 
 interface SelectedWorkflowBtnsProps extends Pick<EditorProps, 'activeWorkflow' | 'editedWorkflow' | 'running'> {
   refresh(): void;
@@ -284,28 +345,13 @@ function Editor({activeWorkflow, editedWorkflow: editedWorkflowIn}: EditorProps)
   );
 }
 
-function WithWorkflows({workflows}: {workflows: Workflow[]}): VNode {
-  const props = useEditorProps(workflows);
+function Inner(): VNode {
+  const workflows = useBehaviourSubject(WorkflowRegistry.inst.workflows$);
 
-  return h<EditorProps>(props.editedWorkflow.value ? Editor : DashboardShell, props);
+  return workflows.length
+    ? (<WithWorkflows workflows={workflows}/>)
+    : (<NoDashboardsDefined/>);
 }
-
-const NoDashboardsDefined = staticComponent(() => {
-  const openWorkflowPage = useCallback((e: Event) => {
-    e.preventDefault();
-    sidebarItems.value.newWorkflow.click();
-  }, EMPTY_ARR);
-
-  return (
-    <div class={'alert alert-info text-center'}>
-      <span>{'You haven\'t defined any workflows! Go! '}</span>
-      <a href={'#'} onClick={openWorkflowPage}>
-        <span>{'Do this '}</span>
-        <strong>{'now!'}</strong>
-      </a>
-    </div>
-  );
-});
 
 function evtTypeMapper(evt: WorkflowEvent): Observable<string> {
   switch (evt.type) {

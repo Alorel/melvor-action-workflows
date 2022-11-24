@@ -94,6 +94,10 @@ export default class WorkflowRegistry {
     this.workflows$.next(out);
   }
 
+  public save(): void {
+    store(this.workflows);
+  }
+
   public setPrimaryExecution(workflow?: Workflow): void {
     if (workflow?.listId !== this.primaryExecution$.value?.workflow.listId) {
       this.primaryExecution$.next(workflow ? new WorkflowExecution(workflow) : undefined);

@@ -5,6 +5,7 @@ import type {Workflow} from '../data/workflow.mjs';
 export const enum WorkflowEventType {
   ACTION_COMPLETE,
   STEP_LISTENING,
+  STEP_NOT_LISTENING,
   STEP_COMPLETE,
   WORKFLOW_START,
   WORKFLOW_COMPLETE,
@@ -14,6 +15,7 @@ export type WorkflowEvent = WorkflowCompleteEvent
   | WorkflowStartEvent
   | ActionExecutionEvent
   | StepListeningEvent
+  | StepNotListeningEvent
   | StepCompleteEvent;
 
 export type WorkflowCompleteEvent = WorkflowEventBase & Result<void> & {
@@ -30,6 +32,10 @@ export type StepCompleteEvent = StepEventBase & Result<void> & {
 
 export interface StepListeningEvent extends StepEventBase {
   type: WorkflowEventType.STEP_LISTENING;
+}
+
+export interface StepNotListeningEvent extends StepEventBase {
+  type: WorkflowEventType.STEP_NOT_LISTENING;
 }
 
 export type ActionExecutionEvent = Result<void> & Ref & {
