@@ -17,6 +17,7 @@ import {
   scheduled,
   startWith,
   takeUntil,
+  tap,
   throwError
 } from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
@@ -44,11 +45,15 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
 
   private readonly _activeStepIdx$ = new BehaviorSubject<number>(0);
 
+  private incrementActiveStep = true;
+
   private mainSub?: Subscription;
 
   private readonly mainSubObserver: Observer<Out> = {
     complete: () => {
-      ++this.activeStepIdx;
+      if (this.incrementActiveStep) {
+        ++this.activeStepIdx;
+      }
       this.mainSub = asapScheduler.schedule(this.tick);
     },
     error: (e: Error) => {
@@ -74,7 +79,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     return this._activeStepIdx$.value;
   }
 
-  public set activeStepIdx(v: number) {
+  private set activeStepIdx(v: number) {
     if (v === this.activeStepIdx) {
       return;
     }
@@ -83,6 +88,12 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
 
   private get activeStep(): WorkflowStep | undefined {
     return this.workflow.steps[this.activeStepIdx];
+  }
+
+  public setActiveStepIdx(v: number): void {
+    this.incrementActiveStep = false;
+    this.activeStepIdx = v;
+    this.incrementActiveStep = true;
   }
 
   /** @inheritDoc */
@@ -201,13 +212,39 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       });
     });
 
-    return concat(exec$, onSuccess$).pipe(
-      this.whileStepIs(idx),
+    const src$: Observable<Out> = concat(exec$, onSuccess$).pipe(
       startWith<StepListeningEvent>({
         ...baseEvt,
         type: WorkflowEventType.STEP_LISTENING,
       })
     );
+
+    return this
+      .ifIncomplete(src$, {
+        ...baseEvt,
+        type: WorkflowEventType.STEP_NOT_LISTENING,
+      })
+      .pipe(this.whileStepIs(idx));
+  }
+
+  private ifIncomplete<V>(src: Observable<V>, thenEmitEvent: WorkflowEvent): Observable<V> {
+    return new Observable<V>(subscriber => {
+      let completed = false;
+      const flagComplete = (): void => {
+        completed = true;
+      };
+      const sub = src
+        .pipe(tap({complete: flagComplete, error: flagComplete}))
+        .subscribe(subscriber);
+
+      return () => {
+        if (!completed) {
+          this.next(thenEmitEvent);
+        }
+
+        sub.unsubscribe();
+      };
+    });
   }
 
   private mkCompleteEvent(ok: true): WorkflowCompleteEvent;
