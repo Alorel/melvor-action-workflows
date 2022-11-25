@@ -21,11 +21,16 @@ jobs:
         with:
           node-version: 18
           cache: npm
+          registry-url: https://npm.pkg.github.com
       - name: NPM install
-        run: npm ci
+        run: npm ci --no-fund
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Lint
         run: npm run lint
       - run: npm run rollup:prod
         name: Build
+        env:
+          MELVOR_MOD_VERSION: ${{ github.ref_name }}
       - run: npm run modio -- upload --token "${{ secrets.MOD_IO_API_TOKEN }}" --mod-version "${{ github.ref_name }}" --changelog "${{ steps.get-body.outputs.result }}"
         name: Publish
