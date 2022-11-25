@@ -33,7 +33,7 @@ export const mainIcon = game.items.getObject('melvorD', 'Rubber_Ducky')!.media;
         {
           ...pageCommon,
           containerID: WORKFLOWS_DASHBOARD_ID,
-          customName: 'Action Workflows Dashboard',
+          customName: `[${process.env.MELVOR_MOD_VERSION}] Action Workflows Dashboard`,
           id: 'actionWorkflowsDashboard',
           sidebarSubItems: [
             cat({name: 'Dashboard'}),
@@ -42,7 +42,7 @@ export const mainIcon = game.items.getObject('melvorD', 'Rubber_Ducky')!.media;
         {
           ...pageCommon,
           containerID: NEW_WORKFLOW_PAGE_ID,
-          customName: 'New Action Workflow',
+          customName: `[${process.env.MELVOR_MOD_VERSION}] New Action Workflow`,
           id: 'newActionWorkflow',
           sidebarSubItems: [
             cat({name: 'New Action Workflow'}),

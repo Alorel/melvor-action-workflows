@@ -66,6 +66,7 @@ export default function (opts) {
         include: srcInclude,
         preventAssignment: true,
         values: {
+          'process.env.MELVOR_MOD_VERSION': JSON.stringify(process.env.MELVOR_MOD_VERSION || 'dev'),
           'process.env.PRODUCTION': String(prod),
         },
       }),
