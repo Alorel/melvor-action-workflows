@@ -37,7 +37,7 @@ export default abstract class SkillAction<T extends object, S extends GatheringS
     this.category = category;
     this.skill = game[skillKey] as any;
     this.media = media ?? this.skill.media;
-    this.label = label ?? this.skill.name;
+    this.label = label ?? `Start ${this.skill.name}`;
     if (options) {
       this.options = options;
     }
