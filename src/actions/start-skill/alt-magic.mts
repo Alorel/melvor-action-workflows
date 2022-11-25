@@ -53,7 +53,7 @@ defineAction<Props>({
       asyncScheduler
     )
   ),
-  label: 'Alt Magic',
+  label: 'Start Alt. Magic',
   localID: 'startAltMagic',
   media: magic.media,
   namespace,
