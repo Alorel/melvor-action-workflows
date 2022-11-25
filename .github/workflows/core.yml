@@ -22,3 +22,5 @@ jobs:
         run: npm run rollup
       - name: Lint
         run: npm run lint
+      - name: Test axios
+        run: npm run modio -- next-dev-version --token "${{ secrets.MOD_IO_API_TOKEN }}"
