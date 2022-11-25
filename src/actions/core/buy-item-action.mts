@@ -31,7 +31,6 @@ defineLocalAction<Props>({
       min: 1,
       showIf: ({item}: Partial<Props>) => item?.allowQuantityPurchase === true,
       type: Number,
-      uiKey: ({item}: Partial<Props>) => item?.id ?? '',
     },
   ],
 });

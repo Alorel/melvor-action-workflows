@@ -177,7 +177,4 @@ export interface NodeOptionBase extends Omit<Referenceable, 'namespace'> {
   type: any;
 
   showIf?(optionValues: Obj<any>): boolean;
-
-  /** Key used to re-render the component */
-  uiKey?(optionValues: Obj<any>): string | number;
 }

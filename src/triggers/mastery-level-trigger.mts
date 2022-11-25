@@ -37,7 +37,6 @@ const triggerCtx = defineLocalTrigger<Data<any>>({
       required: true,
       showIf: ({skill}: Data<any>) => Boolean(skill),
       type: 'MediaItem',
-      uiKey: ({skill}: Data<any>) => skill?.id ?? '',
     },
     {
       label: 'Level',

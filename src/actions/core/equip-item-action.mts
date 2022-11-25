@@ -91,7 +91,6 @@ defineLocalAction<Props>({
         items?.length === 1 && Boolean(items[0]?.validSlots?.includes(EquipSlotType.Passive))
       ),
       type: Boolean,
-      uiKey: ({items}: Props) => items[0].id,
     },
   ],
 });

@@ -29,7 +29,6 @@ defineAction(
           required: true,
           showIf: ({recipe}: SingleRecipeData<Fletching>) => Boolean(recipe?.alternativeCosts?.length),
           type: 'AltRecipeCost',
-          uiKey: ({recipe}: SingleRecipeData<Fletching>) => recipe!.id,
         },
       ],
       skillKey: 'fletching',
