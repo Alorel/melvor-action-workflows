@@ -422,6 +422,8 @@ export class WeaponItem extends Item {
 }
 
 export class EquipmentItem extends Item {
+  ammoType?: AmmoTypeID;
+
   validSlots: EquipSlotType[];
 }
 
@@ -449,6 +451,14 @@ export class Item extends NamespacedObject {
   get hasDescription(): boolean;
 
   get media(): string;
+}
+
+export enum AmmoTypeID {
+  Arrows = 0,
+  Bolts = 1,
+  Javelins = 2,
+  ThrowingKnives = 3,
+  None = 4,
 }
 
 export class SingleProductRecipe extends BasicSkillRecipe {

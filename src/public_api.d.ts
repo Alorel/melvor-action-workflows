@@ -66,7 +66,7 @@ export interface StringNodeOption extends NodeOptionBase {
    * Render a `<select>` of these options instead of an `<input>`.
    * key = model value, value = display label
    */
-  enum?: Obj<string>;
+  enum?: Obj<string> | ((otherValues: any) => Obj<string>);
 
   type: StringConstructor;
 }
