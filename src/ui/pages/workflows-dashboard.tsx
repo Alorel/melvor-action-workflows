@@ -6,7 +6,7 @@ import type {VNode} from 'preact';
 import {Fragment, h} from 'preact';
 import {memo} from 'preact/compat';
 import {useCallback, useEffect, useRef} from 'preact/hooks';
-import type {Observable} from 'rxjs';
+import type {Observable, OperatorFunction} from 'rxjs';
 import {distinctUntilChanged, EMPTY, map, merge, of, skip, switchMap} from 'rxjs';
 import {Workflow} from '../../lib/data/workflow.mjs';
 import type {WorkflowCompleteEvent, WorkflowEvent} from '../../lib/execution/workflow-event.mjs';
@@ -27,6 +27,10 @@ import DashboardStep from './workflows-dashboard/dashboard-step';
 import {NoDashboardsDefined} from './workflows-dashboard/no-dashboards-defined';
 
 /* eslint-disable max-lines */
+
+const enum Strings {
+  STD_CLASS = 'summoning',
+}
 
 export const WORKFLOWS_DASHBOARD_ID = autoId();
 
@@ -67,9 +71,6 @@ function useEditorProps(workflows: Workflow[]) {
 }
 
 function usePrimaryExecutionSignal() {
-  const enum Strings {
-    STD_CLASS = 'summoning',
-  }
 
   const reg = WorkflowRegistry.inst;
   const running = useSignal(false);
@@ -94,12 +95,12 @@ function usePrimaryExecutionSignal() {
           running.value = true;
 
           const border$ = exec.pipe(
-            switchMap(evtTypeMapper),
+            eventToBorder(running),
             distinctWithInitial<string>(Strings.STD_CLASS)
           );
-          const stepIdx$ = getStepIdx(exec, activeStepIdx);
+          const stepIdxNever$ = getStepIdx(exec, activeStepIdx);
 
-          return merge(border$, stepIdx$);
+          return merge(border$, stepIdxNever$);
         })
       )
       .subscribe(border => {
@@ -109,13 +110,27 @@ function usePrimaryExecutionSignal() {
     return () => {
       sub.unsubscribe();
     };
-  }, [borderClass, activeStepIdx]);
+  }, EMPTY_ARR);
 
   return {
     activeStepIdx: activeStepIdx as ReadonlySignal<number>,
     borderClass: borderClass as ReadonlySignal<string>,
     running: running as ReadonlySignal<boolean>,
   } as const;
+}
+
+function eventToBorder(running: Signal<boolean>): OperatorFunction<WorkflowEvent, string> {
+  return switchMap(evt => {
+    switch (evt.type) {
+      case WorkflowEventType.WORKFLOW_START:
+        return of('agility');
+      case WorkflowEventType.WORKFLOW_COMPLETE:
+        running.value = false;
+        return of((evt as WorkflowCompleteEvent).ok ? 'woodcutting' : 'fletching');
+      default:
+        return EMPTY;
+    }
+  });
 }
 
 function getStepIdx(exec: WorkflowExecution, activeStepIdx: Signal<number>): Observable<never> {
@@ -351,15 +366,4 @@ function Inner(): VNode {
   return workflows.length
     ? (<WithWorkflows workflows={workflows}/>)
     : (<NoDashboardsDefined/>);
-}
-
-function evtTypeMapper(evt: WorkflowEvent): Observable<string> {
-  switch (evt.type) {
-    case WorkflowEventType.WORKFLOW_START:
-      return of('agility');
-    case WorkflowEventType.WORKFLOW_COMPLETE:
-      return of((evt as WorkflowCompleteEvent).ok ? 'woodcutting' : 'fletching');
-    default:
-      return EMPTY;
-  }
 }
