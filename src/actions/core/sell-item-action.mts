@@ -11,7 +11,7 @@ defineLocalAction<Props>({
   execute({items}) {
     for (const item of items) {
       const qty = game.bank.getQty(item);
-      if (qty) {
+      if (qty > 0) {
         game.bank.processItemSale(item, qty);
       }
     }

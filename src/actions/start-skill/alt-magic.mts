@@ -25,8 +25,8 @@ defineAction<Props>({
   execute: ({bar, food, junk, item, recipe, superGem}) => (
     scheduled(
       new Observable<void>(subscriber => {
+        game.stopActiveAction();
         magic.selectSpellOnClick(recipe);
-        magic.stop();
 
         switch (recipe.specialCost.type) {
           case AltMagicConsumptionID.AnyItem:

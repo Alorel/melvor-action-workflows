@@ -638,4 +638,6 @@ export class Game {
   woodcutting: Woodcutting;
 
   checkRequirement(req: Requirement): boolean;
+
+  public stopActiveAction(): void;
 }
