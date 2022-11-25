@@ -49,6 +49,9 @@ yargs(processArgs)
         default: false,
         describe: 'Upload as the active version?',
       },
+      changelog: {
+        describe: 'Optional changelog string',
+      },
       'mod-version': {
         demandOption: !shouldPrompt,
         describe: 'New version to publish',
@@ -57,7 +60,7 @@ yargs(processArgs)
     },
     command: 'upload',
     describe: 'Upload a new mod version',
-    async handler({active, modVersion: versionOrNull, token}) {
+    async handler({active, changelog, modVersion: versionOrNull, token}) {
       try {
         let modVersion;
         if (versionOrNull) {
@@ -112,6 +115,9 @@ yargs(processArgs)
         form.append('filedata', createReadStream(modFileLocation));
         form.append('version', modVersion);
         form.append('active', String(active));
+        if (changelog) {
+          form.append('changelog', changelog);
+        }
 
         const {data} = await axios.post(`${baseUrl}/files`, form, {
           headers: {

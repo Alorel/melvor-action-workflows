@@ -1,0 +1,31 @@
+name: Make release
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        name: Get changelog
+        id: get-body
+        with:
+          script: return context.payload.release.body;
+      - uses: actions/checkout@v3
+        name: Checkout
+      - uses: actions/setup-node@v3
+        name: Set up Node
+        with:
+          node-version: 18
+          cache: npm
+      - name: NPM install
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - run: npm run rollup:prod
+        name: Build
+      - run: npm run modio -- upload --token "${{ secrets.MOD_IO_API_TOKEN }}" --mod-version "${{ github.ref_name }}" --changelog "${{ steps.get-body.outputs.result }}"
+        name: Publish
