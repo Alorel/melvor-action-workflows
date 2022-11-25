@@ -74,6 +74,7 @@ export default function (opts) {
       }),
       prod && iifeWrapPlugin({
         vars: [
+          'AltMagicConsumptionID',
           'Array',
           'Boolean',
           'console',

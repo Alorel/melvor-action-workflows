@@ -12,6 +12,7 @@ class AgilityAction extends SkillAction<{}, Agility> {
   /** @inheritDoc */
   public override execute(): Observable<void> {
     return new Observable(subscriber => {
+      this.skill.stop();
       this.skill.start();
       nextComplete(subscriber);
     });
