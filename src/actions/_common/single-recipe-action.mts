@@ -26,12 +26,17 @@ export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gatheri
     this.skill.createButtonOnClick();
   }
 
-  public static altArtisanExec(this: BarebonesThis, data: Pick<AltRecipeData<BarebonesSkill>, 'alt' | 'recipe'>): void {
-    if (data.alt != null) {
-      this.skill.selectAltRecipeOnClick(data.alt);
+  public static altArtisanExec(
+    this: BarebonesThis,
+    {alt, recipe}: Pick<AltRecipeData<BarebonesSkill>, 'alt' | 'recipe'>
+  ): void {
+    this.skill.selectRecipeOnClick(recipe);
+
+    if (alt != null) {
+      this.skill.selectAltRecipeOnClick(alt);
     }
 
-    SingleRecipeAction.artisanExec.call(this, data);
+    this.skill.createButtonOnClick();
   }
 
   public static new<S extends Gathering>(

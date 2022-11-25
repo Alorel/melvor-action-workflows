@@ -81,7 +81,7 @@ export class RecipeAction<T extends object, S extends Gathering, R>
   public execute(data: T): Observable<void> {
     return new Observable<void>(s => {
       const prep = this.prepareExec(data);
-      this.skill.stop();
+      game.stopActiveAction();
       this.exec(data, prep);
       nextComplete(s);
     });
