@@ -1,11 +1,11 @@
 import {isPlainObject} from 'lodash-es';
 import type {VNode} from 'preact';
 import {Fragment, h} from 'preact';
-import {useMemo} from 'preact/compat';
 import {useCallback} from 'preact/hooks';
 import {defineOption} from '../lib/api.mjs';
-import {EMPTY_ARR} from '../lib/util.mjs';
-import type {OptionRenderEditCtx, StringNodeOption} from '../public_api';
+import {EMPTY_ARR, EMPTY_OBJ} from '../lib/util.mjs';
+import {resolveDynamicOptionObject} from '../lib/util/dynamic-option.mjs';
+import type {Obj, OptionRenderEditCtx, StringNodeOption} from '../public_api';
 import Btn from '../ui/components/btn';
 import {BinSvg} from '../ui/components/svg';
 import {useRenderEditTouch} from './_common.mjs';
@@ -13,22 +13,28 @@ import {useRenderEditTouch} from './_common.mjs';
 defineOption<string, StringNodeOption>({
   is: (v): v is StringNodeOption => (
     v.type === String
-    && (v.enum == null || isPlainObject(v.enum))
+    && (v.enum == null || isPlainObject(v.enum) || typeof v.enum === 'function')
   ),
   renderEdit: ctx => h(ctx.option.enum ? RenderEnumOpts : RenderInput, ctx),
-  renderView: ({value, option}) => (
+  renderView: ({value, option, otherValues}) => (
     <Fragment>{
       value && option.enum
-        ? option.enum[value] ?? value
+        ? (resolveDynamicOptionObject(option.enum, otherValues)?.[value] ?? value)
         : value
     }</Fragment>
   ),
   token: String,
-  validate: (value: string | undefined, {enum: dEnum}: StringNodeOption): string[] => (
-    value != null && dEnum && !(value in dEnum)
-      ? [`Value should be one of the following: "${Object.values(dEnum).join('", "')}"`]
-      : EMPTY_ARR
-  ),
+  validate(value: string | undefined, {enum: dEnum}: StringNodeOption, otherValues): string[] {
+    if (value == null || !dEnum) {
+      return EMPTY_ARR;
+    }
+
+    const obj: Obj<string> = resolveDynamicOptionObject(dEnum, otherValues) ?? EMPTY_OBJ;
+
+    return value in obj
+      ? EMPTY_ARR
+      : [`Value should be one of the following: "${Object.values(dEnum).join('", "')}"`];
+  },
 });
 
 function RenderInput({
@@ -43,7 +49,8 @@ function RenderInput({
 }
 
 function RenderEnumOpts({
-  option: {enum: enumOpts, required},
+  option: {enum: rawEnumOpts, required},
+  otherValues,
   value = '',
   onChange,
 }: OptionRenderEditCtx<string, StringNodeOption>): VNode {
@@ -51,13 +58,14 @@ function RenderEnumOpts({
   const clear = useCallback(() => {
     onChange(undefined);
   }, []);
-  const entries = useMemo(() => Object.entries(enumOpts!), [enumOpts]);
+
+  const enumOpts = resolveDynamicOptionObject(rawEnumOpts!, otherValues);
 
   return (
     <div class={'input-group'}>
       {!required && <Btn kind={'danger'} size={'sm'} onClick={clear}><BinSvg/></Btn>}
       <select class={'form-control form-control-sm'} onBlur={onBlur} onChange={onInp} value={value}>
-        {entries.map(renderEnumEntryMapper)}
+        {enumOpts && Object.entries(enumOpts).map(renderEnumEntryMapper)}
       </select>
     </div>
   );

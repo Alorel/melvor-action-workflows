@@ -1,96 +1,69 @@
-import type {EquipItemArgSlot, EquipmentItem as TEquipmentItem} from 'melvor';
+import type {EquipmentItem as TEquipmentItem} from 'melvor';
 import {EquipSlotType} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 
 interface Props {
-  items: TEquipmentItem[];
+  item: TEquipmentItem;
 
-  passive?: boolean;
-}
+  qty?: number;
 
-function *summoningSlots(): IterableIterator<EquipSlotType> {
-  {
-    const {Summon1, Summon2} = game.combat.player.equipment.slots;
-    const emptyId = game.emptyEquipmentItem.id;
-
-    if (Summon1.item.id !== emptyId && Summon2.item.id === emptyId) {
-      yield EquipSlotType.Summon2;
-    }
-  }
-
-  yield EquipSlotType.Summon1;
-  while (true) {
-    yield EquipSlotType.Summon2;
-  }
-}
-
-function equipPassive(item: TEquipmentItem | undefined): void {
-  const player = game.combat.player;
-  if (!item?.validSlots?.includes(EquipSlotType.Passive) || !player.isEquipmentSlotUnlocked(EquipSlotType.Passive)) {
-    return;
-  }
-
-  const qty = game.bank.getQty(item);
-  if (qty) {
-    player.equipItem(item, player.equipToSet, EquipSlotType.Passive, qty);
-  }
-}
-
-function equipNonPassive(items: TEquipmentItem[]): void {
-  const player = game.combat.player;
-  const summonSlot = summoningSlots();
-
-  for (const item of items) {
-    const qty = game.bank.getQty(item);
-    if (!qty) {
-      continue;
-    }
-
-    const slot: EquipItemArgSlot = item.validSlots.includes(EquipSlotType.Summon1)
-      ? summonSlot.next().value
-      : 'Default';
-
-    player.equipItem(item, player.equipToSet, slot, qty);
-  }
+  slot?: EquipSlotType;
 }
 
 defineLocalAction<Props>({
   category: InternalCategory.CORE,
-  execute({items, passive}) {
-    const player = game.combat.player;
-
-    player.changeEquipToSet(player.selectedEquipmentSet);
-
-    if (passive) {
-      equipPassive(items[0]);
-    } else {
-      equipNonPassive(items);
+  execute({item, qty, slot}) {
+    const bankQty = game.bank.getQty(item);
+    if (!bankQty) {
+      return;
     }
+
+    const player = game.combat.player;
+    player.changeEquipToSet(player.selectedEquipmentSet);
+    player.equipItem(item, player.equipToSet, slot || 'Default', qty ?? bankQty);
   },
-  initOptions: () => ({items: [undefined as any]}),
-  label: 'Equip items',
+  label: 'Equip item',
   localID: 'equipItem',
   media: game.items.getObjectByID('melvorD:Black_Platebody')!.media,
   options: [
     {
-      description: 'Choose a single item with a pasive effect to be able to explicitly equip it to the passive slot.',
-      label: 'Item(s)',
-      localID: 'items',
+      label: 'Item',
+      localID: 'item',
       mediaFilter: item => item instanceof EquipmentItem,
-      multi: true,
       registry: 'items',
       required: true,
       type: 'MediaItem',
     },
     {
-      description: 'No effect if the passive slot isn\'t unlocked',
-      label: 'Equip to passive slot',
-      localID: 'passive',
-      showIf: ({items}: Partial<Props>) => (
-        items?.length === 1 && Boolean(items[0]?.validSlots?.includes(EquipSlotType.Passive))
-      ),
-      type: Boolean,
+      enum: ({item}: Props) => objectFromArray(item.validSlots),
+      label: 'Slot',
+      localID: 'slot',
+      showIf: ({item}: Partial<Props>) => (item?.validSlots?.length ?? 0) > 1,
+      type: String,
+    },
+    {
+      label: 'Quantity',
+      localID: 'qty',
+      min: 1,
+      showIf: ({item}: Partial<Props>) => SLOTS_WITH_QTY.has(item?.validSlots[0] as EquipSlotType),
+      type: Number,
     },
   ],
 });
+
+function objectFromArray<T extends string>(values: T[]): Record<T, T> {
+  const out: Record<T, T> = {} as any;
+  for (const v of values) {
+    out[v] = v;
+  }
+
+  return out;
+}
+
+const SLOTS_WITH_QTY = new Set<EquipSlotType>([
+  EquipSlotType.Consumable,
+  EquipSlotType.Quiver,
+  EquipSlotType.Summon1,
+  EquipSlotType.Summon2,
+]);
