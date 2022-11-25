@@ -25,7 +25,6 @@ defineAction(
           required: true,
           showIf: ({recipe}: SingleRecipeData<Summoning>) => Boolean(recipe?.nonShardItemCosts.length),
           type: 'AltRecipeCost',
-          uiKey: ({recipe}: SingleRecipeData<Summoning>) => recipe!.id,
         },
       ],
       skillKey: 'summoning',

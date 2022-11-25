@@ -30,7 +30,6 @@ defineAction(
           },
           registry: ['cooking', 'actions'],
           type: 'MediaItem',
-          uiKey: ({recipe}: Data) => recipe?.id ?? '',
         },
       ],
       skillKey: 'cooking',
