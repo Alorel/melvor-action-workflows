@@ -20,11 +20,7 @@ defineLocalAction<Props>({
     {
       label: 'Item',
       localID: 'item',
-      mediaFilter(item: ShopPurchase) {
-        const limit = item.getBuyLimit(game.currentGamemode);
-
-        return limit === Number.POSITIVE_INFINITY || limit > game.shop.getPurchaseCount(item);
-      },
+      mediaFilter: (item: ShopPurchase) => item.getBuyLimit(game.currentGamemode) > game.shop.getPurchaseCount(item),
       registry: 'shop.purchases',
       required: true,
       type: 'MediaItem',
@@ -33,7 +29,7 @@ defineLocalAction<Props>({
       label: 'Quantity',
       localID: 'qty',
       min: 1,
-      showIf: ({item}: Partial<Props>) => item?.getBuyLimit(game.currentGamemode) !== Number.POSITIVE_INFINITY,
+      showIf: ({item}: Partial<Props>) => item?.allowQuantityPurchase === true,
       type: Number,
       uiKey: ({item}: Partial<Props>) => item?.id ?? '',
     },
