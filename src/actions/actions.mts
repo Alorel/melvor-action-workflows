@@ -4,6 +4,7 @@ import './core/equip-item-action.mjs';
 import './core/sell-item-action.mjs';
 import './core/switch-equipment-set-action.mjs';
 import './start-skill/agility.mjs';
+import './start-skill/alt-magic.mjs';
 import './start-skill/astrology.mjs';
 import './start-skill/cooking.mjs';
 import './start-skill/crafting.mjs';

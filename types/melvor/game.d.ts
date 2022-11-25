@@ -242,6 +242,52 @@ export class ArtisanSkill<T> extends GatheringSkill<T> {
 export class SingleProductArtisanSkillRecipe extends CategorizedArtisanRecipe {
 }
 
+export enum AltMagicConsumptionID {
+  AnyItem = -1,
+  AnyNormalFood = -7,
+  AnySuperiorGem = -6,
+  BarIngredientsWithCoal = -3,
+  BarIngredientsWithoutCoal = -4,
+  JunkItem = -2,
+  None = -5,
+}
+
+interface RuneRequirement {
+  item: Item;
+
+  quantity: number;
+}
+
+export class BaseSpell extends NamespacedObject {
+  level: number;
+
+  requirements: any[];
+
+  runesRequired: RuneRequirement[];
+}
+
+export class AltMagicSpell extends BaseSpell {
+  runesRequiredAlt: RuneRequirement[];
+
+  specialCost: AltMagicSpecialCost;
+}
+
+export interface AltMagicSpecialCost {
+  quantity: number;
+
+  type: AltMagicConsumptionID;
+}
+
+export class AltMagic extends CraftingSkill<AltMagicSpell> {
+  castButtonOnClick(): void;
+
+  selectBarOnClick(smithingRecipe: SingleProductArtisanSkillRecipe): void;
+
+  selectItemOnClick(item: Item): void;
+
+  selectSpellOnClick(spell: AltMagicSpell): void;
+}
+
 export const enum EquipSlotType {
   Amulet = 'Amulet',
   Boots = 'Boots',
@@ -343,9 +389,11 @@ export class Summoning extends ArtisanSkill<SummoningRecipe> {
 }
 
 export class Smithing extends ArtisanSkill<SingleProductArtisanSkillRecipe> {
+  categories: NamespaceRegistry<SkillCategory>;
 }
 
 export class CategorizedArtisanRecipe extends ArtisanSkillRecipe {
+  category: SkillCategory;
 }
 
 export class ArtisanSkillRecipe extends BasicSkillRecipe {
@@ -374,6 +422,10 @@ export class WeaponItem extends Item {
 
 export class EquipmentItem extends Item {
   validSlots: EquipSlotType[];
+}
+
+export class FoodItem extends Item {
+
 }
 
 export class Item extends NamespacedObject {
@@ -538,6 +590,8 @@ export class Game {
   activeAction?: Skill;
 
   agility: Agility;
+
+  altMagic: AltMagic;
 
   astrology: Astrology;
 
