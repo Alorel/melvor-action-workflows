@@ -1,6 +1,8 @@
 import {startCase} from 'lodash-es';
 import {namespace} from '../manifest.json';
+import type {Obj} from '../public_api';
 import './assets/styles.scss';
+import {DEBUG_PAGE_ID} from './pages/debug-page';
 import {NEW_WORKFLOW_PAGE_ID} from './pages/new-workflow';
 import {WORKFLOWS_DASHBOARD_ID} from './pages/workflows-dashboard';
 
@@ -27,29 +29,38 @@ export const mainIcon = game.items.getObject('melvorD', 'Rubber_Ducky')!.media;
     media: mainIcon,
   };
 
-  await ctx.gameData.addPackage({
-    data: {
-      pages: [
-        {
-          ...pageCommon,
-          containerID: WORKFLOWS_DASHBOARD_ID,
-          customName: `[${process.env.MELVOR_MOD_VERSION}] Action Workflows Dashboard`,
-          id: 'actionWorkflowsDashboard',
-          sidebarSubItems: [
-            cat({name: 'Dashboard'}),
-          ],
-        },
-        {
-          ...pageCommon,
-          containerID: NEW_WORKFLOW_PAGE_ID,
-          customName: `[${process.env.MELVOR_MOD_VERSION}] New Action Workflow`,
-          id: 'newActionWorkflow',
-          sidebarSubItems: [
-            cat({name: 'New Action Workflow'}),
-          ],
-        },
+  const pages: Array<Obj<any>> = [
+    {
+      ...pageCommon,
+      containerID: WORKFLOWS_DASHBOARD_ID,
+      customName: `[${process.env.MELVOR_MOD_VERSION}] Action Workflows Dashboard`,
+      id: 'actionWorkflowsDashboard',
+      sidebarSubItems: [
+        cat({name: 'Dashboard'}),
       ],
     },
-    namespace,
-  });
+    {
+      ...pageCommon,
+      containerID: NEW_WORKFLOW_PAGE_ID,
+      customName: `[${process.env.MELVOR_MOD_VERSION}] New Action Workflow`,
+      id: 'newActionWorkflow',
+      sidebarSubItems: [
+        cat({name: 'New Action Workflow'}),
+      ],
+    },
+  ];
+
+  if (!process.env.PRODUCTION) {
+    pages.push({
+      ...pageCommon,
+      containerID: DEBUG_PAGE_ID,
+      customName: `v${process.env.MELVOR_MOD_VERSION}`,
+      id: 'actionWorkflowsDebugPage',
+      sidebarSubItems: [
+        cat({name: 'Action Workflows Dev'}),
+      ],
+    });
+  }
+
+  await ctx.gameData.addPackage({data: {pages}, namespace});
 }

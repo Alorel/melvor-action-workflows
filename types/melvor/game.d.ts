@@ -386,6 +386,7 @@ export class SummoningRecipe extends CategorizedArtisanRecipe {
 }
 
 export class Summoning extends ArtisanSkill<SummoningRecipe> {
+  discoverMark(recipe: SummoningRecipe): void;
 }
 
 export class Smithing extends ArtisanSkill<SingleProductArtisanSkillRecipe> {
@@ -531,6 +532,16 @@ export class Shop extends NamespacedObject {
   getPurchaseCount(purchase: ShopPurchase): number;
 }
 
+export class Currency {
+  add(num: number): void;
+}
+
+export class GP extends Currency {
+}
+
+export class SlayerCoins extends Currency {
+}
+
 export class Gamemode extends NamespacedObject {
 }
 
@@ -613,6 +624,8 @@ export class Game {
 
   fletching: Fletching;
 
+  gp: GP;
+
   herblore: Herblore;
 
   items: ItemRegistry;
@@ -628,6 +641,8 @@ export class Game {
   shop: Shop;
 
   skills: NamespaceRegistry<Skill>;
+
+  slayerCoins: SlayerCoins;
 
   smithing: Smithing;
 

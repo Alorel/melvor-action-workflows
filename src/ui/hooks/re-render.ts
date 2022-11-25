@@ -1,9 +1,10 @@
 import {useCallback, useState} from 'preact/hooks';
+import {isFalsy} from '../../lib/util.mjs';
 
 export default function useReRender(): () => void {
-  const setValue = useState(Number.MIN_VALUE)[1];
+  const setValue = useState(false)[1];
 
   return useCallback(() => {
-    setValue(val => val + 1);
+    setValue(isFalsy);
   }, []);
 }
