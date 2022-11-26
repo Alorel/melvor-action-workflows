@@ -92,7 +92,7 @@ function LvAllSkills(): VNode {
         'farming',
         'township',
       ]) {
-        (game[skill] as unknown as (Partial<Skill> | undefined))?.addXP?.(1_000_000_000);
+        (game[skill] as unknown as (Partial<Skill> | undefined))?.addXP?.(104_273_168);
       }
     }}
     kind={'primary'}>{'Level up'}</Btn>
