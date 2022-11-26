@@ -20,7 +20,7 @@ export async function listModVersions(token) {
       headers: baseHeaders(tok),
     });
 
-  return data.map(file => file.version);
+  return data.map(({id, version}) => ({id, version}));
 }
 
 export function baseHeaders(token) {

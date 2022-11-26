@@ -5,8 +5,8 @@ export default {
   describe: 'List published versions',
   async handler({token}) {
     try {
-      for (const v of await listModVersions(token)) {
-        console.log(v);
+      for (const {version, id} of await listModVersions(token)) {
+        console.log(id, '~', version);
       }
     } catch (e) {
       onErr(e);

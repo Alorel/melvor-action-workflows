@@ -20,7 +20,7 @@ export default {
             listModVersions(token)
           ])
           .then(([parse, rawVersions]) => {
-            const versions = rawVersions.map(rv => parse(rv));
+            const versions = rawVersions.map(({version}) => parse(version));
             versions.sort((a, b) => a.compare(b));
 
             return versions[versions.length - 1];

@@ -15,7 +15,8 @@
     "rollup:watch": "npm run rollup -- --watch",
     "modio": "node build/modio.mjs",
     "modio:dev": "node build/modio.mjs --token auto",
-    "publish:alpha:dev": "npm run modio:dev -- upload --mod-version $(node build/modio.mjs --token auto next-dev-version)",
+    "rm-alpha-versions": "npm run modio:dev -- rm-modfiles --versions $(npm run modio:dev -- list-versions | grep alpha | cut -d \"~\" -f1)",
+    "publish:alpha:dev": "npm run modio:dev -- upload --mod-version $(npm run modio:dev -- --token auto next-dev-version)",
     "lint": "eslint --ext .ts,.mts,.js,.mjs,.tsx,.jsx .",
     "lint:fix": "npm run lint -- --fix"
   },
