@@ -31,7 +31,7 @@ const triggerCtx = defineLocalTrigger<Data>({
     {
       label: '%',
       localID: 'pool',
-      max: ({skill}: Partial<Data>) => skill?.masteryPoolCapPercent ?? 100, // eslint-disable-line @typescript-eslint/no-magic-numbers
+      max: ({skill}: Partial<Data>) => Math.max(125, skill?.masteryPoolCapPercent ?? 0), // eslint-disable-line @typescript-eslint/no-magic-numbers
       min: 0,
       required: true,
       step: 0.01,
