@@ -54,7 +54,7 @@ function OptsTable({action, opts}: OptsTableProps): VNode {
 
           return show !== false && (
             <RenderNodeOption option={option}
-              key={`${option.localID}@${action.listId}`}
+              key={`${option.localID}@${action.action.id}`}
               otherValues={action.opts}
               value={action.opts[option.localID]}
               onChange={value => {

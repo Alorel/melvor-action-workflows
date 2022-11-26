@@ -9,7 +9,7 @@ import {BorderedBlock} from '../../block';
 import Btn from '../../btn';
 import {BinSvg, ChevronLeftSvg, ChevronRightSvg} from '../../svg';
 import ActionConfig from '../action-config';
-import {EDITOR_CTX} from '../editor-ctx.mjs';
+import {EDITOR_CTX, EDITOR_SECTION_CLASS} from '../editor-ctx.mjs';
 import NewStepHeader from './header-block';
 
 interface Props {
@@ -23,40 +23,42 @@ const NewStep = memo<Props>(({children, step}): VNode => {
   const lastStepIdx = useContext(EDITOR_CTX)!.workflow.lastStepIdx;
 
   return (
-    <BorderedBlock kind={'summoning'} size={4}>
-      <NewStepHeader step={step}/>
+    <div class={EDITOR_SECTION_CLASS}>
+      <BorderedBlock kind={'summoning'} size={4}>
+        <NewStepHeader step={step}/>
 
-      <BorderedBlock kind={'thieving'}>
-        <div class={'font-size-sm font-w600'}>{'Actions'}</div>
+        <BorderedBlock kind={'thieving'}>
+          <div class={'font-size-sm font-w600 mb-1'}>{'Actions'}</div>
 
-        <div class={'row row-deck'}>
-          {step.actions.map((action, i) => (
-            <div class={'col-12 col-xl-auto'} key={action.listId}>
-              <ActionConfig action={action}>
-                {canMvActions && i !== 0 && (
-                  <Btn size={'sm'} kind={'light'} data-idx={i} data-shift={-1} onClick={shiftActionIdx}>
-                    <ChevronLeftSvg/>
-                  </Btn>
-                )}
-                {canMvActions && i !== lastStepIdx && (
-                  <Btn size={'sm'} kind={'light'} data-idx={i} data-shift={1} onClick={shiftActionIdx}>
-                    <ChevronRightSvg/>
-                  </Btn>
-                )}
-                {canMvActions && <Btn size={'sm'} kind={'danger'} data-idx={i} onClick={rmAction}><BinSvg/></Btn>}
-              </ActionConfig>
-            </div>
-          ))}
-        </div>
-
-        <div class={'text-right'}>
-          <div class={'btn-group btn-group-sm'}>
-            <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
-            {children}
+          <div class={'row row-deck'}>
+            {step.actions.map((action, i) => (
+              <div class={'col-12 col-xl-auto'} key={action.listId}>
+                <ActionConfig action={action}>
+                  {canMvActions && i !== 0 && (
+                    <Btn size={'sm'} kind={'light'} data-idx={i} data-shift={-1} onClick={shiftActionIdx}>
+                      <ChevronLeftSvg/>
+                    </Btn>
+                  )}
+                  {canMvActions && i !== lastStepIdx && (
+                    <Btn size={'sm'} kind={'light'} data-idx={i} data-shift={1} onClick={shiftActionIdx}>
+                      <ChevronRightSvg/>
+                    </Btn>
+                  )}
+                  {canMvActions && <Btn size={'sm'} kind={'danger'} data-idx={i} onClick={rmAction}><BinSvg/></Btn>}
+                </ActionConfig>
+              </div>
+            ))}
           </div>
-        </div>
+
+          <div class={'text-right'}>
+            <div class={'btn-group btn-group-sm'}>
+              <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
+              {children}
+            </div>
+          </div>
+        </BorderedBlock>
       </BorderedBlock>
-    </BorderedBlock>
+    </div>
   );
 });
 

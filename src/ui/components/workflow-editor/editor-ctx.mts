@@ -6,6 +6,7 @@ import {Workflow} from '../../../lib/data/workflow.mjs';
 
 export interface EditorCtx {
   touched: Signal<boolean>;
+
   workflow: Workflow;
 }
 
@@ -26,6 +27,7 @@ function useEditorCtxProvider(
 
   return [workflow as Signal<Workflow>, editorCtx];
 }
+
 export {useEditorCtxProvider};
 
 export const EDITOR_SECTION_CLASS = 'col-12 col-xl-11 m-auto';

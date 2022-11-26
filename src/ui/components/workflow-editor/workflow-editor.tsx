@@ -6,7 +6,7 @@ import type {Workflow} from '../../../lib/data/workflow.mjs';
 import useReRender from '../../hooks/re-render';
 import {mkClass} from '../../util/mk-class.mjs';
 import Btn from '../btn';
-import {EDITOR_CTX, EDITOR_SECTION_CLASS} from './editor-ctx.mjs';
+import {EDITOR_CTX} from './editor-ctx.mjs';
 import type {WorkflowEditorHeaderBlockProps} from './header-block';
 import WorkflowEditorHeaderBlock from './header-block';
 import NewStep from './new-step/new-step';
@@ -24,12 +24,10 @@ const WorkflowEditor = memo<Props>(props => {
       <WorkflowEditorHeaderBlock {...props}/>
       <div className={mkClass('row row-deck', touched.value && 'ActionWorkflowsCore-touched')}>
         {workflow.steps.map((step, idx): VNode => (
-          <div class={EDITOR_SECTION_CLASS} key={step.listId}>
-            <NewStep step={step}>
-              {idx === lastStepIdx && <Btn kind={'success'} onClick={addStep}>Add step</Btn>}
-              {idx !== 0 && <Btn kind={'danger'} data-idx={idx} onClick={rmStep}>Remove step</Btn>}
-            </NewStep>
-          </div>
+          <NewStep step={step} key={step.listId}>
+            {idx === lastStepIdx && <Btn kind={'success'} onClick={addStep}>Add step</Btn>}
+            {idx !== 0 && <Btn kind={'danger'} data-idx={idx} onClick={rmStep}>Remove step</Btn>}
+          </NewStep>
         ))}
       </div>
     </Fragment>
