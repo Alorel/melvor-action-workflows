@@ -173,6 +173,8 @@ export class SkillWithMastery<T> extends Skill {
 
   get masteryLevelCap(): number;
 
+  get masteryPoolCapPercent(): number;
+
   get masteryPoolProgress(): number;
 
   addMasteryPoolXP(xp: number): void;

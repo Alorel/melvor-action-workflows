@@ -1,6 +1,7 @@
 import {Item} from 'melvor';
 import {ComponentType} from 'preact';
 import {ObservableInput} from 'rxjs';
+import {DynamicOption} from './lib/util/dynamic-option.mjs';
 
 export type Obj<T> = object & Record<string, T>;
 
@@ -66,7 +67,7 @@ export interface StringNodeOption extends NodeOptionBase {
    * Render a `<select>` of these options instead of an `<input>`.
    * key = model value, value = display label
    */
-  enum?: Obj<string> | ((otherValues: any) => Obj<string>);
+  enum?: DynamicOption<Obj<string> | undefined>;
 
   type: StringConstructor;
 }
@@ -80,9 +81,9 @@ export interface EquipmentSetOption extends NodeOptionBase {
 }
 
 export interface NumberNodeOption extends NodeOptionBase {
-  max?: number;
+  max?: DynamicOption<number | undefined>;
 
-  min?: number;
+  min?: DynamicOption<number | undefined>;
 
   step?: number;
 
@@ -112,7 +113,7 @@ export interface MediaItemNodeOption extends NodeOptionBase {
    *
    * The items in this registry must be compatible with the {@link MediaSelectable} interface.
    */
-  registry: string | string[] | ((optionValues: Obj<any>) => string | string[]);
+  registry: DynamicOption<string | string[]>;
 
   type: 'MediaItem';
 
