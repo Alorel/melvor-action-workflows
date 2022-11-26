@@ -41,9 +41,7 @@ const triggerCtx = defineLocalTrigger<Data<any>>({
     {
       label: 'Level',
       localID: 'level',
-      max: Math.max(
-        ...[...game.skills.registeredObjects.values()].map(s => (s as TSkillWithMastery<any>).masteryLevelCap ?? 0)
-      ),
+      max: ({skill}: Partial<Data<any>>) => skill?.masteryLevelCap ?? 99, // eslint-disable-line @typescript-eslint/no-magic-numbers
       min: 2,
       required: true,
       type: Number,
