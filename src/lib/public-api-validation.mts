@@ -6,12 +6,12 @@ import type {
   NodeOption,
   NodeOptionBase,
   Obj,
-  OptionDefinition,
   Referenceable,
   TriggerNodeDefinition
 } from '../public_api';
+import type {OptionDefinition} from './define-option.mjs';
 import {OPTION_REGISTRY} from './registries/option-registry.mjs';
-import {isUndefinedOr} from './util/is-undefined-or.mjs';
+import {isUndefinedOr} from './util/type-is.mjs';
 
 type IsBase = NodeOptionBase & Obj<any>;
 

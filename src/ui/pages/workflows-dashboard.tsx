@@ -22,7 +22,7 @@ import {EDITOR_CTX, useEditorCtxProvider} from '../components/workflow-editor/ed
 import WorkflowEditor from '../components/workflow-editor/workflow-editor';
 import useReRender from '../hooks/re-render';
 import {useBehaviourSubject} from '../hooks/use-subject.mjs';
-import autoId from '../id-gen.mjs';
+import autoId from '../util/id-gen.mjs';
 import type {DashboardStepProps} from './workflows-dashboard/dashboard-step';
 import DashboardStep from './workflows-dashboard/dashboard-step';
 import {NoDashboardsDefined} from './workflows-dashboard/no-dashboards-defined';
@@ -219,7 +219,7 @@ const RenderSteps = memo<Pick<EditorProps, 'activeWorkflow' | 'borderClass' | 'a
                 onShift(idx, direction);
               }}
               onSetActive={() => {
-                WorkflowRegistry.inst.primaryExecution$.value!.setActiveStepIdx(idx);
+                             WorkflowRegistry.inst.primaryExecution$.value!.setActiveStepIdx(idx);
               }}
               step={step}
               {...stepProps[idx]}/>

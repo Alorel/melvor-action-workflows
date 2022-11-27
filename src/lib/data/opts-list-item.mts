@@ -14,9 +14,11 @@ interface Init {
 @PersistClassName('OptsListItem')
 export default abstract class OptsListItem {
 
+  /** Just a key for quick rendering inside lists */
   @AutoIncrement()
   public readonly listId!: number;
 
+  /** Option values */
   @JsonProp({format: FormatDeepToJsonObject()})
   public opts!: Obj<any>;
 
@@ -27,7 +29,6 @@ export default abstract class OptsListItem {
   }
 
   protected abstract getOptions(): NodeOption[] | undefined;
-
 
   public get isValid(): boolean {
     const opts: NodeOption[] = this.getOptions() ?? EMPTY_ARR;

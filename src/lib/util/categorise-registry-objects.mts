@@ -9,6 +9,7 @@ export interface CategorisedObject<T> {
   items: T[];
 }
 
+/** Split the items in this registry into categories */
 export default function categoriseRegistryObjects<T extends NodeDefinition<any>, D extends NamespacedDefinition<T>>(
   registry: NamespaceRegistry<D>
 ): Array<CategorisedObject<D>> {

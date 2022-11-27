@@ -1,7 +1,7 @@
 import type {Crafting} from 'melvor';
 import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import {SingleRecipeAction} from '../_common/single-recipe-action.mjs';
+import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
 defineAction(
   SingleRecipeAction

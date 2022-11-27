@@ -1,10 +1,10 @@
-import {nextComplete, wasLogged} from '@aloreljs/rxutils';
+import {nextComplete} from '@aloreljs/rxutils';
+import {logError} from '@aloreljs/rxutils/operators';
 import type {MonoTypeOperatorFunction, Observer, Subscription, TeardownLogic} from 'rxjs';
 import {
   asapScheduler,
   asyncScheduler,
   BehaviorSubject,
-  catchError,
   concat,
   defer,
   EMPTY,
@@ -17,8 +17,7 @@ import {
   scheduled,
   startWith,
   takeUntil,
-  tap,
-  throwError
+  tap
 } from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
 import type {WorkflowStep} from '../data/workflow-step.mjs';
@@ -26,6 +25,7 @@ import type {Workflow} from '../data/workflow.mjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import {debugLog, errorLog} from '../util/log.mjs';
+import prependErrorWith from '../util/rxjs/prepend-error-with.mjs';
 import ShareReplayLike from '../util/share-replay-like-observable.mjs';
 import type {
   ActionExecutionEvent,
@@ -38,17 +38,28 @@ import {WorkflowEventType} from './workflow-event.mjs';
 
 type Out = WorkflowEvent;
 
+/** Represents a workflow in the middle of being executed */
 @PersistClassName('WorkflowTrigger')
 export class WorkflowExecution extends ShareReplayLike<Out> {
   @AutoIncrement()
   public readonly id!: number;
 
+  /** Currently executed step index */
   private readonly _activeStepIdx$ = new BehaviorSubject<number>(0);
 
+  /** Gets set to false when the step is being set forcefully to avoid invalid updates to the active step index */
   private incrementActiveStep = true;
 
+  /**
+   * The currently executed step subscription
+   * @see #tick
+   */
   private mainSub?: Subscription;
 
+  /**
+   * Observer for {@link #mainSub}
+   * @see #tick
+   */
   private readonly mainSubObserver: Observer<Out> = {
     complete: () => {
       if (this.incrementActiveStep) {
@@ -61,8 +72,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       this.events.push(evt);
       errorLog('WorkflowExecution error', e);
       for (const sub of this.subscribers) {
-        sub.next(evt);
-        sub.complete();
+        nextComplete(sub, evt);
       }
     },
     next: value => {
@@ -75,10 +85,12 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     this.tick = this.tick.bind(this);
   }
 
+  /** Currently executed step index */
   public get activeStepIdx(): number {
     return this._activeStepIdx$.value;
   }
 
+  /** Currently executed step index */
   private set activeStepIdx(v: number) {
     if (v === this.activeStepIdx) {
       return;
@@ -86,14 +98,19 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     this._activeStepIdx$.next(v);
   }
 
+  /** Currently executed step */
   private get activeStep(): WorkflowStep | undefined {
     return this.workflow.steps[this.activeStepIdx];
   }
 
+  /** Set the currently executed step index. */
   public setActiveStepIdx(v: number): void {
     this.incrementActiveStep = false;
-    this.activeStepIdx = v;
-    this.incrementActiveStep = true;
+    try {
+      this.activeStepIdx = v;
+    } finally {
+      this.incrementActiveStep = true;
+    }
   }
 
   /** @inheritDoc */
@@ -115,6 +132,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     this.tick();
   }
 
+  /** Mark the execution as complete */
   private end(): void {
     const evt = this.mkCompleteEvent(true);
     this.events.push(evt);
@@ -123,6 +141,12 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     }
   }
 
+  /**
+   * Executed a step's action
+   * @param step The step containing the action
+   * @param stepIdx The step's index in the workflow
+   * @param actionIdx The action's index in the step
+   */
   private executeAction(step: WorkflowStep, stepIdx: number, actionIdx: number): Observable<ActionExecutionEvent> {
     const action = step.actions[actionIdx];
     const makeSuccessEvent = (): ActionExecutionEvent => ({
@@ -150,33 +174,35 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     });
 
     return src$.pipe(
-      catchError((e: Error) => {
-        if (!wasLogged(e)) {
-          errorLog(`Error executing action ${actionIdx} in workflow ${this.workflow.name} step ${stepIdx}:`, e);
-        }
-
-        return new Observable<ActionExecutionEvent>(subscriber => {
-          subscriber.next({
-            ...makeSuccessEvent(),
-            err: e.message,
-            ok: false,
-          });
-          subscriber.error(e);
-        });
-      })
+      logError(`[Exec action ${step.actions[actionIdx]?.action.id}[${actionIdx}]@${this.workflow.name}[${stepIdx}]]`),
+      prependErrorWith(e => of<ActionExecutionEvent>({
+        ...makeSuccessEvent(),
+        err: e.message,
+        ok: false,
+      }))
     );
   }
 
-  private executeActions(step: WorkflowStep, idx: number): Observable<ActionExecutionEvent> {
+  /**
+   * Execute all of the step's actions
+   * @param step The step containing the action
+   * @param stepIdx The step's index in the workflow
+   */
+  private executeActions(step: WorkflowStep, stepIdx: number): Observable<ActionExecutionEvent> {
     if (!step.actions.length) {
       debugLog('No actions to execute in workflow', this.workflow);
       return EMPTY;
     }
 
-    return concat(...step.actions.map((_, i) => this.executeAction(step, idx, i)));
+    return concat(...step.actions.map((_, i) => this.executeAction(step, stepIdx, i)));
   }
 
-  private executeStep(step: WorkflowStep, idx: number): Observable<Out> {
+  /**
+   * Execute the step
+   * @param step The step containing the action
+   * @param stepIdx The step's index in the workflow
+   */
+  private executeStep(step: WorkflowStep, stepIdx: number): Observable<Out> {
     const baseEvt: Omit<StepListeningEvent, 'type'> = {
       step,
       workflow: this.workflow,
@@ -186,25 +212,18 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
 
     const exec$: Observable<Out> = scheduled(trigger$, asyncScheduler)
       .pipe(
-        switchMap(() => this.executeActions(step, idx)),
-        catchError((e: Error) => {
-          if (!wasLogged(e)) {
-            errorLog(`Error executing step ${idx} in workflow ${this.workflow.name}:`);
-          }
-
-          return throwError(() => e).pipe(
-            startWith<StepCompleteEvent>({
-              ...baseEvt,
-              err: e.message,
-              ok: false,
-              type: WorkflowEventType.STEP_COMPLETE,
-            })
-          );
-        })
+        switchMap(() => this.executeActions(step, stepIdx)),
+        logError(`Error executing step ${stepIdx} in workflow ${this.workflow.name}:`),
+        prependErrorWith(e => of<StepCompleteEvent>({
+          ...baseEvt,
+          err: e.message,
+          ok: false,
+          type: WorkflowEventType.STEP_COMPLETE,
+        }))
       );
 
     const onSuccess$ = new Observable<StepCompleteEvent>(subscriber => {
-      debugLog('Executed step', step, 'at idx', idx, 'workflow', this.workflow.name);
+      debugLog('Executed step', step, 'at idx', stepIdx, 'workflow', this.workflow.name);
       nextComplete(subscriber, {
         ...baseEvt,
         ok: true,
@@ -224,9 +243,10 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
         ...baseEvt,
         type: WorkflowEventType.STEP_NOT_LISTENING,
       })
-      .pipe(this.whileStepIs(idx));
+      .pipe(this.whileStepIs(stepIdx));
   }
 
+  /** Emit the given event if the source gets unsubscribed from without completing */
   private ifIncomplete<V>(src: Observable<V>, thenEmitEvent: WorkflowEvent): Observable<V> {
     return new Observable<V>(subscriber => {
       let completed = false;
@@ -247,8 +267,10 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     });
   }
 
+  /** Create a successful workflow completion event */
   private mkCompleteEvent(ok: true): WorkflowCompleteEvent;
 
+  /** Create a failed workflow completion event */
   private mkCompleteEvent(ok: false, err: string): WorkflowCompleteEvent;
 
   private mkCompleteEvent(ok = true, err?: string): WorkflowCompleteEvent { // eslint-disable-line default-param-last
@@ -261,6 +283,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     return (ok ? base : {...base, err}) as WorkflowCompleteEvent;
   }
 
+  /** Main ticking function for the workflow */
   private tick(): void {
     const step = this.activeStep;
     if (!step) {
@@ -272,6 +295,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       .subscribe(this.mainSubObserver);
   }
 
+  /** Shortcut for `takeUntil(activeStepIdx !== idx)` */
   private whileStepIs<T>(idx: number): MonoTypeOperatorFunction<T> {
     return takeUntil(this._activeStepIdx$.pipe(filter(i => i !== idx)));
   }

@@ -1,70 +1,36 @@
 import {Item} from 'melvor';
-import {ComponentType} from 'preact';
 import {ObservableInput} from 'rxjs';
 import {DynamicOption} from './lib/util/dynamic-option.mjs';
 
 export type Obj<T> = object & Record<string, T>;
 
-export interface Api {
+/** The public API */
+export default interface Api {
+  /** Define a new action */
   defineAction<T extends object = {}>(definition: ActionNodeDefinition<T>): void;
 
-  defineOption<Val, Interface extends NodeOptionBase>(opt: OptionDefinition<Val, Interface>): void;
-
+  /** Define a new trigger */
   defineTrigger<T extends object = {}>(definition: TriggerNodeDefinition): TriggerDefinitionContext<T>;
 }
 
-export interface NodeValidationStore {
-  readonly errors: string[];
-
-  touched: boolean;
-}
-
-export interface OptionRenderEditCtx<Val, Interface> {
-  value?: Val;
-
-  option: Interface;
-
-  otherValues: Obj<any>;
-
-  onChange(value?: Val): void;
-}
-
-export interface OptionRenderViewCtx<Val, Interface> {
-  option: Interface;
-
-  otherValues: Obj<any>;
-
-  value?: Val;
-}
-
-export interface OptionDefinition<Val, Interface extends NodeOptionBase> {
-  /** @default true */
-  hasLabel?: boolean;
-
-  token: Interface['type'];
-
-  is(v: NodeOptionBase & Obj<any>): v is Interface;
-
-  renderEdit: ComponentType<OptionRenderEditCtx<Val, Interface>>;
-
-  renderView: ComponentType<OptionRenderViewCtx<Val, Interface>>;
-
-  validate?(value: Val | undefined, def: Interface, fullOptsObject: Obj<any>): string[];
-}
-
+/** Context of a defined trigger */
 export class TriggerDefinitionContext<T extends object = {}> {
+  /** The trigger definition */
   readonly def: TriggerNodeDefinition;
 
+  /** The trigger ID */
   readonly id: string;
 
   private constructor(nope: never);
 
+  /** Notify listeners mething the given filter function */
   public notifyListeners(filter?: (listenerData: T) => any): void;
 }
 
+/** An `<input type="text"/>` or `<select>` */
 export interface StringNodeOption extends NodeOptionBase {
   /**
-   * Render a `<select>` of these options instead of an `<input>`.
+   * Render a `<select/>` of these options instead of an `<input type="text"/>`.
    * key = model value, value = display label
    */
   enum?: DynamicOption<Obj<string> | undefined>;
@@ -72,38 +38,52 @@ export interface StringNodeOption extends NodeOptionBase {
   type: StringConstructor;
 }
 
+/** A checkbox */
 export interface BooleanNodeOption extends Omit<NodeOptionBase, 'required'> {
   type: BooleanConstructor;
 }
 
+/** Equipment set select */
 export interface EquipmentSetOption extends NodeOptionBase {
   type: 'EquipmentSet';
 }
 
+/** `<input type="number"/>` */
 export interface NumberNodeOption extends NodeOptionBase {
+  /** "max" attribute */
   max?: DynamicOption<number | undefined>;
 
+  /** "min" attribute */
   min?: DynamicOption<number | undefined>;
 
+  /** "step" attribute */
   step?: number;
 
   type: NumberConstructor;
 }
 
+/** Alternative/secondary recipe cost option */
 export interface AltRecipeCostNodeOption extends NodeOptionBase {
   /** Name of the option holding the main recipe */
   recipeOption: string;
 
   type: 'AltRecipeCost';
 
+  /** Get the items available for selection */
   getAltCostItems(recipe: any): Item[] | undefined;
 }
 
+/** Config for {@link MediaItemNodeOption}'s {@link MediaItemNodeOption#multi multi} option */
 export interface MediaItemNodeOptionMultiConfig {
   maxLength?: number;
 }
 
+/** Select from pretty much any in-game registry */
 export interface MediaItemNodeOption extends NodeOptionBase {
+  /**
+   * Select one (`false`) or multiple (`true`/`object`) values?
+   * @default false
+   */
   multi?: boolean | MediaItemNodeOptionMultiConfig;
 
   /**
@@ -117,6 +97,7 @@ export interface MediaItemNodeOption extends NodeOptionBase {
 
   type: 'MediaItem';
 
+  /** Filter out irrelevant items in the registry */
   mediaFilter?(item: any, optionValues: Obj<any>): boolean;
 }
 
@@ -127,6 +108,7 @@ export type NodeOption = AltRecipeCostNodeOption
   | EquipmentSetOption
   | BooleanNodeOption;
 
+/** Something selectable by {@link MediaItemNodeOption} */
 export interface MediaSelectable {
   id: string;
 
@@ -135,6 +117,7 @@ export interface MediaSelectable {
   name: string;
 }
 
+/** Definition of a trigger */
 export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefinition<T> {
   /**
    * Check if the given data passes the trigger. Called when a trigger node activates.
@@ -146,13 +129,17 @@ export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefini
   init(): void;
 }
 
+/** Definition of an action */
 export interface ActionNodeDefinition<T extends object> extends NodeDefinition<T> {
+  /** Execute the action */
   execute(data: T): void | ObservableInput<void>;
 }
 
+/** Common node definition */
 export interface NodeDefinition<T extends object = {}> extends Referenceable {
   category?: string;
 
+  /** The icon */
   media: string;
 
   options?: NodeOption[];
@@ -161,6 +148,7 @@ export interface NodeDefinition<T extends object = {}> extends Referenceable {
   initOptions?(): Partial<T>;
 }
 
+/** Something that can be referenced */
 export interface Referenceable {
   label: string;
 
@@ -169,13 +157,22 @@ export interface Referenceable {
   namespace: string;
 }
 
+/** Common node option */
 export interface NodeOptionBase extends Omit<Referenceable, 'namespace'> {
   /** Info tooltip */
   description?: string;
 
+  /**
+   * Usually means `!= null`, but if the option returns, say, an array, it can mean that the array mustn't be empty
+   */
   required?: boolean;
 
   type: any;
 
+  /**
+   * Only show the option if this function returns false.
+   * Always show it if the function isn't defined
+   * @param optionValues Other options' values
+   */
   showIf?(optionValues: Obj<any>): boolean;
 }

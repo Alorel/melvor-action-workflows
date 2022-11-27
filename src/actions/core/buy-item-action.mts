@@ -4,6 +4,7 @@ import {defineLocalAction} from '../../lib/util/define-local.mjs';
 
 interface Props {
   item: ShopPurchase;
+
   qty?: number;
 }
 

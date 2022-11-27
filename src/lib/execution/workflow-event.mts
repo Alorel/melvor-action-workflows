@@ -3,11 +3,23 @@ import type {WorkflowStep} from '../data/workflow-step.mjs';
 import type {Workflow} from '../data/workflow.mjs';
 
 export const enum WorkflowEventType {
+
+  /** An action completed */
   ACTION_COMPLETE,
+
+  /** Step listener started */
   STEP_LISTENING,
+
+  /** Step listener stopped. Only emits if the active workflow step is changed forcefully */
   STEP_NOT_LISTENING,
+
+  /** Step execution finished */
   STEP_COMPLETE,
+
+  /** Workflow execution started */
   WORKFLOW_START,
+
+  /** Workflow execution completed */
   WORKFLOW_COMPLETE,
 }
 

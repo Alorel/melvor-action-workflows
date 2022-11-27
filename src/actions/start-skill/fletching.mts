@@ -1,8 +1,8 @@
 import type {Fletching, FletchingAlternativeCosts, FletchingRecipe, Item} from 'melvor';
 import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import type {AltRecipeData, SingleRecipeData} from '../_common/single-recipe-action.mjs';
-import {SingleRecipeAction} from '../_common/single-recipe-action.mjs';
+import type {AltRecipeData, SingleRecipeData} from '../lib/single-recipe-action.mjs';
+import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
 function mapAltCost(altCost: FletchingAlternativeCosts): Item {
   return altCost.itemCosts[0].item;

@@ -2,6 +2,7 @@ import type {Obj} from '../../../public_api';
 import type {ToJsonFormatter} from '../to-json.mjs';
 import {isToJSON} from '../to-json.mjs';
 
+/** Format an object calling toJSON on its items recursively */
 export function FormatDeepToJsonObject<T extends object>(
   fromFn?: (value: T[string & keyof T], key: string & keyof T) => any
 ): ToJsonFormatter {

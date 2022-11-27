@@ -26,6 +26,7 @@ interface Props<T> {
 
 export {Props as CategorisedNodeSelectProps};
 
+/** Common select for actions & triggers */
 export default function CategorisedNodeSelect<T extends Def>({
   children,
   clearable = false,

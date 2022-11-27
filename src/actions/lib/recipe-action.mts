@@ -13,8 +13,10 @@ export interface RecipeActionInit<T extends object, S extends Gathering, R> {
   /** Override the default check function */
   checkRecipe?(this: RecipeAction<T, S, R>, recipe: RecipeOf<S>): void;
 
+  /** Main execution function */
   exec(this: RecipeAction<T, S, R>, data: T, prep: R): void;
 
+  /** Prepare some data for the main exec function */
   prepareExec?(this: RecipeAction<T, S, R>, data: T): R;
 }
 
@@ -33,8 +35,10 @@ export interface RecipeActionBuilder<T extends object, S extends Gathering, R = 
     checkFn: (this: RecipeAction<T, S, R> & Ctx, recipe: RecipeOf<S>) => void
   ): RecipeActionBuilder<T, S, R, Ctx>;
 
+  /** Main execution function */
   exec(fn: (this: RecipeAction<T, S, R> & Ctx, data: T, prep: R) => void): RecipeAction<T, S, R> & Ctx;
 
+  /** Prepare some data for the main exec function */
   prep<RR>(fn: (this: RecipeAction<T, S, RR> & Ctx, data: T) => RR): RecipeActionBuilder<T, S, RR, Ctx>;
 }
 
@@ -43,8 +47,10 @@ export class RecipeAction<T extends object, S extends Gathering, R>
   extends SkillAction<T, S>
   implements Reqd<T, S> {
 
+  /** Main execution function */
   public exec: Reqd<T, S>['exec'];
 
+  /** Prepare some data for the main exec function */
   public prepareExec: Reqd<T, S>['prepareExec'];
 
   protected constructor(init: SkillActionInit<T>, {checkRecipe, exec, prepareExec}: RecipeActionInit<T, S, R>) {
@@ -56,6 +62,7 @@ export class RecipeAction<T extends object, S extends Gathering, R>
     }
   }
 
+  /** Builder method */
   public static base<T extends object, S extends Gathering>(init: SkillActionInit<T>): RecipeActionBuilder<T, S> {
     const finalCfg: Partial<RecipeActionInit<T, S, any>> = {};
 

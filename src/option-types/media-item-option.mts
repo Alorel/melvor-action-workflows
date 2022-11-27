@@ -1,18 +1,18 @@
 import {get} from 'lodash-es';
 import type {NamespaceRegistry as TNamespaceRegistry} from 'melvor';
-import {defineOption} from '../../lib/api.mjs';
-import {EMPTY_ARR} from '../../lib/util.mjs';
-import {isUndefinedOr} from '../../lib/util/is-undefined-or.mjs';
+import {defineOption} from '../lib/define-option.mjs';
+import {EMPTY_ARR} from '../lib/util.mjs';
+import {isUndefinedOr} from '../lib/util/type-is.mjs';
 import type {
   MediaItemNodeOption,
   MediaItemNodeOptionMultiConfig,
   MediaSelectable,
   NodeOptionBase,
   Obj
-} from '../../public_api';
-import {resolveMediaItemRegistry, resolveMediaMulti} from './render-media-commons.mjs';
-import RenderMediaEdit from './render-media-edit';
-import RenderMediaSelectView from './render-media-view';
+} from '../public_api';
+import {resolveMediaItemRegistry, resolveMediaMulti} from './media-item/render-media-commons.mjs';
+import RenderMediaEdit from './media-item/render-media-edit';
+import RenderMediaSelectView from './media-item/render-media-view';
 
 export type MediaOptionValue = MediaSelectable | MediaSelectable[];
 
@@ -70,7 +70,7 @@ defineOption<MediaOptionValue, MediaItemNodeOption>({
 });
 
 export default function isMediaItemOption(v: NodeOptionBase & Obj<any>): v is MediaItemNodeOption {
-  const {type, mediaFilter, registry, multi} = v;
+  const {type, mediaFilter, registry, multi} = v as Partial<MediaItemNodeOption>;
 
   return type === 'MediaItem'
     && isUndefinedOr(mediaFilter, 'function')

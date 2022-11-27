@@ -24,6 +24,48 @@ export interface ToJsonFormatter {
   to(live: any): any;
 }
 
+/** Mark the class as JSON-serialisable. Defined a `toJSON` instance method & `fromJSON` static one. */
+export function Serialisable<T, P = Partial<T>>({from, override}: ImplToJsonCfg<T, P>): ClassDecorator {
+  return target => {
+    const proto: Partial<ToJSON<any>> & Obj<any> = target.prototype;
+
+    target[FROM_JSON_FORMATTER] = from;
+    if (PROPS in target) {
+      if (override) {
+        proto.toJSON = baseToJson;
+      } else {
+        const origToJSON = proto.toJSON;
+
+        if (origToJSON) {
+          proto.toJSON = function toJSON(this: any): Obj<any> {
+            return doToJson(this, {...origToJSON.call(this)});
+          };
+        } else {
+          proto.toJSON = baseToJson;
+        }
+      }
+
+      (target as unknown as FromJSON<any>).fromJSON = fromJSON.bind(target);
+    } else if (typeof proto.toJSON === 'function') {
+      (target as unknown as FromJSON<any>).fromJSON = from;
+    } else if (!process.env.PRODUCTION) {
+      warnLog('No JSON props decorated on', target);
+    }
+  };
+}
+
+export function JsonProp({format = baseFormatter}: JsonPropCfg = {}): PropertyDecorator & MethodDecorator {
+  return function ToJsonPropDecorator(target: Function, propertyKey: PropertyKey, desc?: PropertyDescriptor): void {
+    getItems(target, propertyKey, desc).push([propertyKey as string, {
+      format,
+    }]);
+  };
+}
+
+export function isToJSON(v: any): v is ToJSON {
+  return typeof v?.toJSON === 'function';
+}
+
 const PROPS: unique symbol = Symbol('JSON props');
 const FROM_JSON_FORMATTER: unique symbol = Symbol('fromJSON formatter');
 
@@ -76,45 +118,4 @@ function fromJSON<T>(this: object, obj: any): any {
 interface ImplToJsonCfg<T, P> {
   override?: boolean;
   from(val: P): T | undefined,
-}
-
-export function Serialisable<T, P = Partial<T>>({from, override}: ImplToJsonCfg<T, P>): ClassDecorator {
-  return target => {
-    const proto: Partial<ToJSON<any>> & Obj<any> = target.prototype;
-
-    target[FROM_JSON_FORMATTER] = from;
-    if (PROPS in target) {
-      if (override) {
-        proto.toJSON = baseToJson;
-      } else {
-        const origToJSON = proto.toJSON;
-
-        if (origToJSON) {
-          proto.toJSON = function toJSON(this: any): Obj<any> {
-            return doToJson(this, {...origToJSON.call(this)});
-          };
-        } else {
-          proto.toJSON = baseToJson;
-        }
-      }
-
-      (target as unknown as FromJSON<any>).fromJSON = fromJSON.bind(target);
-    } else if (typeof proto.toJSON === 'function') {
-      (target as unknown as FromJSON<any>).fromJSON = from;
-    } else if (!process.env.PRODUCTION) {
-      warnLog('No JSON props decorated on', target);
-    }
-  };
-}
-
-export function JsonProp({format = baseFormatter}: JsonPropCfg = {}): PropertyDecorator & MethodDecorator {
-  return function ToJsonPropDecorator(target: Function, propertyKey: PropertyKey, desc?: PropertyDescriptor): void {
-    getItems(target, propertyKey, desc).push([propertyKey as string, {
-      format,
-    }]);
-  };
-}
-
-export function isToJSON(v: any): v is ToJSON {
-  return typeof v?.toJSON === 'function';
 }

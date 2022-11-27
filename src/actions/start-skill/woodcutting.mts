@@ -1,7 +1,7 @@
 import type {Woodcutting as TWoodcutting, WoodcuttingTree} from 'melvor';
 import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import {RecipeAction} from '../_common/recipe-action.mjs';
+import {RecipeAction} from '../lib/recipe-action.mjs';
 
 export interface StartWoodcuttingData {
   recipes: WoodcuttingTree[];

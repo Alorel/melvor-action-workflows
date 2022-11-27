@@ -7,6 +7,7 @@ export type CompressedJsonValues<E> = Array<Array<E[string & keyof E]>>;
 
 export type CompressedJsonArray<E> = [CompressedJsonKeys<E>, CompressedJsonValues<E>];
 
+/** Call toJSON on an arary of objects. Compress keys and values to take up less space */
 export function FormatToJsonArrayCompressed<J extends object, L>(from?: JsonFrom<J, L | undefined>): ToJsonFormatter {
   if (!from) {
     return baseFormatter;

@@ -1,14 +1,12 @@
 import {Fragment} from 'preact';
 import {useCallback} from 'preact/hooks';
-import {defineOption} from '../lib/api.mjs';
+import {defineOption} from '../lib/define-option.mjs';
 import type {BooleanNodeOption} from '../public_api';
 import {useNodeValidationCtx} from '../ui/components/workflow-editor/render-node-option/node-option-validation-ctx';
 
 defineOption<boolean, BooleanNodeOption>({
   hasLabel: false,
-  is: (v): v is BooleanNodeOption => (
-    v.type === Boolean
-  ),
+  is: (v): v is BooleanNodeOption => v.type === Boolean,
   renderEdit({option: {label}, value = false, onChange}) {
     const {touched} = useNodeValidationCtx();
     const onInpChange = useCallback((e: Event) => {

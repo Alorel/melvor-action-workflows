@@ -2,8 +2,8 @@ import type {Fish, Fishing, FishingArea} from 'melvor';
 import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import LazyValue from '../../lib/util/lazy-value.mjs';
-import {segmentSkillAreasAndRecipes} from '../_common/segment-skill-areas-and-recipes.mjs';
-import {SingleRecipeAction} from '../_common/single-recipe-action.mjs';
+import {segmentSkillAreasAndRecipes} from '../lib/segment-skill-areas-and-recipes.mjs';
+import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
 const fishAreaMap = new LazyValue(() => segmentSkillAreasAndRecipes<FishingArea, Fish>(game.fishing.areas, 'fish'));
 

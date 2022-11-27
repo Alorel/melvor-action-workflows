@@ -1,4 +1,5 @@
 import {LazyGetter} from 'lazy-get-decorator';
+import type {Observable} from 'rxjs';
 import {BehaviorSubject} from 'rxjs';
 import {Workflow} from '../data/workflow.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
@@ -14,17 +15,27 @@ const enum Strings {
   CFG_KEY = 'workflows:v2',
 }
 
+export type ReadonlyBehaviorSubject<T> = Pick<BehaviorSubject<T>, 'value' | keyof Observable<T>>;
+
+/** Container for all the workflows */
 @PersistClassName('WorkflowRegistry')
 export default class WorkflowRegistry {
 
+  /** The current "main" workflow being executed */
   public readonly primaryExecution$ = new BehaviorSubject<undefined | WorkflowExecution>(undefined);
 
-  public readonly workflows$: BehaviorSubject<Workflow[]>;
+  /** All the registered workflows, as a Subject. Do NOT modify this directly without emitting a change event */
+  public readonly workflows$: ReadonlyBehaviorSubject<Workflow[]>;
 
+  /** All the registered workflows, as a Subject. Do NOT modify this directly without emitting a change event */
+  private readonly _workflows$: BehaviorSubject<Workflow[]>;
+
+  /** Use the singleton @ {@link #inst} */
   private constructor(workflows: Workflow[]) {
-    this.workflows$ = new BehaviorSubject(workflows);
+    this.workflows$ = this._workflows$ = new BehaviorSubject(workflows);
   }
 
+  /** Singleton workflow registry instance */
   @LazyGetter()
   public static get inst(): WorkflowRegistry {
     let out: WorkflowRegistry;
@@ -40,10 +51,12 @@ export default class WorkflowRegistry {
     return out;
   }
 
+  /** All the registered workflows. Do NOT modify this directly without emitting a change event */
   public get workflows(): readonly Workflow[] {
-    return this.workflows$.value;
+    return this._workflows$.value;
   }
 
+  /** Load from storage */
   private static fromStorage(): WorkflowRegistry {
     const out: Workflow[] = [];
 
@@ -70,14 +83,12 @@ export default class WorkflowRegistry {
     return new WorkflowRegistry(out);
   }
 
+  /** Add a new workflow to the list */
   public add(workflow: Workflow): void {
     this.setWorkflows([...this.workflows, workflow]);
   }
 
-  public getWorkflow(listId: number): Workflow | undefined {
-    return this.workflows.find(wf => wf.listId === listId);
-  }
-
+  /** Overwrite the workflow at the given index */
   public patch(workflow: Workflow, idx: number): void {
     if (idx < 0 || idx >= this.workflows.length) {
       return;
@@ -88,13 +99,18 @@ export default class WorkflowRegistry {
     this.setWorkflows(out);
   }
 
+  /** Remove the workflow at the given index */
   public rmByIdx(idx: number): void {
+    if (idx < 0 || idx >= this.workflows.length) {
+      return;
+    }
     const out = [...this.workflows];
     out.splice(idx, 1);
     store(out);
-    this.workflows$.next(out);
+    this._workflows$.next(out);
   }
 
+  /** Save the workflows to mod storage */
   public save(): void {
     store(this.workflows);
   }
@@ -108,7 +124,7 @@ export default class WorkflowRegistry {
   private setWorkflows(workflows: Workflow[]): void | never {
     workflows.sort(({name: a}, {name: b}) => a > b ? 1 : a < b ? -1 : 0);
     store(workflows);
-    this.workflows$.next(workflows);
+    this._workflows$.next(workflows);
   }
 }
 

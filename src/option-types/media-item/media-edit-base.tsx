@@ -3,8 +3,9 @@ import type {VNode} from 'preact';
 import {memo} from 'preact/compat';
 import type {Ref} from 'preact/hooks';
 import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
+import type {OptionRenderEditCtx} from '../../lib/define-option.mjs';
 import {EMPTY_ARR} from '../../lib/util.mjs';
-import type {MediaItemNodeOption, MediaSelectable, OptionRenderEditCtx} from '../../public_api';
+import type {MediaItemNodeOption, MediaSelectable} from '../../public_api';
 import Btn from '../../ui/components/btn';
 import useTippy from '../../ui/hooks/tippy.mjs';
 import {useRenderEditTouch} from '../_common.mjs';
@@ -99,6 +100,7 @@ function RenderFilter<T extends MediaSelectable>({focus, filterFn, onChange}: In
   );
 }
 
+/** Focus an element this ref gets attached to on init if `focus` is true */
 function useFocus<T extends HTMLElement>(focus: boolean): Ref<T> {
   const ref = useRef<T>(null);
   useEffect(() => {

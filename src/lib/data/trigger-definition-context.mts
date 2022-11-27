@@ -47,13 +47,9 @@ export class TriggerDefinitionContext<T extends object = {}>
 
   /** @inheritDoc */
   public notifyListeners(filter: (listenerData: Readonly<T>) => any = this.def.check): void {
-    doNotifyListeners(filteredListeners(filter, this.#listeners.values()));
-  }
-}
-
-function doNotifyListeners<T extends object>(listeners: Iterable<TriggerListener<T>>): void {
-  for (const listener of listeners) {
-    listener.notify();
+    for (const listener of filteredListeners(filter, this.#listeners.values())) {
+      listener.notify();
+    }
   }
 }
 
@@ -62,8 +58,10 @@ function *filteredListeners<T extends object>(
   listeners: Iterable<TriggerListener<T>>
 ): Iterable<TriggerListener<T>> {
   for (const listener of listeners) {
-    if (filter(listener.data)) {
-      yield listener;
+    if (!filter(listener.data)) {
+      continue;
     }
+
+    yield listener;
   }
 }

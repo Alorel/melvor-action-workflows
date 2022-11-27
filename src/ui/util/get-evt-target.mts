@@ -1,3 +1,4 @@
+/** Get the event target, going up the DOM tree, until the predicate passes */
 export default function getEvtTarget(
   e: Pick<Event, 'target'>,
   predicate: (el: HTMLElement) => any

@@ -1,8 +1,8 @@
 import type {Cooking, CookingRecipe} from 'melvor';
 import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import type {SingleRecipeData} from '../_common/single-recipe-action.mjs';
-import {SingleRecipeAction} from '../_common/single-recipe-action.mjs';
+import type {SingleRecipeData} from '../lib/single-recipe-action.mjs';
+import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
 interface Data extends SingleRecipeData<Cooking> {
   passives: Array<this['recipe']>;

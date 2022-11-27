@@ -30,6 +30,7 @@ class ActionConfigItem extends OptsListItem {
   /** @internal */
   public static fromJSON: FromJSON<ActionConfigItem>['fromJSON'];
 
+  /** The wrapped action */
   @JsonProp({format: FormatToJson(ActionNodeDefinitionImpl.fromJSON)})
   public action: ActionNodeDefinitionImpl<any>;
 
@@ -41,6 +42,7 @@ class ActionConfigItem extends OptsListItem {
     }
   }
 
+  /** Reset {@link #opts} to the action's defaults */
   public resetOpts(): void {
     this.opts = this.action.def.initOptions?.() ?? {};
   }

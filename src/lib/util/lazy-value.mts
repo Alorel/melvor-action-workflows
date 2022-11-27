@@ -1,6 +1,7 @@
 import {LazyGetter} from 'lazy-get-decorator';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 
+/** Compute the value lazily */
 @PersistClassName('LazyValue')
 export default class LazyValue<T> {
   private readonly f: () => T;
@@ -12,9 +13,5 @@ export default class LazyValue<T> {
   @LazyGetter()
   public get value(): T {
     return this.f();
-  }
-
-  public get(): T {
-    return this.value;
   }
 }

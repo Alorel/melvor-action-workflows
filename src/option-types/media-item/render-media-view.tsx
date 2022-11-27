@@ -1,9 +1,10 @@
 import type {VNode} from 'preact';
 import {Fragment} from 'preact';
-import type {MediaItemNodeOption, MediaSelectable, OptionDefinition} from '../../public_api';
+import type {OptionDefinition} from '../../lib/define-option.mjs';
+import type {MediaItemNodeOption, MediaSelectable} from '../../public_api';
 import type {RenderNodeMediaProps} from '../../ui/pages/workflows-dashboard/render-node-media';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
-import type {MediaOptionValue} from './media-item-option.mjs';
+import type {MediaOptionValue} from '../media-item-option.mjs';
 
 type PartialMedia = Pick<MediaSelectable, 'name' | 'media'>;
 

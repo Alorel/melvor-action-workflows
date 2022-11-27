@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {defineAction} from '../../lib/api.mjs';
 import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import SkillAction from '../_common/skill-action.mjs';
+import SkillAction from '../lib/skill-action.mjs';
 
 @PersistClassName('AgilityAction')
 class AgilityAction extends SkillAction<{}, Agility> {
