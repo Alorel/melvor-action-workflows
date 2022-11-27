@@ -426,6 +426,8 @@ export class WeaponItem extends Item {
 export class EquipmentItem extends Item {
   ammoType?: AmmoTypeID;
 
+  tier?: string;
+
   validSlots: EquipSlotType[];
 }
 
