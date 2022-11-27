@@ -12,14 +12,28 @@ jobs:
         name: Set up node
         with:
           cache: npm
-          node-version: v18
+          node-version: 18
           registry-url: https://npm.pkg.github.com
       - name: Install deps
         run: npm ci --no-fund
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Typescript cache
+        uses: ./.github/actions/cache
+        with:
+          node-version: 18
+          path: rollup-plugin-typescript2
+          prefix: v1-tsc
+          cache-key-cmd: cat package-lock.json | grep rollup-plugin-typescript2
       - name: Build
         run: npm run rollup
+      - name: ESLint cache
+        uses: ./.github/actions/cache
+        with:
+          node-version: 18
+          path: eslint
+          prefix: v1-eslint
+          cache-key-cmd: cat package-lock.json | grep eslint
       - name: Lint
         run: npm run lint
       - name: Test API

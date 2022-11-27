@@ -17,7 +17,7 @@
     "modio:dev": "node build/modio.mjs --token auto",
     "rm-alpha-versions": "npm run modio:dev -- rm-modfiles --versions $(node build/modio.mjs list-versions --token auto | grep alpha | cut -d \"~\" -f1)",
     "publish:alpha:dev": "npm run modio:dev -- upload --mod-version $(node build/modio.mjs --token auto next-dev-version)",
-    "lint": "eslint --ext .ts,.mts,.js,.mjs,.tsx,.jsx .",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint/cache --ext .ts,.mts,.js,.mjs,.tsx,.jsx .",
     "lint:fix": "npm run lint -- --fix"
   },
   "devDependencies": {

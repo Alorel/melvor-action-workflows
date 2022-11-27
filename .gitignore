@@ -4,6 +4,7 @@ node_modules/
 /dist/
 /.nyc_output
 /coverage
+/.ci-cache-key
 
 /tmp.mjs
 /tmp.ts
