@@ -1,6 +1,5 @@
 import {baseHeaders, baseUrl, loadToken} from "./common.mjs";
 import axios, {AxiosError} from "axios";
-import {chunk} from "lodash-es";
 
 export default {
   builder: {
@@ -29,10 +28,7 @@ export default {
       }
     };
 
-    const runChunk = async versionsChunk => {
-      await Promise.all(versionsChunk.map(runVersion))
-    };
-
-    await Promise.all(chunk(versions, 3).map(runChunk));
+    const Bluebird = await import('bluebird');
+    await Bluebird.map(versions, runVersion, {concurrency: 3});
   }
 };
