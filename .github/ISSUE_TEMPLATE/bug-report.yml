@@ -1,0 +1,68 @@
+name: Bug Report
+description: Death to all digital insects
+labels: ["bug", "confirmation needed"]
+body:
+  - type: markdown
+    attributes:
+      value: "Thanks for taking the time to fill out this out! :heart:"
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: What platform did you experience this bug on?
+      multiple: true
+      options:
+        - Web
+        - Steam
+        - Android
+        - iOS
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What best describes bug?
+      options:
+        - A bugged trigger
+        - A bugged action
+        - Mod API bugs
+        - Other/Not sure
+      validations:
+        required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: A clear step-by-step on how to reproduce this bug
+      placeholder: |
+        1. Go to X
+        2. Click on Y
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Any screenshots & screencaps if applicable
+  - type: textarea
+    id: other-info
+    attributes:
+      label: Any other relevant information
+  - type: checkboxes
+    id: TOS
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow the [Code of Conduct](/Alorel/melvor-mod/.github/CODE_OF_CONDUCT.md)
+      options:
+        - label: "I agree"
+          required: true

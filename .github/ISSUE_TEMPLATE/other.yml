@@ -1,0 +1,20 @@
+name: Question
+description: General queries
+labels: ["question"]
+body:
+  - type: checkboxes
+    id: TOS
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow the [Code of Conduct](/Alorel/melvor-mod/.github/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree with the code of conduct
+          required: true
+        - label: My issue does not match any other template better
+          required: true
+  - type: textarea
+    id: body
+    attributes:
+      label: Body
+    validations:
+      required: true
