@@ -303,11 +303,19 @@ const BtnsNotRunning = memo<BtnsNotRunningProps>(
         doRefresh();
       });
     }, [activeWorkflow, doRefresh]);
+    const clone = useCallback(() => {
+      const cloned = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek()!)))!;
+      cloned.name += ` [copied ${new Date().toLocaleString()}]`;
+
+      reg.add(cloned);
+      activeWorkflow.value = cloned;
+    }, [activeWorkflow]);
 
     return (
       <div class={'btn-group btn-group-sm'}>
         <Btn kind={'success'} onClick={run}>{'Run'}</Btn>
         <Btn kind={'primary'} onClick={startEditing}>{'Edit'}</Btn>
+        <Btn kind={'primary'} onClick={clone}>{'Copy'}</Btn>
         <Btn kind={'danger'} onClick={del}>{'Delete'}</Btn>
       </div>
     );
