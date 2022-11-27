@@ -14,6 +14,7 @@ import {WorkflowEventType} from '../../lib/execution/workflow-event.mjs';
 import type {WorkflowExecution} from '../../lib/execution/workflow-execution.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
 import {EMPTY_ARR} from '../../lib/util.mjs';
+import {alertConfirm} from '../../lib/util/alert';
 import swapElements from '../../lib/util/swap-elements.mjs';
 import {BorderedBlock} from '../components/block';
 import Btn from '../components/btn';
@@ -296,12 +297,16 @@ const BtnsNotRunning = memo<BtnsNotRunningProps>(
       });
     }, [editedWorkflow, activeWorkflow]);
     const del = useCallback(() => {
-      const activeId = activeWorkflow.peek()!.listId;
-      batch(() => {
-        activeWorkflow.value = undefined;
-        reg.rmByIdx(reg.workflows.findIndex(wf => wf.listId === activeId));
-        doRefresh();
-      });
+      const activeWf = activeWorkflow.peek()!;
+
+      alertConfirm(`Are you sure you want to delete "${activeWf.name}"?`)
+        .subscribe(() => {
+          batch(() => {
+            activeWorkflow.value = undefined;
+            reg.rmByIdx(reg.workflows.findIndex(wf => wf.listId === activeWf.listId));
+            doRefresh();
+          });
+        });
     }, [activeWorkflow, doRefresh]);
     const clone = useCallback(() => {
       const cloned = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek()!)))!;
