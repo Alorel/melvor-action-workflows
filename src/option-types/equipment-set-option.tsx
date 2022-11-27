@@ -28,7 +28,7 @@ defineOption<number, EquipmentSetOption>({
   token: 'EquipmentSet',
   validate: (value: number | undefined): string[] => (
     value != null && value >= game.combat.player.numEquipSets
-      ? [`Out of bounds! Max value: ${game.combat.player.numEquipSets}`]
+      ? [`Out of bounds! Number of equipment sets available: ${game.combat.player.numEquipSets}`]
       : EMPTY_ARR
   ),
 });
