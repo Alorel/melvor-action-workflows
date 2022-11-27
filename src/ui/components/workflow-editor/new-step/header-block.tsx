@@ -19,25 +19,28 @@ const NewStepHeader = memo<Props>(({step}) => {
     reRender();
   }, [step.trigger]);
 
+  const stepTrigger = step.trigger;
+  const triggerId = stepTrigger.trigger.id;
+
   return (
     <table className={'table table-sm font-size-sm'}>
       <tbody>
         <tr>
           <Td class={'font-w600'}>{'Trigger'}</Td>
           <Td>
-            <TriggerSelect value={step.trigger.trigger} onChange={onTriggerChange}/>
+            <TriggerSelect value={stepTrigger.trigger} onChange={onTriggerChange}/>
           </Td>
         </tr>
 
-        {step.trigger.trigger.def.options?.map(opt => (
-          <RenderNodeOption key={`${opt.localID}@${step.trigger.listId}`}
+        {stepTrigger.trigger.def.options?.map(opt => (
+          <RenderNodeOption key={`${opt.localID}@${triggerId}`}
             onChange={value => {
-              step.trigger.opts = {...step.trigger.opts, [opt.localID]: value};
+              step.trigger.opts = {...stepTrigger.opts, [opt.localID]: value};
               reRender();
             }}
             option={opt}
-            otherValues={step.trigger.opts}
-            value={step.trigger.opts[opt.localID]}/>
+            otherValues={stepTrigger.opts}
+            value={stepTrigger.opts[opt.localID]}/>
         ))}
       </tbody>
     </table>
