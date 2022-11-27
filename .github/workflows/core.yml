@@ -23,5 +23,5 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Test API
-        if: ${{ github.token }}
+        if: ${{ github.secret_source == 'Actions' }}
         run: npm run modio -- next-dev-version --token "${{ secrets.MOD_IO_API_TOKEN }}"
