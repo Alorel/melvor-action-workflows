@@ -3,6 +3,7 @@ import type {ToJSON, ToJsonFormatter} from '../to-json.mjs';
 
 export type JsonFrom<I = any, O = any> = (value: I) => O;
 
+/** Just call toJSON */
 export function FormatToJson(fromFn?: JsonFrom): ToJsonFormatter {
   return fromFn ? {from: fromFn, to} : defaultFormatter;
 }

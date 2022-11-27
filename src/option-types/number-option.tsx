@@ -1,15 +1,15 @@
 import {Fragment} from 'preact';
 import {useCallback} from 'preact/hooks';
-import {defineOption} from '../lib/api.mjs';
+import {defineOption} from '../lib/define-option.mjs';
 import {EMPTY_ARR} from '../lib/util.mjs';
 import {resolveDynamicOptionObject} from '../lib/util/dynamic-option.mjs';
-import {isUndefinedOr, typeIs} from '../lib/util/is-undefined-or.mjs';
+import {isUndefinedOr, typeIs} from '../lib/util/type-is.mjs';
 import type {NumberNodeOption} from '../public_api';
 import useReRender from '../ui/hooks/re-render';
 import {useRenderEditTouch} from './_common.mjs';
 
 defineOption<number, NumberNodeOption>({
-  is: (v): v is NumberNodeOption => {
+  is(v): v is NumberNodeOption {
     const {type, max, min, step} = v as Partial<NumberNodeOption>;
 
     return type === Number

@@ -1,15 +1,13 @@
 import type {VNode} from 'preact';
 import {Fragment} from 'preact';
 import {useCallback} from 'preact/hooks';
-import {defineOption} from '../lib/api.mjs';
+import {defineOption} from '../lib/define-option.mjs';
 import {EMPTY_ARR} from '../lib/util.mjs';
 import type {EquipmentSetOption} from '../public_api';
 import {useRenderEditTouch} from './_common.mjs';
 
 defineOption<number, EquipmentSetOption>({
-  is: (v): v is EquipmentSetOption => (
-    v.type === 'EquipmentSet'
-  ),
+  is: (v): v is EquipmentSetOption => v.type === 'EquipmentSet',
   renderEdit({value = 0, onChange}) {
     const onInp = useCallback((e: Event) => {
       const newVal = parseInt((e.target as HTMLInputElement).value);

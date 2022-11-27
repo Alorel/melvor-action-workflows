@@ -22,12 +22,16 @@ export default abstract class SkillAction<T extends object, S extends GatheringS
   /** @inheritDoc */
   public readonly category: string;
 
+  /** @inheritDoc */
   public readonly initOptions?: () => Obj<any>;
 
+  /** @inheritDoc */
   public readonly label: string;
 
+  /** @inheritDoc */
   public media: string;
 
+  /** @inheritDoc */
   public readonly options?: NodeOption[];
 
   public readonly skill: S;

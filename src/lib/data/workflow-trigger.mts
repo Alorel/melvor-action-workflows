@@ -1,5 +1,3 @@
-import {Memoise} from '@aloreljs/memoise-decorator';
-import {identity} from 'rxjs';
 import type {NodeOption, Obj} from '../../public_api';
 import {
   allTriggerSelectGroups
@@ -59,28 +57,20 @@ export class WorkflowTrigger extends OptsListItem {
     return this.nodeOptions as NodeOption[];
   }
 
+  /** Shortcut for getting the trigger ID */
   @JsonProp()
   public get id(): string {
     return this.trigger.id;
   }
 
+  /** SHortcut for getting the trigger's option definitions */
   public get nodeOptions(): readonly NodeOption[] {
     return this.trigger?.def.options ?? EMPTY_ARR;
   }
 
-  public optionGetSet<T>(key: string): [T, (val: T) => void] {
-    return [this.opts[key], this.getOptionSetter(key)];
-  }
-
+  /** Reset options to the trigger's defaults */
   public resetOpts(): void {
     this.opts = this.trigger.def.initOptions?.() ?? {};
-  }
-
-  @Memoise(identity)
-  private getOptionSetter(key: string): (val: any) => void {
-    return val => {
-      this.opts[key] = val;
-    };
   }
 }
 

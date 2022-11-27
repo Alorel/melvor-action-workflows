@@ -8,6 +8,7 @@ const baseOpts: Partial<SweetAlertOptions> = {
   showConfirmButton: true,
 };
 
+/** Make an error alert message */
 export function alertError(text: string, title = 'Confirmation'): void {
   Swal
     .fire({
@@ -21,6 +22,7 @@ export function alertError(text: string, title = 'Confirmation'): void {
     .catch(console.error);
 }
 
+/** Make an confirmation alert message. Emits if the confirmation is confirmed. */
 export function alertConfirm(text: string, title = 'Confirmation'): Observable<void> {
   return new Observable<void>(subscriber => {
     Swal

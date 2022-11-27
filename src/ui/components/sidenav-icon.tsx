@@ -23,7 +23,7 @@ const SidenavIcon = memo(() => {
 
   const Comp = running ? PlaySvg : PauseSvg;
 
-  return <Comp class={'nav-img'}/>;
+  return <Comp class={'mr-1'}/>;
 });
 
 export default SidenavIcon;

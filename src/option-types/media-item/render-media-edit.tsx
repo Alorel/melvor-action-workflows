@@ -3,16 +3,12 @@ import type {VNode} from 'preact';
 import {h} from 'preact';
 import {memo, useMemo} from 'preact/compat';
 import {useCallback} from 'preact/hooks';
-import type {
-  MediaItemNodeOption,
-  MediaItemNodeOptionMultiConfig,
-  MediaSelectable,
-  OptionRenderEditCtx
-} from '../../public_api';
+import type {OptionRenderEditCtx} from '../../lib/define-option.mjs';
+import type {MediaItemNodeOption, MediaItemNodeOptionMultiConfig, MediaSelectable} from '../../public_api';
 import Btn from '../../ui/components/btn';
 import {BinSvg} from '../../ui/components/svg';
+import type {MediaOptionValue} from '../media-item-option.mjs';
 import RenderMediaItemOptionOneBase from './media-edit-base';
-import type {MediaOptionValue} from './media-item-option.mjs';
 import {findItems, resolveMediaItemRegistry, resolveMediaMulti} from './render-media-commons.mjs';
 
 export default function RenderMediaEdit(ctx: OptionRenderEditCtx<MediaOptionValue, MediaItemNodeOption>): VNode {

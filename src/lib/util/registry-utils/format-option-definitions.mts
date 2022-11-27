@@ -1,9 +1,16 @@
 import {get} from 'lodash-es';
 import type {NamespaceRegistry} from 'melvor';
-import isMediaItemOption from '../../../option-types/media-item/media-item-option.mjs';
+import isMediaItemOption from '../../../option-types/media-item-option.mjs';
 import type {NodeOption, Obj} from '../../../public_api';
 import {errorLog} from '../log.mjs';
 
+/**
+ * Serialisation util for formatting option definition objects
+ * @param init Raw serialised data
+ * @param optDefinitions All option definitions
+ * @param opts Option values
+ * @return Whether the data is valid or not
+ */
 export function formatOptionDefinitions(
   init: Obj<any>,
   optDefinitions: NodeOption[] | undefined,

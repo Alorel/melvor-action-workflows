@@ -2,19 +2,22 @@ import {isPlainObject} from 'lodash-es';
 import type {VNode} from 'preact';
 import {Fragment, h} from 'preact';
 import {useCallback} from 'preact/hooks';
-import {defineOption} from '../lib/api.mjs';
+import type {OptionRenderEditCtx} from '../lib/define-option.mjs';
+import {defineOption} from '../lib/define-option.mjs';
 import {EMPTY_ARR, EMPTY_OBJ} from '../lib/util.mjs';
 import {resolveDynamicOptionObject} from '../lib/util/dynamic-option.mjs';
-import type {Obj, OptionRenderEditCtx, StringNodeOption} from '../public_api';
+import type {Obj, StringNodeOption} from '../public_api';
 import Btn from '../ui/components/btn';
 import {BinSvg} from '../ui/components/svg';
 import {useRenderEditTouch} from './_common.mjs';
 
 defineOption<string, StringNodeOption>({
-  is: (v): v is StringNodeOption => (
-    v.type === String
-    && (v.enum == null || isPlainObject(v.enum) || typeof v.enum === 'function')
-  ),
+  is(v): v is StringNodeOption {
+    const {type, enum: vEnum} = v as Partial<StringNodeOption>;
+
+    return type === String
+      && (vEnum == null || isPlainObject(vEnum) || typeof vEnum === 'function');
+  },
   renderEdit: ctx => h(ctx.option.enum ? RenderEnumOpts : RenderInput, ctx),
   renderView: ({value, option, otherValues}) => (
     <Fragment>{

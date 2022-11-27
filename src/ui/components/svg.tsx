@@ -1,7 +1,9 @@
+import {AdoptedStylesheets, ShadowHost} from '@alorel/preact-shadow-root';
 import {staticComponent} from '@alorel/preact-static-component';
 import type {VNode} from 'preact';
 import type {FunctionComponent} from 'preact/compat';
 import type {JSXInternal} from 'preact/src/jsx';
+import makeConstructableCss from '../util/make-constructable-css.mjs';
 
 type SvgProps = Omit<BaseProps, 'viewBox' | 'children'>;
 
@@ -10,7 +12,8 @@ interface ChevronBaseProps extends ChevronProps {
   chevRotate?: number;
 }
 const ChevronBase: FunctionComponent<ChevronBaseProps> = ({chevRotate, style, ...rest}) => (
-  <BaseSvg fill={'#f8f9fa'}
+  <BaseSvg
+    fill={'#f8f9fa'}
     viewBox={'0 0 24 24'}
     style={chevRotate ? {transform: `rotate(${chevRotate}deg)`, ...style} : style}
     {...rest}>
@@ -63,15 +66,17 @@ export const PauseSvg = staticComponent<NoSpaceProps>(props => (
   </BaseSvg>
 ));
 
-interface BaseProps extends Omit<JSXInternal.SVGAttributes<SVGSVGElement>, 'xmlns' | 'style'> {
+interface BaseProps extends Omit<JSXInternal.SVGAttributes<SVGSVGElement>, 'xmlns' | 'style' | 'className' | 'class'> {
+  class?: string;
   style?: JSXInternal.CSSProperties;
 }
-function BaseSvg({style, ...props}: BaseProps): VNode {
-  return <svg xmlns={'http://www.w3.org/2000/svg'}
-    style={{
-      height: '1rem',
-      width: '1rem',
-      ...style,
-    }}
-    {...props}/>;
-}
+
+const svgSheet = makeConstructableCss('svg{width:1rem;height:1rem}');
+const BaseSvg = ({class: className, ...props}: BaseProps): VNode => (
+  <span class={className}>
+    <ShadowHost adoptedStyleSheets={svgSheet}>
+      <AdoptedStylesheets/>
+      <svg xmlns={'http://www.w3.org/2000/svg'} {...props}/>
+    </ShadowHost>
+  </span>
+);

@@ -1,20 +1,23 @@
 import type {BasicSkillRecipe, Item} from 'melvor';
 import {h} from 'preact';
 import {useCallback} from 'preact/hooks';
-import {defineOption} from '../lib/api.mjs';
+import type {OptionRenderViewCtx} from '../lib/define-option.mjs';
+import {defineOption} from '../lib/define-option.mjs';
 import {EMPTY_ARR} from '../lib/util.mjs';
-import type {AltRecipeCostNodeOption, MediaSelectable, Obj, OptionRenderViewCtx} from '../public_api';
+import type {AltRecipeCostNodeOption, MediaSelectable, Obj} from '../public_api';
+import type {MediaOptionValue} from './media-item-option.mjs';
 import RenderMediaItemOptionOneBase from './media-item/media-edit-base';
-import type {MediaOptionValue} from './media-item/media-item-option.mjs';
 import {findItems} from './media-item/render-media-commons.mjs';
 import RenderMediaSelectView from './media-item/render-media-view';
 
 defineOption<number, AltRecipeCostNodeOption>({
-  is: (v): v is AltRecipeCostNodeOption => (
-    v.type === 'AltRecipeCost'
-    && typeof v.recipeOption === 'string'
-    && typeof v.getAltCostItems === 'function'
-  ),
+  is(v): v is AltRecipeCostNodeOption {
+    const {type, recipeOption, getAltCostItems} = v as Partial<AltRecipeCostNodeOption>;
+
+    return type === 'AltRecipeCost'
+      && typeof recipeOption === 'string'
+      && typeof getAltCostItems === 'function';
+  },
   renderEdit({
     otherValues,
     option,

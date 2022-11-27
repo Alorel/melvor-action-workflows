@@ -60,6 +60,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "dependencies": {
+    "@alorel/preact-shadow-root": "^1.1.0",
     "@alorel/preact-static-component": "^1.0.0",
     "@aloreljs/awesome-iter": "^1.0.3",
     "@aloreljs/bound-decorator": "^2.0.0",

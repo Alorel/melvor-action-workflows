@@ -1,8 +1,9 @@
 import type {VNode} from 'preact';
 import {h} from 'preact';
+import type {OptionRenderViewCtx} from '../../../lib/define-option.mjs';
 import {OPTION_REGISTRY} from '../../../lib/registries/option-registry.mjs';
 import {errorLog} from '../../../lib/util/log.mjs';
-import type {NodeOption, OptionRenderViewCtx} from '../../../public_api';
+import type {NodeOption} from '../../../public_api';
 import Td from '../../components/td';
 
 export default function RenderNodeOptionValue<N extends NodeOption>(init: OptionRenderViewCtx<any, N>): VNode | null {
