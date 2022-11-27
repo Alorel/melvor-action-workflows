@@ -91,6 +91,7 @@ export default function (opts) {
           'RegExp',
           'String',
           'Symbol',
+          'Swal',
           'TypeError',
           'undefined',
           'WeakMap',

@@ -7,6 +7,7 @@ import {
   instantiateCompressedToJsonArray
 } from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {WorkflowExecution} from '../execution/workflow-execution.mjs';
+import {alertError} from '../util/alert';
 import {debugLog, errorLog} from '../util/log.mjs';
 
 const enum Strings {
@@ -115,16 +116,10 @@ function store(workflows: Workflow[] | readonly Workflow[]): void | never {
   try {
     ctx.accountStorage.setItem(Strings.CFG_KEY, compressArray(workflows));
   } catch (e) {
-    Swal
-      .fire({
-        cancelButtonColor: '#d33',
-        cancelButtonText: 'Kurwa!',
-        showCancelButton: true,
-        showConfirmButton: false,
-        text: 'Melvor mods have a 8kB storage limit and we\'ve reached it. Gonna have to delete some workflows.',
-        title: 'Failed to save',
-      })
-      .catch(errorLog);
+    alertError(
+      'Melvor mods have a 8kB storage limit and we\'ve reached it. Gonna have to delete some workflows.',
+      'Failed to save'
+    );
 
     throw e;
   }
