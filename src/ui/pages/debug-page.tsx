@@ -63,7 +63,6 @@ const ItemLookup = (() => {
 
       return (
         <Fragment>
-          <pre class={'text-light'}>{JSON.stringify(item, null, 2)}</pre>
           <div class={'input-group'}>
             <input placeholder={'Count'}
               class={'form-control form-control-sm'}
@@ -72,6 +71,7 @@ const ItemLookup = (() => {
               onInput={onChange}/>
             <Btn onClick={grant} kind={'primary'}>{'Get'}</Btn>
           </div>
+          <pre className={'text-light'} style={'user-select:text'}>{JSON.stringify(item, null, 2)}</pre>
         </Fragment>
       );
     },
