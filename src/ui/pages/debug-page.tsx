@@ -2,6 +2,8 @@ import {startCase} from 'lodash-es';
 import type {Currency, Game, Skill} from 'melvor';
 import type {TypedKeys} from 'mod-util/typed-keys';
 import type {VNode} from 'preact';
+import {ACTION_REGISTRY} from '../../lib/registries/action-registry.mjs';
+import {TRIGGER_REGISTRY} from '../../lib/registries/trigger-registry.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
 import {BlockDiv} from '../components/block';
 import Btn from '../components/btn';
@@ -17,7 +19,7 @@ export default function DebugPage(): VNode {
       <div class={'btn-group btn-group-sm'}>
         <LvAllSkills/>
         <UnlockSummoning/>
-        <PrintRegistry/>
+        <PrintLog/>
         <GetCurrency path={'gp'}/>
         <GetCurrency path={'slayerCoins'}/>
       </div>
@@ -25,12 +27,16 @@ export default function DebugPage(): VNode {
   );
 }
 
-function PrintRegistry(): VNode {
+function PrintLog(): VNode {
   return (
     <Btn onClick={() => {
-      console.dir(WorkflowRegistry.inst);
+      console.dir({
+        actions: ACTION_REGISTRY,
+        triggers: TRIGGER_REGISTRY,
+        workflows: WorkflowRegistry.inst,
+      });
     }}
-    kind={'primary'}>{'console.dir the registry'}</Btn>
+    kind={'primary'}>{'console.dir all the things'}</Btn>
   );
 }
 
