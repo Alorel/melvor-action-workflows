@@ -1,0 +1,32 @@
+name: Question
+description: General queries
+labels: ["question"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What best describes your question?
+      options:
+        - Question about the UI or terminology
+        - Question about an Action
+        - Question about a Trigger
+        - Question about workflows
+        - Question about the mod API
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: checkboxes
+    id: TOS
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow the [Code of Conduct](/Alorel/melvor-mod/.github/CODE_OF_CONDUCT.md)
+      options:
+        - label: "I agree"
+          required: true

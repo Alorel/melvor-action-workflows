@@ -1,0 +1,30 @@
+name: Feature Request
+description: I want a thing
+labels: ["feature request"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What best describes your request?
+      options:
+        - A new action
+        - A new trigger
+        - Additions to the mod API
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What are you missing?
+    validations:
+      required: true
+  - type: checkboxes
+    id: TOS
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow the [Code of Conduct](/Alorel/melvor-mod/.github/CODE_OF_CONDUCT.md)
+      options:
+        - label: "I agree"
+          required: true
