@@ -28,7 +28,7 @@ export default {
       }
     };
 
-    const Bluebird = await import('bluebird');
+    const Bluebird = (await import('bluebird')).default;
     await Bluebird.map(versions, runVersion, {concurrency: 3});
   }
 };
