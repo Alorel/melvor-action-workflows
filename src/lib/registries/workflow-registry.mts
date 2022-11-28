@@ -22,16 +22,20 @@ export type ReadonlyBehaviorSubject<T> = Pick<BehaviorSubject<T>, 'value' | keyo
 export default class WorkflowRegistry {
 
   /** The current "main" workflow being executed */
-  public readonly primaryExecution$ = new BehaviorSubject<undefined | WorkflowExecution>(undefined);
+  public readonly primaryExecution$: ReadonlyBehaviorSubject<undefined | WorkflowExecution>;
 
   /** All the registered workflows, as a Subject. Do NOT modify this directly without emitting a change event */
   public readonly workflows$: ReadonlyBehaviorSubject<Workflow[]>;
+
+  /** The current "main" workflow being executed */
+  private readonly _primaryExecution$: BehaviorSubject<undefined | WorkflowExecution>;
 
   /** All the registered workflows, as a Subject. Do NOT modify this directly without emitting a change event */
   private readonly _workflows$: BehaviorSubject<Workflow[]>;
 
   /** Use the singleton @ {@link #inst} */
   private constructor(workflows: Workflow[]) {
+    this.primaryExecution$ = this._primaryExecution$ = new BehaviorSubject<undefined | WorkflowExecution>(undefined);
     this.workflows$ = this._workflows$ = new BehaviorSubject(workflows);
   }
 
@@ -116,8 +120,8 @@ export default class WorkflowRegistry {
   }
 
   public setPrimaryExecution(workflow?: Workflow): void {
-    if (workflow?.listId !== this.primaryExecution$.value?.workflow.listId) {
-      this.primaryExecution$.next(workflow ? new WorkflowExecution(workflow) : undefined);
+    if (workflow?.listId !== this._primaryExecution$.value?.workflow.listId) {
+      this._primaryExecution$.next(workflow ? new WorkflowExecution(workflow) : undefined);
     }
   }
 
