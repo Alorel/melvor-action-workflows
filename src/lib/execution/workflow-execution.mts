@@ -1,3 +1,4 @@
+import {Memoise} from '@aloreljs/memoise-decorator';
 import {nextComplete} from '@aloreljs/rxutils';
 import {logError} from '@aloreljs/rxutils/operators';
 import type {MonoTypeOperatorFunction, Observer, Subscription, TeardownLogic} from 'rxjs';
@@ -47,6 +48,12 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   /** Currently executed step index */
   private readonly _activeStepIdx$ = new BehaviorSubject<number>(0);
 
+  /** Whether {@link #activeStepIdx} was set manually or not */
+  private activeStepIdxManual = false;
+
+  /** Set to true when {@link #end} is called */
+  private finished = false;
+
   /** Gets set to false when the step is being set forcefully to avoid invalid updates to the active step index */
   private incrementActiveStep = true;
 
@@ -63,6 +70,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   private readonly mainSubObserver: Observer<Out> = {
     complete: () => {
       if (this.incrementActiveStep) {
+        this.activeStepIdxManual = false;
         ++this.activeStepIdx;
       }
       this.mainSub = asapScheduler.schedule(this.tick);
@@ -106,6 +114,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   /** Set the currently executed step index. */
   public setActiveStepIdx(v: number): void {
     this.incrementActiveStep = false;
+    this.activeStepIdxManual = true;
     try {
       this.activeStepIdx = v;
     } finally {
@@ -117,9 +126,14 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   protected override cleanup(): void {
     this.mainSub?.unsubscribe();
     this.mainSub = undefined;
+    if (this.finished) {
+      // Restore the events prop to its initial state
+      Object.defineProperty(this, 'events', DESC_EVENTS);
+    }
   }
 
   /** @inheritDoc */
+  @Memoise.all()
   protected override getOnInitEvents(): Out[] {
     return [{
       type: WorkflowEventType.WORKFLOW_START,
@@ -129,16 +143,29 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
 
   /** @inheritDoc */
   protected override init(): TeardownLogic {
+    if (this.finished) {
+      if (!this.activeStepIdxManual) {
+        this.activeStepIdx = 0;
+      }
+      this.finished = false;
+    }
     this.tick();
   }
 
   /** Mark the execution as complete */
   private end(): void {
+    this.finished = true;
     const evt = this.mkCompleteEvent(true);
     this.events.push(evt);
     for (const sub of this.subscribers) {
-      nextComplete(sub, evt);
+      try {
+        nextComplete(sub, evt);
+      } catch (e) {
+        errorLog('Workflow Execution end() error', e);
+      }
     }
+
+    this.patchOnInitEventsOnEnd();
   }
 
   /**
@@ -283,6 +310,15 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     return (ok ? base : {...base, err}) as WorkflowCompleteEvent;
   }
 
+  /** Patch {@link #getOnInitEvents} to also emit a workflow reset event */
+  @Memoise.all()
+  private patchOnInitEventsOnEnd(): void {
+    this.getOnInitEvents().unshift({
+      type: WorkflowEventType.WORKFLOW_RESET,
+      workflow: this.workflow,
+    });
+  }
+
   /** Main ticking function for the workflow */
   private tick(): void {
     const step = this.activeStep;
@@ -300,3 +336,5 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     return takeUntil(this._activeStepIdx$.pipe(filter(i => i !== idx)));
   }
 }
+
+const DESC_EVENTS = Object.getOwnPropertyDescriptor(WorkflowExecution.prototype, 'events')!;

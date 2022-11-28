@@ -7,7 +7,7 @@ import {Fragment, h} from 'preact';
 import {memo} from 'preact/compat';
 import {useCallback, useEffect, useRef} from 'preact/hooks';
 import type {Observable, OperatorFunction} from 'rxjs';
-import {distinctUntilChanged, EMPTY, map, merge, of, skip, switchMap} from 'rxjs';
+import {debounceTime, distinctUntilChanged, EMPTY, map, merge, of, skip, startWith, switchMap} from 'rxjs';
 import {Workflow} from '../../lib/data/workflow.mjs';
 import type {WorkflowCompleteEvent, WorkflowEvent} from '../../lib/execution/workflow-event.mjs';
 import {WorkflowEventType} from '../../lib/execution/workflow-event.mjs';
@@ -81,7 +81,6 @@ function usePrimaryExecutionSignal() {
   useEffect(() => {
     const sub = reg.primaryExecution$
       .pipe(
-        distinctUntilChanged((a, b) => a?.id === b?.id),
         switchMap(exec => {
           if (!exec) {
             batch(() => {
@@ -97,7 +96,9 @@ function usePrimaryExecutionSignal() {
 
           const border$ = exec.pipe(
             eventToBorder(running),
-            distinctWithInitial<string>(Strings.STD_CLASS)
+            startWith(Strings.STD_CLASS),
+            debounceTime(0),
+            distinctUntilChanged()
           );
           const stepIdxNever$ = getStepIdx(exec, activeStepIdx);
 
@@ -219,7 +220,7 @@ const RenderSteps = memo<Pick<EditorProps, 'activeWorkflow' | 'borderClass' | 'a
                 onShift(idx, direction);
               }}
               onSetActive={() => {
-                             WorkflowRegistry.inst.primaryExecution$.value!.setActiveStepIdx(idx);
+                             WorkflowRegistry.inst.primaryExecution!.setActiveStepIdx(idx);
               }}
               step={step}
               {...stepProps[idx]}/>
@@ -287,7 +288,7 @@ const BtnsNotRunning = memo<BtnsNotRunningProps>(
 
     const reg = WorkflowRegistry.inst;
     const run = useCallback(() => {
-      reg.setPrimaryExecution(activeWorkflow.peek()!);
+      reg.setPrimaryExecution(activeWorkflow.peek(), true);
       doRefresh();
     }, [activeWorkflow, doRefresh]);
     const startEditing = useCallback(() => {

@@ -1,10 +1,9 @@
-import {distinctWithInitial} from '@aloreljs/rxutils/operators';
 import type {VNode} from 'preact';
 import type {HTMLAttributes} from 'preact/compat';
 import {memo, useMemo} from 'preact/compat';
 import {useCallback, useEffect, useState} from 'preact/hooks';
 import type {Observable} from 'rxjs';
-import {EMPTY, of, skip, startWith, switchMap} from 'rxjs';
+import {debounceTime, distinctUntilChanged, EMPTY, of, startWith, switchMap} from 'rxjs';
 import type {WorkflowStep} from '../../../lib/data/workflow-step.mjs';
 import type {StepCompleteEvent, StepListeningEvent, WorkflowEvent} from '../../../lib/execution/workflow-event.mjs';
 import {WorkflowEventType} from '../../../lib/execution/workflow-event.mjs';
@@ -139,6 +138,7 @@ function useBorder(stepId: number): string {
         case WorkflowEventType.STEP_COMPLETE:
           return of((evt as StepCompleteEvent).ok ? 'woodcutting' : 'fletching');
         case WorkflowEventType.STEP_NOT_LISTENING:
+        case WorkflowEventType.WORKFLOW_RESET:
           return of(Strings.DEFAULT_CSS);
         default:
           return EMPTY;
@@ -153,8 +153,8 @@ function useBorder(stepId: number): string {
             startWith<string>(Strings.DEFAULT_CSS)
           ) ?? of<string>(Strings.DEFAULT_CSS)
         )),
-        distinctWithInitial(border),
-        skip(1)
+        debounceTime(0),
+        distinctUntilChanged()
       )
       .subscribe(setBorder);
 
