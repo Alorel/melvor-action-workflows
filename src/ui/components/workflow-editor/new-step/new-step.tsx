@@ -1,7 +1,8 @@
 import type {VNode} from 'preact';
+import {Fragment} from 'preact';
 import type {FunctionComponent} from 'preact/compat';
 import {memo} from 'preact/compat';
-import {useCallback, useContext} from 'preact/hooks';
+import {useCallback} from 'preact/hooks';
 import type {WorkflowStep} from '../../../../lib/data/workflow-step.mjs';
 import swapElements from '../../../../lib/util/swap-elements.mjs';
 import useReRender from '../../../hooks/re-render';
@@ -11,7 +12,7 @@ import {BorderedBlock} from '../../block';
 import Btn from '../../btn';
 import {BinSvg, ChevronLeftSvg, ChevronRightSvg} from '../../svg';
 import ActionConfig from '../action-config';
-import {EDITOR_CTX, EDITOR_SECTION_CLASS} from '../editor-ctx.mjs';
+import {EDITOR_SECTION_CLASS} from '../editor-ctx.mjs';
 import NewStepHeader from './header-block';
 
 interface Props {
@@ -21,8 +22,9 @@ interface Props {
 const NewStep = memo<Props>(({children, step}): VNode => {
   const [addAction, rmAction, shiftActionIdx] = useStepCallbacks(step);
 
-  const canMvActions = step.actions.length > 1;
-  const lastStepIdx = useContext(EDITOR_CTX)!.workflow.lastStepIdx;
+  const actions = step.actions;
+  const canMvActions = actions.length > 1;
+  const lastActionIdx = actions.length - 1;
 
   return (
     <div class={EDITOR_SECTION_CLASS}>
@@ -30,23 +32,28 @@ const NewStep = memo<Props>(({children, step}): VNode => {
         <NewStepHeader step={step}/>
 
         <BorderedBlock kind={'thieving'}>
-          <div class={'font-size-sm font-w600 mb-1'}>{'Actions'}</div>
+          <div class={'font-size-sm font-w600 mb-1'}>Actions</div>
 
           <div class={'row row-deck'}>
-            {step.actions.map((action, i) => (
+            {actions.map((action, i) => (
               <div class={'col-12 col-xl-auto'} key={action.listId}>
                 <ActionConfig action={action}>
-                  {canMvActions && i !== 0 && (
-                    <ActionMvBtn idx={i} shift={-1} onClick={shiftActionIdx}>
-                      <ChevronLeftSvg/>
-                    </ActionMvBtn>
+                  {canMvActions && (
+                    <Fragment>
+                      {i !== 0 && (
+                        <ActionMvBtn idx={i} shift={-1} onClick={shiftActionIdx}>
+                          <ChevronLeftSvg/>
+                        </ActionMvBtn>
+                      )}
+                      {i !== lastActionIdx && (
+                        <ActionMvBtn idx={i} shift={1} onClick={shiftActionIdx}>
+                          <ChevronRightSvg/>
+                        </ActionMvBtn>
+                      )}
+                      <ActionRmBtn idx={i} onClick={rmAction}/>
+                    </Fragment>
                   )}
-                  {canMvActions && i !== lastStepIdx && (
-                    <ActionMvBtn idx={i} shift={1} onClick={shiftActionIdx}>
-                      <ChevronRightSvg/>
-                    </ActionMvBtn>
-                  )}
-                  {canMvActions && <ActionRmBtn idx={i} onClick={rmAction}/>}
+
                 </ActionConfig>
               </div>
             ))}
