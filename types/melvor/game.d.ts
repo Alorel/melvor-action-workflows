@@ -375,6 +375,34 @@ export class CombatManager {
   player: Player;
 }
 
+type PotionReuseTarget = Skill | CombatManager;
+
+export interface PotionUse {
+  charges: number;
+
+  item: PotionItem;
+}
+
+export class PotionManager {
+  public activePotions: Map<PotionReuseTarget, PotionUse>;
+
+  public autoReuseActions: Set<PotionReuseTarget>;
+
+  public autoReusePotionsForAction(action: PotionReuseTarget): boolean;
+
+  public getActivePotionForAction(action: PotionReuseTarget): PotionItem | undefined;
+
+  public getPotionCharges(potion: PotionItem): number;
+
+  public isPotionActive(potion: PotionItem): boolean;
+
+  public isPotionActiveForAction(action: PotionReuseTarget): boolean;
+
+  public toggleAutoReusePotion(action: PotionReuseTarget): void;
+
+  public usePotion(potion: PotionItem, loadPotions?: boolean): void;
+}
+
 export class SummoningRecipe extends CategorizedArtisanRecipe {
   gpCost: number;
 
@@ -433,6 +461,20 @@ export class EquipmentItem extends Item {
 
 export class FoodItem extends Item {
 
+}
+
+export class PotionItem extends Item {
+  action: PotionReuseTarget;
+
+  getActivePotionForAction(): PotionItem | undefined;
+
+  getPotionCharges(potion: PotionItem): number;
+
+  isPotionActive(potion: PotionItem): boolean;
+
+  isPotionActiveForAction(action: PotionReuseTarget): boolean;
+
+  toggleAutoReusePotion(action: PotionReuseTarget): void;
 }
 
 export class Item extends NamespacedObject {
@@ -647,6 +689,8 @@ export class Game {
   mining: Mining;
 
   pages: NamespaceRegistry<Page>;
+
+  potions: PotionManager;
 
   registeredNamespaces: NamespaceMap;
 
