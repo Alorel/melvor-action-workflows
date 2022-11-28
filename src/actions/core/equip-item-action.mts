@@ -36,6 +36,7 @@ defineLocalAction<Props>({
       type: 'MediaItem',
     },
     {
+      description: 'Leave empty to use the item\'s default, e.g. a ring with a passive effect would get equipped to the ring slot. If you\'re equipping two summons, specify the slot for each.',
       enum: ({item}: Props) => objectFromArray(item.validSlots),
       label: 'Slot',
       localID: 'slot',
