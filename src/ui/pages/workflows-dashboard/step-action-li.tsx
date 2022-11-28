@@ -1,10 +1,10 @@
-import {distinctWithInitial} from '@aloreljs/rxutils/operators';
 import {memo} from 'preact/compat';
 import {useEffect, useState} from 'preact/hooks';
 import type {Observable} from 'rxjs';
-import {EMPTY, of, skip, startWith, switchMap} from 'rxjs';
+import {debounceTime, distinctUntilChanged, EMPTY, of, startWith, switchMap} from 'rxjs';
 import type ActionConfigItem from '../../../lib/data/action-config-item.mjs';
 import type {ActionExecutionEvent} from '../../../lib/execution/workflow-event.mjs';
+import {WorkflowEventType} from '../../../lib/execution/workflow-event.mjs';
 import WorkflowRegistry from '../../../lib/registries/workflow-registry.mjs';
 import {DefSection} from './def-section';
 
@@ -37,16 +37,20 @@ function useActionLiClass(actionId: number): string {
           }
 
           return exec.pipe(
-            switchMap((evt): Observable<string> => (
-              (evt as Partial<ActionExecutionEvent>).action?.listId === actionId
-                ? of((evt as ActionExecutionEvent).ok ? 'list-group-item-success' : 'list-group-item-danger')
-                : EMPTY
-            )),
+            switchMap((evt): Observable<string> => {
+              if (evt.type === WorkflowEventType.WORKFLOW_RESET) {
+                return of(Strings.INITIAL_CLASS);
+              } else if ((evt as Partial<ActionExecutionEvent>).action?.listId === actionId) {
+                return of((evt as ActionExecutionEvent).ok ? 'list-group-item-success' : 'list-group-item-danger');
+              }
+
+              return EMPTY;
+            }),
             startWith(Strings.INITIAL_CLASS)
           );
         }),
-        distinctWithInitial(value),
-        skip(1)
+        debounceTime(0),
+        distinctUntilChanged()
       )
       .subscribe(setValue);
 

@@ -55,6 +55,10 @@ export default class WorkflowRegistry {
     return out;
   }
 
+  public get primaryExecution(): undefined | WorkflowExecution {
+    return this.primaryExecution$.value;
+  }
+
   /** All the registered workflows. Do NOT modify this directly without emitting a change event */
   public get workflows(): readonly Workflow[] {
     return this._workflows$.value;
@@ -119,8 +123,8 @@ export default class WorkflowRegistry {
     store(this.workflows);
   }
 
-  public setPrimaryExecution(workflow?: Workflow): void {
-    if (workflow?.listId !== this._primaryExecution$.value?.workflow.listId) {
+  public setPrimaryExecution(workflow?: Workflow, force = false): void {
+    if (force || workflow?.listId !== this.primaryExecution?.workflow.listId) {
       this._primaryExecution$.next(workflow ? new WorkflowExecution(workflow) : undefined);
     }
   }

@@ -7,55 +7,52 @@ export const enum WorkflowEventType {
   /** An action completed */
   ACTION_COMPLETE,
 
+  /** Step execution finished */
+  STEP_COMPLETE,
+
   /** Step listener started */
   STEP_LISTENING,
 
   /** Step listener stopped. Only emits if the active workflow step is changed forcefully */
   STEP_NOT_LISTENING,
 
-  /** Step execution finished */
-  STEP_COMPLETE,
+  /** Workflow execution completed */
+  WORKFLOW_COMPLETE,
+
+  /** The workflow has been reset */
+  WORKFLOW_RESET,
 
   /** Workflow execution started */
   WORKFLOW_START,
-
-  /** Workflow execution completed */
-  WORKFLOW_COMPLETE,
 }
 
 export type WorkflowEvent = WorkflowCompleteEvent
   | WorkflowStartEvent
+  | WorkflowResetEvent
   | ActionExecutionEvent
   | StepListeningEvent
   | StepNotListeningEvent
   | StepCompleteEvent;
 
-export type WorkflowCompleteEvent = WorkflowEventBase & Result<void> & {
-  type: WorkflowEventType.WORKFLOW_COMPLETE;
-}
+export type WorkflowCompleteEvent = WorkflowEventBase<WorkflowEventType.WORKFLOW_COMPLETE> & Result<void>;
 
-export type WorkflowStartEvent = WorkflowEventBase & {
-  type: WorkflowEventType.WORKFLOW_START;
-}
+export type WorkflowResetEvent = WorkflowEventBase<WorkflowEventType.WORKFLOW_RESET>;
 
-export type StepCompleteEvent = StepEventBase & Result<void> & {
-  type: WorkflowEventType.STEP_COMPLETE;
-}
+export type WorkflowStartEvent = WorkflowEventBase<WorkflowEventType.WORKFLOW_START>;
 
-export interface StepListeningEvent extends StepEventBase {
-  type: WorkflowEventType.STEP_LISTENING;
-}
+export type StepCompleteEvent = StepEventBase<WorkflowEventType.STEP_COMPLETE> & Result<void>;
 
-export interface StepNotListeningEvent extends StepEventBase {
-  type: WorkflowEventType.STEP_NOT_LISTENING;
-}
+export type StepListeningEvent = StepEventBase<WorkflowEventType.STEP_LISTENING>;
 
-export type ActionExecutionEvent = Result<void> & Ref & {
-  type: WorkflowEventType.ACTION_COMPLETE;
-}
+export type StepNotListeningEvent = StepEventBase<WorkflowEventType.STEP_NOT_LISTENING>;
 
-type WorkflowEventBase = Pick<StepEventBase, 'workflow'>;
-type StepEventBase = Pick<Ref, 'step' | 'workflow'>;
+export type ActionExecutionEvent = StepEventBase<WorkflowEventType.ACTION_COMPLETE> & Result<void> & Ref;
+
+type WorkflowEventBase<T> = Pick<StepEventBase<T>, 'workflow' | 'type'>;
+
+interface StepEventBase<T> extends Pick<Ref, 'step' | 'workflow'> {
+  type: T;
+}
 
 interface Ref {
   action: ActionConfigItem;
