@@ -1,6 +1,5 @@
 import type {VNode} from 'preact';
 import {Fragment} from 'preact';
-import type {FunctionComponent} from 'preact/compat';
 import {memo} from 'preact/compat';
 import {useCallback} from 'preact/hooks';
 import type {WorkflowStep} from '../../../../lib/data/workflow-step.mjs';
@@ -20,7 +19,11 @@ interface Props {
 }
 
 const NewStep = memo<Props>(({children, step}): VNode => {
-  const [addAction, rmAction, shiftActionIdx] = useStepCallbacks(step);
+  const reRender = useReRender();
+  const addAction = useCallback((): void => {
+    step.addAction();
+    reRender();
+  }, [step]);
 
   const actions = step.actions;
   const canMvActions = actions.length > 1;
@@ -39,19 +42,10 @@ const NewStep = memo<Props>(({children, step}): VNode => {
               <div class={'col-12 col-xl-auto'} key={action.listId}>
                 <ActionConfig action={action}>
                   {canMvActions && (
-                    <Fragment>
-                      {i !== 0 && (
-                        <ActionMvBtn idx={i} shift={-1} onClick={shiftActionIdx}>
-                          <ChevronLeftSvg/>
-                        </ActionMvBtn>
-                      )}
-                      {i !== lastActionIdx && (
-                        <ActionMvBtn idx={i} shift={1} onClick={shiftActionIdx}>
-                          <ChevronRightSvg/>
-                        </ActionMvBtn>
-                      )}
-                      <ActionRmBtn idx={i} onClick={rmAction}/>
-                    </Fragment>
+                    <ActionMvBtns i={i}
+                      lastActionIdx={lastActionIdx}
+                      reRender={reRender}
+                      step={step}/>
                   )}
 
                 </ActionConfig>
@@ -61,8 +55,8 @@ const NewStep = memo<Props>(({children, step}): VNode => {
 
           <div class={'text-right'}>
             <div class={'btn-group btn-group-sm'}>
-              <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
               {children}
+              <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
             </div>
           </div>
         </BorderedBlock>
@@ -73,6 +67,34 @@ const NewStep = memo<Props>(({children, step}): VNode => {
 
 export default NewStep;
 
+interface BtnsProps extends Props {
+  i: number;
+
+  lastActionIdx: number;
+
+  reRender(): void;
+}
+
+const ActionMvBtns = ({i, lastActionIdx, reRender, step}: BtnsProps) => {
+  const [rmAction, shiftActionIdx] = useStepMoveCallbacks(step, reRender);
+
+  return (
+    <Fragment>
+      {i !== 0 && (
+        <ActionMvBtn idx={i} shift={-1} onClick={shiftActionIdx}>
+          <ChevronLeftSvg/>
+        </ActionMvBtn>
+      )}
+      {i !== lastActionIdx && (
+        <ActionMvBtn idx={i} shift={1} onClick={shiftActionIdx}>
+          <ChevronRightSvg/>
+        </ActionMvBtn>
+      )}
+      <ActionRmBtn idx={i} onClick={rmAction}/>
+    </Fragment>
+  );
+};
+
 interface MvBtnProps {
   idx: number;
 
@@ -81,7 +103,7 @@ interface MvBtnProps {
   onClick(e: Event): void;
 }
 
-const ActionMvBtn: FunctionComponent<MvBtnProps> = ({children, idx, onClick, shift}) => {
+const ActionMvBtn = memo<MvBtnProps>(({children, idx, onClick, shift}) => {
   const btnRef = useTippy<HTMLButtonElement>(`Move this action ${shift === 1 ? 'forward' : 'back'}`);
 
   return (
@@ -94,7 +116,7 @@ const ActionMvBtn: FunctionComponent<MvBtnProps> = ({children, idx, onClick, shi
       {children}
     </Btn>
   );
-};
+});
 
 type RmBtnProps = Pick<MvBtnProps, 'idx' | 'onClick'>;
 
@@ -112,14 +134,7 @@ const ActionRmBtn = ({idx, onClick}: RmBtnProps): VNode => {
   );
 };
 
-function useStepCallbacks(step: WorkflowStep) {
-  const reRender = useReRender();
-
-  const addAction = useCallback((): void => {
-    step.addAction();
-    reRender();
-  }, [step]);
-
+const useStepMoveCallbacks = (step: WorkflowStep, reRender: () => void) => {
   const rmAction = useCallback((e: Event): void => {
     const btnEl = getEvtTarget(e, el => el.tagName === 'BUTTON');
     let idx: number;
@@ -140,13 +155,12 @@ function useStepCallbacks(step: WorkflowStep) {
     }
 
     const idx = parseInt(btnEl!.dataset.idx!);
-    if (isNaN(idx)) {
+    if (isNaN(idx) || !swapElements(step.actions, idx, idx + shift)) {
       return;
     }
 
-    swapElements(step.actions, idx, idx + shift);
     reRender();
   }, [step.actions]);
 
-  return [addAction, rmAction, shiftActionIdx] as const;
-}
+  return [rmAction, shiftActionIdx] as const;
+};
