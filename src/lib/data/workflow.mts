@@ -49,13 +49,8 @@ export class Workflow {
       && this.steps.every(s => s.isValid);
   }
 
-  /** Index of the last step in the steps array */
-  public get lastStepIdx(): number {
-    return this.steps.length - 1;
-  }
-
-  public addStep(): void {
-    this.steps.push(new WorkflowStep());
+  public addStep(idx: number = this.steps.length): void {
+    this.steps.splice(idx, 0, new WorkflowStep());
   }
 
   public rmStep(idx: number): void {
