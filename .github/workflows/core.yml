@@ -1,5 +1,15 @@
 name: Core
-on: push
+on:
+  push:
+    paths-ignore:
+      - ".github/ISSUE_TEMPLATE/*"
+      - ".github/workflows/release.yml"
+      - "**/*.md"
+      - ".gitattributes"
+      - ".gitignore"
+      - ".npmrc"
+      - ".nvmrc"
+      - "LICENSE"
 
 jobs:
   lint_test:
