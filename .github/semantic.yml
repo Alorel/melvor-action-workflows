@@ -13,6 +13,7 @@ types:
   - ci # Stuff only affecting Github Actions
   - chore # General maintenance work
   - revert # Reverting some previous commit. The message should be `revert: OriginalMessage CommitSha`
+  - ux # User experience improvements
 scopes:
   - deps
   - deps-dev
