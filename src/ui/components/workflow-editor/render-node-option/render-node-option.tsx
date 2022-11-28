@@ -63,7 +63,7 @@ function Inner({option: opt, otherValues, spec, value, onChange: onChangeOut}: I
 function Label(opt: NodeOption): VNode {
   return (
     <Td>
-      {opt.description && <Desc description={opt.description}/>}
+      {opt.description && <NodeOptionDesc description={opt.description}/>}
       {(opt as Partial<NodeOptionBase>).required && <span class={'mr-1'}>{'*'}</span>}
       <span>{opt.label}</span>
     </Td>
@@ -78,7 +78,7 @@ function Errors({errors}: {errors: string[]}): VNode {
   );
 }
 
-function Desc({description}: Pick<NodeOption, 'description'>): VNode {
+export function NodeOptionDesc({description}: Pick<NodeOption, 'description'>): VNode {
   const el = useTippy(description);
 
   return (<i ref={el} class={'fa fa-question-circle mr-1'}/>);
