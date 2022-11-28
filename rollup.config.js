@@ -9,6 +9,7 @@ import {assetLoader} from "./build/asset-loader.mjs";
 import jsonPlugin from "@rollup/plugin-json";
 import cleanPlugin from "./build/clean-plugin.mjs";
 import scssLoader from "./build/scss-loader.mjs";
+import {join} from "node:path";
 
 const srcInclude = /src[\\/].+\.m?tsx?$/;
 const srcExclude = /node_modules[\\/]/;
@@ -110,12 +111,22 @@ export default function (opts) {
         },
       }),
       copyPlugin({
-        copy: [{
-          from: [
-            'manifest.json',
-            // 'public_api.d.ts',
-          ]
-        }],
+        copy: [
+          {
+            from: [
+              'manifest.json',
+              // 'public_api.d.ts',
+            ]
+          },
+          {
+            from: 'adoptedStyleSheets.js',
+            opts: {
+              glob: {
+                cwd: join(process.cwd(), 'node_modules', 'construct-style-sheets-polyfill', 'dist'),
+              },
+            },
+          }
+        ],
         defaultOpts: {
           glob: {cwd: 'src'},
           emitNameKind: 'fileName',
