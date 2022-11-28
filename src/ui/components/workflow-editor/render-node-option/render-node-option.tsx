@@ -3,7 +3,7 @@ import {isEqual} from 'lodash-es';
 import type {VNode} from 'preact';
 import {h} from 'preact';
 import {memo} from 'preact/compat';
-import {useCallback, useMemo, useRef} from 'preact/hooks';
+import {useCallback, useMemo} from 'preact/hooks';
 import type {OptionDefinition, OptionRenderEditCtx} from '../../../../lib/define-option.mjs';
 import {OPTION_REGISTRY} from '../../../../lib/registries/option-registry.mjs';
 import {validateNodeOption} from '../../../../lib/util/validate-workflow.mjs';
@@ -79,12 +79,9 @@ function Errors({errors}: {errors: string[]}): VNode {
 }
 
 function Desc({description}: Pick<NodeOption, 'description'>): VNode {
-  const el = useRef<HTMLElement>(null);
-  useTippy(description, el);
+  const el = useTippy(description);
 
-  return (
-    <i ref={el} class={'fa fa-question-circle mr-1'}/>
-  );
+  return (<i ref={el} class={'fa fa-question-circle mr-1'}/>);
 }
 
 function Err({type}: Pick<NodeOption, 'type'>): VNode {

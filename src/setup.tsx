@@ -6,12 +6,12 @@ import {errorLog} from './lib/util/log.mjs';
 import './option-types/option-types.mjs';
 import './triggers/index.mjs';
 import SidenavIcon from './ui/components/sidenav-icon';
-import makePageContainer from './ui/util/make-page-container.mjs';
 import DebugPage, {DEBUG_PAGE_ID} from './ui/pages/debug-page';
 import NewWorkflow, {NEW_WORKFLOW_PAGE_ID} from './ui/pages/new-workflow';
 import WorkflowsDashboard, {WORKFLOWS_DASHBOARD_ID} from './ui/pages/workflows-dashboard';
 import {SIDENAV_ITEM} from './ui/sidebar-mgr.mjs';
 import {mainIcon} from './ui/ui.mjs';
+import makePageContainer from './ui/util/make-page-container.mjs';
 
 // ctx.api<Readonly<Api>>(api); // rollup will freeze it
 

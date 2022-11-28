@@ -5,8 +5,8 @@ import {Workflow} from '../../lib/data/workflow.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
 import {EDITOR_CTX, useEditorCtxProvider} from '../components/workflow-editor/editor-ctx.mjs';
 import WorkflowEditor from '../components/workflow-editor/workflow-editor';
-import autoId from '../util/id-gen.mjs';
 import {sidebarItems} from '../sidebar-mgr.mjs';
+import autoId from '../util/id-gen.mjs';
 
 export const NEW_WORKFLOW_PAGE_ID = autoId();
 

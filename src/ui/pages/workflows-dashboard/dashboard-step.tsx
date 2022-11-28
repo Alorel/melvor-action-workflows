@@ -2,7 +2,7 @@ import {distinctWithInitial} from '@aloreljs/rxutils/operators';
 import type {VNode} from 'preact';
 import type {HTMLAttributes} from 'preact/compat';
 import {memo, useMemo} from 'preact/compat';
-import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
+import {useCallback, useEffect, useState} from 'preact/hooks';
 import type {Observable} from 'rxjs';
 import {EMPTY, of, skip, startWith, switchMap} from 'rxjs';
 import type {WorkflowStep} from '../../../lib/data/workflow-step.mjs';
@@ -115,8 +115,7 @@ interface MoveBtnProps extends Omit<BtnProps, 'kind' | 'btnRef'> {
 }
 
 const MoveBtn = memo<MoveBtnProps>(({tooltip, ...rest}) => {
-  const btnRef = useRef<HTMLButtonElement>(null);
-  useTippy(tooltip, btnRef);
+  const btnRef = useTippy<HTMLButtonElement>(tooltip);
 
   return (<Btn kind={'default'} btnRef={btnRef} {...rest}/>);
 });

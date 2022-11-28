@@ -52,11 +52,6 @@ export class WorkflowTrigger extends OptsListItem {
     }
   }
 
-  /** @inheritDoc */
-  protected override getOptions(): NodeOption[] | undefined {
-    return this.nodeOptions as NodeOption[];
-  }
-
   /** Shortcut for getting the trigger ID */
   @JsonProp()
   public get id(): string {
@@ -71,6 +66,11 @@ export class WorkflowTrigger extends OptsListItem {
   /** Reset options to the trigger's defaults */
   public resetOpts(): void {
     this.opts = this.trigger.def.initOptions?.() ?? {};
+  }
+
+  /** @inheritDoc */
+  protected override getOptions(): NodeOption[] | undefined {
+    return this.nodeOptions as NodeOption[];
   }
 }
 
