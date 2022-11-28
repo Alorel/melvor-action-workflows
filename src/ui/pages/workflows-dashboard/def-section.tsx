@@ -13,7 +13,7 @@ interface SectionProps {
 
 export const DefSection = memo<SectionProps>(({config, node}) => (
   <Fragment>
-    <div class={'text-center font-size-sm font-w600'}>
+    <div class={'text-center font-size-sm font-w600 ActionWorkflowsCore-underdot'}>
       <RenderNodeMedia label={node.label} media={node.media}/>
     </div>
     {Boolean(node.options?.length) && <DefSectionOptions opts={node.options!} config={config}/>}

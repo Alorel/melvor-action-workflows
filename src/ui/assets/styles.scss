@@ -6,6 +6,10 @@ $colour-err: #e56767;
     height: 1rem;
   }
 
+  &underdot {
+    border-bottom: 1px dotted #fff;
+  }
+
   &d-inline-tbl {
     display: inline-table;
 
