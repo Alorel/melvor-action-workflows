@@ -45,7 +45,7 @@ export class Bank {
 
   addItem<T extends Item>(item: T, quantity: number): boolean;
 
-  addItemById(id: string, qty: number): void;
+  addItemByID(id: string, qty: number): void;
 
   getQty<T extends Item>(item: T | undefined): number;
 
