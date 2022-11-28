@@ -57,7 +57,7 @@ const ItemLookup = (() => {
       const grant = useCallback(() => {
         const num = parseInt(qty.peek());
         if (!isNaN(num)) {
-          game.bank.addItemById(item.id, num);
+          game.bank.addItemByID(item.id, num);
         }
       }, [item.id]);
 
