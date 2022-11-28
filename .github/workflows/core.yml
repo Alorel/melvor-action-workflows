@@ -1,6 +1,8 @@
 name: Core
 on:
   push:
+    branches:
+      - '*"'
     paths-ignore:
       - ".github/ISSUE_TEMPLATE/*"
       - ".github/workflows/release.yml"
