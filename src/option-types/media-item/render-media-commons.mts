@@ -3,8 +3,7 @@ import type {NamespaceRegistry as TNamespaceRegistry} from 'melvor';
 import type {MediaItemNodeOption, MediaItemNodeOptionMultiConfig, MediaSelectable, Obj} from '../../public_api';
 
 export const enum MediaItemNumbers {
-  MIN_SEARCH_LENGTH = 2,
-  MAX_SEARCH_RESULTS = 50,
+  MAX_SEARCH_RESULTS = 75,
 }
 
 export function resolveMediaItemRegistry<T extends MediaSelectable>(

@@ -9,6 +9,7 @@ interface Props extends Omit<HTMLAttributes<HTMLButtonElement>, 'kind' | 'size'>
 
   size?: string;
 }
+
 export {Props as BtnProps};
 
 export default function Btn({btnRef, kind, size, ...rest}: Props): VNode {

@@ -1,5 +1,7 @@
+import {ShadowHost} from '@alorel/preact-shadow-root';
+import type {ReadonlySignal} from '@preact/signals';
 import {useComputed, useSignal} from '@preact/signals';
-import type {VNode} from 'preact';
+import type {ComponentChildren, VNode} from 'preact';
 import {memo} from 'preact/compat';
 import type {Ref} from 'preact/hooks';
 import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
@@ -9,7 +11,6 @@ import type {MediaItemNodeOption, MediaSelectable} from '../../public_api';
 import Btn from '../../ui/components/btn';
 import useTippy from '../../ui/hooks/tippy.mjs';
 import {useRenderEditTouch} from '../_common.mjs';
-import {MediaItemNumbers} from './render-media-commons.mjs';
 
 interface Props<T> extends Pick<OptionRenderEditCtx<T, MediaItemNodeOption>, 'onChange' | 'value'> {
   filterFn(filterText: string): T[];
@@ -55,7 +56,7 @@ function RenderFilter<T extends MediaSelectable>({focus, filterFn, onChange}: In
   const results = useComputed((): T[] => {
     const txt = filterText.value;
 
-    return txt.length < MediaItemNumbers.MIN_SEARCH_LENGTH ? EMPTY_ARR : filterFn(txt.toLowerCase());
+    return txt.length ? filterFn(txt.toLowerCase()) : EMPTY_ARR;
   });
 
   const onBlur = useRenderEditTouch();
@@ -93,12 +94,28 @@ function RenderFilter<T extends MediaSelectable>({focus, filterFn, onChange}: In
         onInput={onInp}
         onBlur={onBlur}
         placeholder={'Search by name…'}/>
-      <div onClick={onItemClick}>
-        {results.value.map(itemMapper)}
-      </div>
+      <ItemsRender results={results} onItemClick={onItemClick}/>
     </div>
   );
 }
+
+interface ItemsRenderProps<T> {
+  results: ReadonlySignal<T[]>;
+  onItemClick(e: Event): void;
+}
+const ItemsRender = memo(function <T extends MediaSelectable> ({onItemClick, results}: ItemsRenderProps<T>): VNode {
+  const resultsResolved = results.value;
+  const slots = useCallback((): ComponentChildren => resultsResolved.map(itemMapper), [resultsResolved]);
+
+  return (
+    <div onClick={onItemClick}>
+      <ShadowHost slots={slots}>
+        <style>{':host{max-width:500px;overflow-x:scroll;display:flex;flex-wrap:nowrap;min-height:47px}'}</style>
+        <slot/>
+      </ShadowHost>
+    </div>
+  );
+});
 
 /** Focus an element this ref gets attached to on init if `focus` is true */
 function useFocus<T extends HTMLElement>(focus: boolean): Ref<T> {
@@ -121,8 +138,7 @@ function itemMapper<T extends MediaSelectable>(item: T, idx: number): VNode {
 }
 
 function ItemImg<T extends MediaSelectable>({item: {media, name}}: {item: T}): VNode {
-  const ref = useRef<HTMLImageElement>(null);
-  useTippy(name, ref);
+  const ref = useTippy<HTMLImageElement>(name);
 
   return (
     <img className={'skill-icon-xs'} ref={ref} src={media} alt={name}/>

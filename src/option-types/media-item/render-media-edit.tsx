@@ -23,6 +23,7 @@ export default function RenderMediaEdit(ctx: OptionRenderEditCtx<MediaOptionValu
 }
 
 type PatchedOption = Omit<MediaItemNodeOption, 'multi'> & {multi: ReturnType<typeof resolveMediaMulti>};
+
 function usePatchedOption(opt: MediaItemNodeOption): PatchedOption {
   const multi = useMemo(() => resolveMediaMulti(opt.multi), [JSON.stringify(opt.multi)]);
 
@@ -32,9 +33,10 @@ function usePatchedOption(opt: MediaItemNodeOption): PatchedOption {
 interface OptMulti extends Omit<MediaItemNodeOption, 'multi'> {
   multi: MediaItemNodeOptionMultiConfig;
 }
+
 type EditMultiProps<T> = OptionRenderEditCtx<T[], OptMulti>;
 
-const RenderEditMulti = memo(function<T extends MediaSelectable> ({ // eslint-disable-line max-lines-per-function
+const RenderEditMulti = memo(function <T extends MediaSelectable> ({ // eslint-disable-line max-lines-per-function
   option,
   onChange,
   value,
@@ -99,7 +101,7 @@ interface EditOneProps<T> extends OptionRenderEditCtx<T, MediaItemNodeOption> {
   focusInput?: boolean;
 }
 
-const RenderEditOne = memo(function<T extends MediaSelectable> ({
+const RenderEditOne = memo(function <T extends MediaSelectable> ({
   onChange,
   option: {mediaFilter, registry},
   otherValues,

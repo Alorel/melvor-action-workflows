@@ -19,6 +19,7 @@ export const errorLog: LogMethod = (...segments) => {
 };
 
 type Method = TypedKeys<Console, LogMethod>;
+
 function log(m: Method, args: any[]): void {
   (console[m] as LogMethod)('[ActionWorkflows]', ...args);
 }

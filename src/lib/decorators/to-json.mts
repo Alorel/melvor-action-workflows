@@ -117,5 +117,6 @@ function fromJSON<T>(this: object, obj: any): any {
 
 interface ImplToJsonCfg<T, P> {
   override?: boolean;
+
   from(val: P): T | undefined,
 }

@@ -28,8 +28,6 @@ export default abstract class OptsListItem {
     }
   }
 
-  protected abstract getOptions(): NodeOption[] | undefined;
-
   public get isValid(): boolean {
     const opts: NodeOption[] = this.getOptions() ?? EMPTY_ARR;
     for (const opt of opts) {
@@ -46,4 +44,6 @@ export default abstract class OptsListItem {
 
     return true;
   }
+
+  protected abstract getOptions(): NodeOption[] | undefined;
 }

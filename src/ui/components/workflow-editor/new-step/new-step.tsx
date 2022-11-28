@@ -1,9 +1,11 @@
 import type {VNode} from 'preact';
+import type {FunctionComponent} from 'preact/compat';
 import {memo} from 'preact/compat';
 import {useCallback, useContext} from 'preact/hooks';
 import type {WorkflowStep} from '../../../../lib/data/workflow-step.mjs';
 import swapElements from '../../../../lib/util/swap-elements.mjs';
 import useReRender from '../../../hooks/re-render';
+import useTippy from '../../../hooks/tippy.mjs';
 import getEvtTarget from '../../../util/get-evt-target.mjs';
 import {BorderedBlock} from '../../block';
 import Btn from '../../btn';
@@ -35,16 +37,16 @@ const NewStep = memo<Props>(({children, step}): VNode => {
               <div class={'col-12 col-xl-auto'} key={action.listId}>
                 <ActionConfig action={action}>
                   {canMvActions && i !== 0 && (
-                    <Btn size={'sm'} kind={'light'} data-idx={i} data-shift={-1} onClick={shiftActionIdx}>
+                    <ActionMvBtn idx={i} shift={-1} onClick={shiftActionIdx}>
                       <ChevronLeftSvg/>
-                    </Btn>
+                    </ActionMvBtn>
                   )}
                   {canMvActions && i !== lastStepIdx && (
-                    <Btn size={'sm'} kind={'light'} data-idx={i} data-shift={1} onClick={shiftActionIdx}>
+                    <ActionMvBtn idx={i} shift={1} onClick={shiftActionIdx}>
                       <ChevronRightSvg/>
-                    </Btn>
+                    </ActionMvBtn>
                   )}
-                  {canMvActions && <Btn size={'sm'} kind={'danger'} data-idx={i} onClick={rmAction}><BinSvg/></Btn>}
+                  {canMvActions && <ActionRmBtn idx={i} onClick={rmAction}/>}
                 </ActionConfig>
               </div>
             ))}
@@ -63,6 +65,45 @@ const NewStep = memo<Props>(({children, step}): VNode => {
 });
 
 export default NewStep;
+
+interface MvBtnProps {
+  idx: number;
+
+  shift: 1 | -1;
+
+  onClick(e: Event): void;
+}
+
+const ActionMvBtn: FunctionComponent<MvBtnProps> = ({children, idx, onClick, shift}) => {
+  const btnRef = useTippy<HTMLButtonElement>(`Move this action ${shift === 1 ? 'forward' : 'back'}`);
+
+  return (
+    <Btn size={'sm'}
+      kind={'light'}
+      data-idx={idx}
+      data-shift={shift}
+      btnRef={btnRef}
+      onClick={onClick}>
+      {children}
+    </Btn>
+  );
+};
+
+type RmBtnProps = Pick<MvBtnProps, 'idx' | 'onClick'>;
+
+const ActionRmBtn = ({idx, onClick}: RmBtnProps): VNode => {
+  const btnRef = useTippy<HTMLButtonElement>('Remove this action');
+
+  return (
+    <Btn size={'sm'}
+      kind={'danger'}
+      data-idx={idx}
+      btnRef={btnRef}
+      onClick={onClick}>
+      <BinSvg/>
+    </Btn>
+  );
+};
 
 function useStepCallbacks(step: WorkflowStep) {
   const reRender = useReRender();

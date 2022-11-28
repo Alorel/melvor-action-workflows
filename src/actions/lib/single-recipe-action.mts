@@ -21,12 +21,6 @@ export interface AltRecipeData<S extends Gathering> extends SingleRecipeData<S> 
 export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gathering, R>
   extends RecipeAction<T, S, R> {
 
-  /** Standard exec function for artisan skills */
-  public static artisanExec(this: BarebonesThis, {recipe}: Pick<SingleRecipeData<BarebonesSkill>, 'recipe'>): void {
-    this.skill.selectRecipeOnClick(recipe);
-    this.skill.createButtonOnClick();
-  }
-
   /** Exec for artisan skills with alt recipes */
   public static altArtisanExec(
     this: BarebonesThis,
@@ -38,6 +32,12 @@ export class SingleRecipeAction<T extends SingleRecipeData<S>, S extends Gatheri
       this.skill.selectAltRecipeOnClick(alt);
     }
 
+    this.skill.createButtonOnClick();
+  }
+
+  /** Standard exec function for artisan skills */
+  public static artisanExec(this: BarebonesThis, {recipe}: Pick<SingleRecipeData<BarebonesSkill>, 'recipe'>): void {
+    this.skill.selectRecipeOnClick(recipe);
     this.skill.createButtonOnClick();
   }
 

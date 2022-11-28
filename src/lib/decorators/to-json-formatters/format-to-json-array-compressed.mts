@@ -51,6 +51,7 @@ function instantiateCompressedToJsonArray<T extends object>(data?: CompressedJso
 
   return out;
 }
+
 export {instantiateCompressedToJsonArray};
 
 const baseFormatter: ToJsonFormatter = {
