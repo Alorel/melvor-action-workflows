@@ -13,6 +13,7 @@ jobs:
         name: Get changelog
         id: get-body
         with:
+          result-encoding: string
           script: return context.payload.release.body;
       - uses: actions/checkout@v3
         name: Checkout
