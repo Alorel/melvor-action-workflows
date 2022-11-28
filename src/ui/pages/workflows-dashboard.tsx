@@ -202,12 +202,12 @@ const RenderSteps = memo<Pick<EditorProps, 'activeWorkflow' | 'borderClass' | 'a
 
     const onShift = useCallback((idx: number, direction: 1 | -1): void => {
       const workflow = activeWorkflow.peek()!;
-      const steps = [...workflow.steps];
-      swapElements(steps, idx, idx + direction);
-      workflow.steps = steps;
-      reRender();
+      if (!swapElements(workflow.steps, idx, idx + direction)) {
+        return;
+      }
 
       WorkflowRegistry.inst.save();
+      reRender();
     }, [activeWorkflow]);
 
     return (
