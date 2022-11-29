@@ -91,7 +91,7 @@ function validateMulti<T extends MediaSelectable>(
   opt: MediaItemNodeOption,
   values: Obj<any>
 ) {
-  if (multi.maxLength && items.length >= multi.maxLength) {
+  if (multi.maxLength && items.length > multi.maxLength) {
     errors.push(`Too many items! Select ${multi.maxLength} at most.`);
   }
 
