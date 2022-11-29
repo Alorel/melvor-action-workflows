@@ -20,6 +20,7 @@ import {
   useEditedWorkflow,
   useEditedWorkflowHost,
   useTouchedHost,
+  useWorkflowHost,
   WorkflowContext
 } from '../components/workflow-editor/editor-contexts';
 import WorkflowEditor from '../components/workflow-editor/workflow-editor';
@@ -72,6 +73,9 @@ function DashboardShell({workflows}: EditorProps): VNode {
   const reRender = useReRender();
   const hasWorkflow = Boolean(activeWorkflow.value);
 
+  const [ProvideWorkflow, workflow$] = useWorkflowHost(activeWorkflow.peek());
+  workflow$.value = activeWorkflow.peek()!;
+
   const [ProvideActiveStepIdx, activeStepIdx$] = useActiveStepIdxHost(-1);
 
   useEffect(() => {
@@ -87,19 +91,21 @@ function DashboardShell({workflows}: EditorProps): VNode {
 
   return (
     <ProvideActiveStepIdx>
-      <div className={'row'}>
-        <ActiveWorkflowSelect workflows={workflows}/>
-        <div class={'col-xs-12 text-center col-md-auto'}>
-          {
-            hasWorkflow
-              ? <SelectedWorkflowBtns refresh={reRender}/>
-              : 'Select a workflow to get started'
-          }
+      <ProvideWorkflow>
+        <div className={'row'}>
+          <ActiveWorkflowSelect workflows={workflows}/>
+          <div class={'col-xs-12 text-center col-md-auto'}>
+            {
+              hasWorkflow
+                ? <SelectedWorkflowBtns refresh={reRender}/>
+                : 'Select a workflow to get started'
+            }
+          </div>
+
         </div>
 
-      </div>
-
-      {hasWorkflow && <RenderSteps/>}
+        {hasWorkflow && <RenderSteps/>}
+      </ProvideWorkflow>
     </ProvideActiveStepIdx>
   );
 }

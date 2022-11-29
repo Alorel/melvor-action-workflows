@@ -60,5 +60,14 @@ export function defineOption<Val, Interface extends NodeOptionBase>(opt: OptionD
     throw new Error('Duplicate option token; see console.error prior');
   }
 
+  if (!process.env.PRODUCTION) {
+    if (!opt.renderView.displayName) {
+      opt.renderView.displayName = `View[${opt.token}]`;
+    }
+    if (!opt.renderEdit.displayName) {
+      opt.renderEdit.displayName = `Edit[${opt.token}]`;
+    }
+  }
+
   OPTION_REGISTRY.set(opt.token, opt);
 }

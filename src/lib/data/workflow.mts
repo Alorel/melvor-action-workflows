@@ -1,9 +1,11 @@
+import {BehaviorSubject} from 'rxjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {CompressedJsonArray} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {FormatToJsonArrayCompressed} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
 import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
+import type {ReadonlyBehaviorSubject} from '../registries/workflow-registry.mjs';
 import {WorkflowStep} from './workflow-step.mjs';
 
 type Init = Partial<Pick<Workflow, 'name' | 'steps'>>;
@@ -31,12 +33,13 @@ export class Workflow {
   @JsonProp()
   public name: string;
 
-  @JsonProp({format: FormatToJsonArrayCompressed(WorkflowStep.fromJSON)})
-  public steps: WorkflowStep[];
+  public readonly steps$: ReadonlyBehaviorSubject<WorkflowStep[]>;
+
+  private readonly _steps$: BehaviorSubject<WorkflowStep[]>;
 
   public constructor({name, steps}: Init = {}) {
     this.name = name ?? '';
-    this.steps = steps?.length ? steps : [new WorkflowStep()];
+    this.steps$ = this._steps$ = new BehaviorSubject<WorkflowStep[]>(steps?.length ? steps : [new WorkflowStep()]);
   }
 
   public get canRemoveSteps(): boolean {
@@ -49,14 +52,30 @@ export class Workflow {
       && this.steps.every(s => s.isValid);
   }
 
+  @JsonProp({format: FormatToJsonArrayCompressed(WorkflowStep.fromJSON)})
+  public get steps(): WorkflowStep[] {
+    return this._steps$.value;
+  }
+
   public addStep(idx: number = this.steps.length): void {
-    this.steps.splice(idx, 0, new WorkflowStep());
+    const out = [...this.steps];
+    out.splice(idx, 0, new WorkflowStep());
+    this._steps$.next(out);
+  }
+
+  /** Trigger a change on the steps observable */
+  public markStepsChanged(): void {
+    this._steps$.next([...this.steps]);
   }
 
   public rmStep(idx: number): void {
-    if (this.canRemoveSteps) {
-      this.steps.splice(idx, 1);
+    if (!this.canRemoveSteps) {
+      return;
     }
+
+    const out = [...this.steps];
+    out.splice(idx, 1);
+    this._steps$.next(out);
   }
 }
 

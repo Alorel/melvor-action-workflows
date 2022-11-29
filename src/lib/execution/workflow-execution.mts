@@ -1,3 +1,4 @@
+import {BoundMethod} from '@aloreljs/bound-decorator';
 import {Memoise} from '@aloreljs/memoise-decorator';
 import {nextComplete} from '@aloreljs/rxutils';
 import {logError} from '@aloreljs/rxutils/operators';
@@ -21,6 +22,8 @@ import {
   tap
 } from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
+import type {WorkflowExecutionCtx} from '../../public_api';
+import type ActionConfigItem from '../data/action-config-item.mjs';
 import type {WorkflowStep} from '../data/workflow-step.mjs';
 import type {Workflow} from '../data/workflow.mjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
@@ -92,7 +95,6 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
 
   public constructor(public readonly workflow: Workflow) {
     super();
-    this.tick = this.tick.bind(this);
     this._activeStepIdx$ = new BehaviorSubject<number>(0);
     this.activeStepIdx$ = this._activeStepIdx$.asObservable();
   }
@@ -120,6 +122,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   }
 
   /** Set the currently executed step index. */
+  @BoundMethod()
   public setActiveStepIdx(v: number): void {
     this.incrementActiveStep = false;
     this.activeStepIdxManual = true;
@@ -184,20 +187,19 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
    */
   private executeAction(step: WorkflowStep, stepIdx: number, actionIdx: number): Observable<ActionExecutionEvent> {
     const action = step.actions[actionIdx];
-    const makeSuccessEvent = (): ActionExecutionEvent => ({
-      action,
-      ok: true,
-      step,
-      type: WorkflowEventType.ACTION_COMPLETE,
-      workflow: this.workflow,
-    });
 
     const src$ = defer((): Observable<ActionExecutionEvent> => {
-      const result = action.action.def.execute(action.opts);
+      const def = action.action.def;
+      const result = def
+        .execute(action.opts, def.execContext ? this.makeExecCtx(stepIdx) : undefined);
 
+      const successEvent = this.makeSuccessEvent(action, step);
       return result == null
-        ? of(makeSuccessEvent())
-        : from(result).pipe(last(null, null), map(makeSuccessEvent));
+        ? of(successEvent)
+        : from(result).pipe(
+          last(null, null),
+          map(() => successEvent)
+        );
     });
 
     return src$.pipe(
@@ -206,7 +208,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       }),
       logError(`[Exec action ${step.actions[actionIdx]?.action.id}[${actionIdx}]@${this.workflow.name}[${stepIdx}]]`),
       prependErrorWith(e => of<ActionExecutionEvent>({
-        ...makeSuccessEvent(),
+        ...this.makeSuccessEvent(action, step),
         err: e.message,
         ok: false,
       }))
@@ -297,6 +299,27 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     });
   }
 
+  /** Create a {@link WorkflowExecutionCtx} for the current step */
+  private makeExecCtx(stepIdx: number): WorkflowExecutionCtx {
+    return {
+      activeStepIdx$: this.activeStepIdx$,
+      numSteps: this.workflow.steps.length,
+      setActiveStepIdx: this.setActiveStepIdx,
+      stepIdx,
+    };
+  }
+
+  @BoundMethod()
+  private makeSuccessEvent(action: ActionConfigItem, step: WorkflowStep): ActionExecutionEvent {
+    return {
+      action,
+      ok: true,
+      step,
+      type: WorkflowEventType.ACTION_COMPLETE,
+      workflow: this.workflow,
+    };
+  }
+
   /** Create a successful workflow completion event */
   private mkCompleteEvent(ok: true): WorkflowCompleteEvent;
 
@@ -323,6 +346,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   }
 
   /** Main ticking function for the workflow */
+  @BoundMethod()
   private tick(): void {
     const step = this.activeStep;
     if (!step) {

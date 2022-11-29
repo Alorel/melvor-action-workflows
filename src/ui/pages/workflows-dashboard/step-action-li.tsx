@@ -39,7 +39,7 @@ function useActionLiClass(actionId: number): string {
 
           return exec.pipe(
             switchMap((evt): Observable<string> => {
-              if (evt.type === WorkflowEventType.WORKFLOW_RESET) {
+              if (evt.type === WorkflowEventType.WORKFLOW_RESET || evt.type === WorkflowEventType.STEP_NOT_LISTENING) {
                 return of(Strings.INITIAL_CLASS);
               } else if ((evt as Partial<ActionExecutionEvent>).action?.listId === actionId) {
                 return of((evt as ActionExecutionEvent).ok ? 'list-group-item-success' : 'list-group-item-danger');
