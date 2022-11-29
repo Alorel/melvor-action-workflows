@@ -4,14 +4,15 @@ on:
     branches:
       - '**'
     paths-ignore:
-      - ".github/ISSUE_TEMPLATE/*"
-      - ".github/workflows/release.yml"
-      - "**/*.md"
-      - ".gitattributes"
-      - ".gitignore"
-      - ".npmrc"
-      - ".nvmrc"
-      - "LICENSE"
+      - .github/ISSUE_TEMPLATE/**
+      - .github/workflows/**.yml
+      - !.github/workflows/release.yml
+      - "**.md"
+      - .gitattributes
+      - .gitignore
+      - .npmrc
+      - .nvmrc
+      - LICENSE
 
 jobs:
   lint_test:
