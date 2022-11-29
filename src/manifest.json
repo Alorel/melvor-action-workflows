@@ -2,7 +2,7 @@
   "namespace": "ActionWorkflows",
   "setup": "setup.mjs",
   "load": [
-    "adoptedStyleSheets.js",
+    "polyfills.mjs",
     "styles.css"
   ]
 }
