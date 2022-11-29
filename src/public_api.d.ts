@@ -1,5 +1,5 @@
 import {Item} from 'melvor';
-import {ObservableInput} from 'rxjs';
+import {Observable, ObservableInput} from 'rxjs';
 import {DynamicOption} from './lib/util/dynamic-option.mjs';
 
 export type Obj<T> = object & Record<string, T>;
@@ -130,9 +130,12 @@ export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefini
 }
 
 /** Definition of an action */
-export interface ActionNodeDefinition<T extends object> extends NodeDefinition<T> {
+export interface ActionNodeDefinition<T extends object> extends NodeDefinition<T> {  /** `true` will supply an additional {@link WorkflowExecutionCtx} argument to the {@link execute} method */
+  /** `true` will supply an additional {@link WorkflowExecutionCtx} argument to the {@link execute} method */
+  execContext?: boolean;
+
   /** Execute the action */
-  execute(data: T): void | ObservableInput<void>;
+  execute(data: T, executionContext?: WorkflowExecutionCtx): void | ObservableInput<void>;
 }
 
 /** Common node definition */
@@ -146,6 +149,28 @@ export interface NodeDefinition<T extends object = {}> extends Referenceable {
 
   /** Options to set by default when building workflows */
   initOptions?(): Partial<T>;
+}
+
+/**
+ * Context object for the active workflow execution.
+ * Requires {@link ActionNodeDefinition#execContext} to be set to `true`.
+ */
+export interface WorkflowExecutionCtx {
+  /**
+   * The currently running step index.
+   * This will emit the first result on the same tick and will be the same as {@link #stepIdx} if subscribed to
+   * immediately.
+   */
+  activeStepIdx$: Observable<number>;
+
+  /** The number of steps in the workflow */
+  numSteps: number;
+
+  /** This step's index in the steps array */
+  stepIdx: number;
+
+  /** Set the currently executed step index. */
+  setActiveStepIdx(idx: number): void;
 }
 
 /** Something that can be referenced */

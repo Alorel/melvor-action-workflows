@@ -98,11 +98,13 @@ function useRmStepsBtnsCallbacks(reRender: () => void): [(e: Event) => void, (e:
       return;
     }
 
+    const wf = workflow.peek();
     const shift = parseInt(data.shift!);
-    if (isNaN(shift) || !swapElements(workflow.peek().steps, btnIdx, btnIdx + shift)) {
+    if (isNaN(shift) || !swapElements(wf.steps, btnIdx, btnIdx + shift)) {
       return;
     }
 
+    wf.markStepsChanged();
     reRender();
   }, deps);
 

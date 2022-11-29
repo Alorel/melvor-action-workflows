@@ -13,6 +13,7 @@ import {BorderedBlock} from '../../components/block';
 import type {BtnProps} from '../../components/btn';
 import Btn from '../../components/btn';
 import {ChevronLeftSvg, ChevronRightSvg, TargetSvg} from '../../components/svg';
+import {useStepHost} from '../../components/workflow-editor/editor-contexts';
 import useTippy from '../../hooks/tippy.mjs';
 import {DefSection} from './def-section';
 import {ActionLi} from './step-action-li';
@@ -44,20 +45,24 @@ const DashboardStep = memo<Props>(
   }) => {
     const border = useBorder(step.listId);
     const contentProps = useMemo((): HTMLAttributes<HTMLDivElement> => ({class: 'pt-2 pl-2'}), EMPTY_ARR);
+    const [ProvideStep, step$] = useStepHost(step);
+    step$.value = step;
 
     return (
       <div class={'col-auto'}>
         <BorderedBlock kind={border} size={2} contentProps={contentProps}>
-          <DefSection config={step.trigger.opts} node={step.trigger.trigger.def}/>
-          <hr class={'mt-1 mb-1'}/>
-          <ul class={'list-group'}>
-            {step.actions.map(a => <ActionLi action={a} key={a.listId}></ActionLi>)}
-          </ul>
-          {(mvLeft || mvRight || setActive) && <MoveBtns mvLeft={mvLeft}
-            mvRight={mvRight}
-            setActive={setActive}
-            onSetActive={onSetActive}
-            onShift={onShift}/>}
+          <ProvideStep>
+            <DefSection config={step.trigger.opts} node={step.trigger.trigger.def}/>
+            <hr class={'mt-1 mb-1'}/>
+            <ul class={'list-group'}>
+              {step.actions.map(a => <ActionLi action={a} key={a.listId}></ActionLi>)}
+            </ul>
+            {(mvLeft || mvRight || setActive) && <MoveBtns mvLeft={mvLeft}
+              mvRight={mvRight}
+              setActive={setActive}
+              onSetActive={onSetActive}
+              onShift={onShift}/>}
+          </ProvideStep>
         </BorderedBlock>
       </div>
     );

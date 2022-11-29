@@ -2,6 +2,7 @@ import '../option-types/option-types.mjs';
 import './core/buy-item-action.mjs';
 import './core/equip-item-action.mjs';
 import './core/sell-item-action.mjs';
+import './core/set-step-idx-action.mjs';
 import './core/switch-equipment-set-action.mjs';
 import './core/use-potion-action.mjs';
 import './start-skill/agility.mjs';
