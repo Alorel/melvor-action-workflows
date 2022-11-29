@@ -1,6 +1,7 @@
 {
   "namespace": "ActionWorkflows",
   "setup": "setup.mjs",
+  "icon": "https://i.imgur.com/fMgInFq.png",
   "load": [
     "polyfills.mjs",
     "styles.css"

@@ -12,7 +12,7 @@ interface BaseCat {
   itemID: string;
 }
 
-export const mainIcon = game.items.getObject('melvorD', 'Rubber_Ducky')!.media;
+export const mainIcon = 'https://i.imgur.com/fMgInFq.png';
 
 // Init package
 {
