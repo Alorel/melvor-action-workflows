@@ -1,5 +1,5 @@
+import {shallowEquals} from '@alorel/commons-shallow-equals';
 import {signal, useComputed, useSignal} from '@preact/signals';
-import {isEqual} from 'lodash-es';
 import type {VNode} from 'preact';
 import {h} from 'preact';
 import {memo} from 'preact/compat';
@@ -39,7 +39,7 @@ function Inner({option: opt, otherValues, spec, value, onChange: onChangeOut}: I
   const onChange = useCallback((v?: any): void => {
     onChangeOut(v);
     const newErrors = validateNodeOption(v, spec, opt, otherValues);
-    if (!isEqual(newErrors, errors.peek())) {
+    if (!shallowEquals(newErrors, errors.peek())) {
       errors.value = newErrors;
     }
   }, [otherValues, spec, opt, onChangeOut]);
