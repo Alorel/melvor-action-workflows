@@ -1,6 +1,7 @@
 /api-token
 node_modules/
 *.log
+/rollup.config-*
 /dist/
 /.nyc_output
 /coverage

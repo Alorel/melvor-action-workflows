@@ -13,8 +13,6 @@ import scssLoader from "./build/scss-loader.mjs";
 const srcInclude = /src[\\/].+\.m?tsx?$/;
 const srcExclude = /node_modules[\\/]/;
 
-
-
 export default function (opts) {
   const watch = opts.watch;
   const prod = Boolean(getOpt(opts, 'prod'));
@@ -23,7 +21,11 @@ export default function (opts) {
     dir: 'dist',
     entryFileNames: '[name].mjs',
     format: 'es',
-    preferConst: true,
+    generatedCode: {
+      arrowFunctions: true,
+      constBindings: true,
+      objectShorthand: true,
+    },
     preserveModules: false,
     sourcemap: false,
   };
