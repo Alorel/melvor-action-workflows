@@ -1,0 +1,20 @@
+inputs:
+  node-version:
+    description: Node version
+    required: true
+name: Init Node
+description: Initialises Node & installs deps
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v3
+      name: Set up node
+      with:
+        cache: npm
+        node-version: ${{ inputs.node-version }}
+        registry-url: https://npm.pkg.github.com
+    - name: Install deps
+      shell: bash
+      run: npm ci --no-fund
+      env:
+        NODE_AUTH_TOKEN: ${{ github.token }}

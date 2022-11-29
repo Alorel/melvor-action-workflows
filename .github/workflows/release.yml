@@ -16,41 +16,15 @@ jobs:
           script: return context.payload.release.body;
       - uses: actions/checkout@v3
         name: Checkout
-      - uses: actions/setup-node@v3
-        name: Set up Node
+      - name: Init
+        uses: ./.github/actions/init
         with:
           node-version: 18
-          cache: npm
-          registry-url: https://npm.pkg.github.com
-      - name: NPM install
-        run: npm ci --no-fund
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Make TSC cache key
-        run: cat package-lock.json | grep rollup-plugin-typescript2 > .ci-cache-key
-      - name: Typescript cache
-        uses: actions/cache@v3
-        with:
-          path: "./node_modules/.cache/rollup-plugin-typescript2"
-          key: v1-tsc-${{ runner.os }}-18-${{ hashFiles('./.ci-cache-key') }}-${{ github.ref }}
-          restore-keys: |
-            v1-tsc-${{ runner.os }}-18-${{ hashFiles('./.ci-cache-key') }}-refs/heads/master-
-            v1-tsc-${{ runner.os }}-18-${{ hashFiles('./.ci-cache-key') }}-
-            v1-tsc-${{ runner.os }}-18-
-            v1-tsc-${{ runner.os }}
-      - name: ESLint cache
-        uses: actions/cache@v3
-        with:
-          path: "./node_modules/.cache/eslint"
-          key: v1-eslint-${{ github.ref }}-${{ github.sha }}
-          restore-keys: v1-eslint-refs/heads/master-
       - name: Lint
         run: npm run lint
       - run: npm run rollup:prod
         name: Build
         env:
           MELVOR_MOD_VERSION: ${{ github.ref_name }}
-      - name: Format changelog
-        run: echo ${{ steps.get-body.outputs.result }} > .ci-cache-key
-      - run: npm run modio -- upload --active --token "${{ secrets.MOD_IO_API_TOKEN }}" --mod-version "${{ github.ref_name }}" --changelog "$(cat .ci-cache-key)"
+      - run: npm run modio -- upload --active --token "${{ secrets.MOD_IO_API_TOKEN }}" --mod-version "${{ github.ref_name }}" --changelog "$(node .github/fmt-changelog.js ${{ steps.get-body.outputs.result }})"
         name: Publish

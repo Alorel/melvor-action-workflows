@@ -1,0 +1,17 @@
+inputs:
+  node-version:
+    description: Node version
+    required: true
+name: Init
+description: Initialises Node & cache
+runs:
+  using: composite
+  steps:
+    - name: Init Node
+      uses: ./.github/actions/init-node
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Init caches
+      uses: ./.github/actions/init-cache
+      with:
+        node-version: ${{ inputs.node-version }}

@@ -20,41 +20,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        name: Set up node
+      - name: Init
+        uses: ./.github/actions/init
         with:
-          cache: npm
           node-version: 18
-          registry-url: https://npm.pkg.github.com
-      - name: Install deps
-        run: npm ci --no-fund
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Make TSC cache key
-        run: cat package-lock.json | grep rollup-plugin-typescript2 > .ci-cache-key
-      - name: Typescript cache
-        uses: actions/cache@v3
-        with:
-          path: "./node_modules/.cache/rollup-plugin-typescript2"
-          key: v1-tsc-${{ runner.os }}-18-${{ hashFiles('./.ci-cache-key') }}-${{ github.ref }}-${{ github.sha }}
-          restore-keys: |
-            v1-tsc-${{ runner.os }}-18-${{ hashFiles('./.ci-cache-key') }}-${{ github.ref }}-
-            v1-tsc-${{ runner.os }}-18-${{ hashFiles('./.ci-cache-key') }}-refs/heads/master-
-            v1-tsc-${{ runner.os }}-18-${{ hashFiles('./.ci-cache-key') }}-
-            v1-tsc-${{ runner.os }}-18-
-            v1-tsc-${{ runner.os }}
-      - name: ESLint cache
-        uses: actions/cache@v3
-        with:
-          path: "./node_modules/.cache/eslint"
-          key: v1-eslint-${{ github.ref }}-${{ github.sha }}
-          restore-keys: |
-            v1-eslint-${{ github.ref }}-
-            v1-eslint-refs/heads/master-
-      - name: Build
-        run: npm run rollup
       - name: Lint
         run: npm run lint
+      - name: Build
+        run: npm run rollup
       - name: Test API
         if: ${{ github.secret_source == 'Actions' }}
         run: npm run modio -- next-dev-version --token "${{ secrets.MOD_IO_API_TOKEN }}"
