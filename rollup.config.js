@@ -17,135 +17,102 @@ export default function (opts) {
   const watch = opts.watch;
   const prod = Boolean(getOpt(opts, 'prod'));
 
-  const baseOutput = {
-    dir: 'dist',
-    entryFileNames: '[name].mjs',
-    format: 'es',
-    generatedCode: {
-      arrowFunctions: true,
-      constBindings: true,
-      objectShorthand: true,
-    },
-    preserveModules: false,
-    sourcemap: false,
-  };
-
-  return [
-    {
-      input: 'src/setup.tsx',
-      output: baseOutput,
-      plugins: [
-        cleanPlugin(),
-        mkNodeResolve(),
-        jsonPlugin({
-          compact: true,
-          include: '**/*.json',
-          namedExports: true,
-          preferConst: true,
-        }),
-        scssLoader({prod}),
-        typescript({exclude: srcExclude, include: srcInclude}),
-        replacePlugin({
-          exclude: srcExclude,
-          include: srcInclude,
-          preventAssignment: true,
-          values: {
-            'process.env.MELVOR_MOD_VERSION': JSON.stringify(process.env.MELVOR_MOD_VERSION || 'dev'),
-            'process.env.PRODUCTION': String(prod),
-          },
-        }),
-        assetLoader({
-          reg: /\.png$/,
-        }),
-        prod && iifeWrapPlugin({
-          async: true,
-          vars: [
-            'AltMagicConsumptionID',
-            'Array',
-            'Bank',
-            'Boolean',
-            'cdnMedia',
-            'console',
-            'Error',
-            'game',
-            'isNaN',
-            'JSON',
-            'Map',
-            'NamespacedObject',
-            'NamespaceRegistry',
-            'Number',
-            'Object',
-            'Promise',
-            'RegExp',
-            'SkillWithMastery',
-            'String',
-            'Symbol',
-            'Swal',
-            'TypeError',
-            'undefined',
-            'WeakMap',
-          ],
-        }),
-        modWrapPlugin({prod}),
-        prod && threadedTerserPlugin({
-          terserOpts: {
-            output: {
-              comments: false,
-            },
-          },
-        }),
-        copyPlugin({
-          copy: [
-            {
-              from: [
-                'manifest.json',
-                // 'public_api.d.ts',
-              ]
-            },
-            // {
-            //   from: 'adoptedStyleSheets.js',
-            //   opts: {
-            //     glob: {
-            //       cwd: join(process.cwd(), 'node_modules', 'construct-style-sheets-polyfill', 'dist'),
-            //     },
-            //   },
-            // }
-          ],
-          defaultOpts: {
-            glob: {cwd: 'src'},
-            emitNameKind: 'fileName',
-          },
-          watch,
-        }),
-      ],
-      watch: {
-        exclude: 'node_modules/**/*',
+  return {
+    input: 'src/setup.tsx',
+    output: {
+      dir: 'dist',
+      format: 'es',
+      generatedCode: {
+        arrowFunctions: true,
+        constBindings: true,
+        objectShorthand: true,
       },
+      preserveModules: false,
+      sourcemap: false,
+      entryFileNames: 'setup.mjs',
     },
-    {
-      input: 'src/polyfills.mjs',
-      output: baseOutput,
-      plugins: [
-        mkNodeResolve(),
-        prod && iifeWrapPlugin({
-          async: false,
-          vars: [
-            'document',
-            'TypeError',
-            'WeakMap',
-            'window',
-          ],
-        }),
-        prod && threadedTerserPlugin({
-          terserOpts: {
-            output: {
-              comments: false,
-            },
+    plugins: [
+      cleanPlugin(),
+      mkNodeResolve(),
+      jsonPlugin({
+        compact: true,
+        include: '**/*.json',
+        namedExports: true,
+        preferConst: true,
+      }),
+      scssLoader({prod}),
+      typescript({exclude: srcExclude, include: srcInclude}),
+      replacePlugin({
+        exclude: srcExclude,
+        include: srcInclude,
+        preventAssignment: true,
+        values: {
+          'process.env.MELVOR_MOD_VERSION': JSON.stringify(process.env.MELVOR_MOD_VERSION || 'dev'),
+          'process.env.PRODUCTION': String(prod),
+        },
+      }),
+      assetLoader({
+        reg: /\.png$/,
+      }),
+      prod && iifeWrapPlugin({
+        async: true,
+        vars: [
+          'AltMagicConsumptionID',
+          'Array',
+          'Bank',
+          'Boolean',
+          'cdnMedia',
+          'console',
+          'document',
+          'Error',
+          'game',
+          'isNaN',
+          'JSON',
+          'Map',
+          'NamespacedObject',
+          'NamespaceRegistry',
+          'Number',
+          'Object',
+          'Promise',
+          'RegExp',
+          'SkillWithMastery',
+          'String',
+          'Symbol',
+          'Swal',
+          'TypeError',
+          'undefined',
+          'WeakMap',
+          'window',
+        ],
+      }),
+      modWrapPlugin({prod}),
+      prod && threadedTerserPlugin({
+        terserOpts: {
+          output: {
+            comments: false,
           },
-        }),
-      ],
+        },
+      }),
+      copyPlugin({
+        copy: [
+          {
+            from: [
+              'manifest.json',
+              // 'public_api.d.ts',
+            ]
+          },
+        ],
+        defaultOpts: {
+          glob: {cwd: 'src'},
+          emitNameKind: 'fileName',
+        },
+        watch,
+      }),
+    ],
+    watch: {
+      exclude: 'node_modules/**/*',
     },
-  ];
+  };
 }
 
 function getOpt(opts, opt) {
