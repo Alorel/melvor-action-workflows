@@ -12,6 +12,7 @@ export interface NodeOptionValidationCtx {
 }
 
 const CTX = createContext<NodeOptionValidationCtx>(null as any);
+CTX.displayName = 'NodeOptionValidationCtx';
 
 interface ProvideProps extends NodeOptionValidationCtx {
   children: ComponentChildren;

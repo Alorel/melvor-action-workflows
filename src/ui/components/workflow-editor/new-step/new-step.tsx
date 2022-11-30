@@ -1,8 +1,10 @@
 import type {VNode} from 'preact';
 import {Fragment} from 'preact';
+import type {FunctionComponent} from 'preact/compat';
 import {memo} from 'preact/compat';
 import {useCallback} from 'preact/hooks';
 import type {WorkflowStep} from '../../../../lib/data/workflow-step.mjs';
+import {EMPTY_ARR} from '../../../../lib/util.mjs';
 import swapElements from '../../../../lib/util/swap-elements.mjs';
 import useReRender from '../../../hooks/re-render';
 import useTippy from '../../../hooks/tippy.mjs';
@@ -11,63 +13,69 @@ import {BorderedBlock} from '../../block';
 import Btn from '../../btn';
 import {BinSvg, ChevronLeftSvg, ChevronRightSvg} from '../../svg';
 import ActionConfig from '../action-config';
-import {EDITOR_SECTION_CLASS} from '../editor-ctx.mjs';
+import {EDITOR_SECTION_CLASS, useStep, useStepHost} from '../editor-contexts';
 import NewStepHeader from './header-block';
 
 interface Props {
   step: WorkflowStep;
 }
 
-const NewStep = memo<Props>(({children, step}): VNode => {
-  const reRender = useReRender();
-  const addAction = useCallback((): void => {
-    step.addAction();
-    reRender();
-  }, [step]);
+const NewStep = memo<Props>(({children, step: stepIn}): VNode => {
+  const [ProvideStep, step$] = useStepHost(stepIn);
+  step$.value = stepIn;
 
-  const actions = step.actions;
+  const reRender = useReRender();
+
+  const addAction = useCallback((): void => {
+    step$.peek().addAction();
+    reRender();
+  }, EMPTY_ARR);
+
+  const actions = stepIn.actions;
   const canMvActions = actions.length > 1;
   const lastActionIdx = actions.length - 1;
 
   return (
     <div class={EDITOR_SECTION_CLASS}>
       <BorderedBlock kind={'summoning'} size={4}>
-        <NewStepHeader step={step}/>
+        <ProvideStep>
+          <NewStepHeader/>
 
-        <BorderedBlock kind={'thieving'}>
-          <div class={'font-size-sm font-w600 mb-1'}>Actions</div>
+          <BorderedBlock kind={'thieving'}>
+            <div class={'font-size-sm font-w600 mb-1'}>Actions</div>
 
-          <div class={'row row-deck'}>
-            {actions.map((action, i) => (
-              <div class={'col-12 col-xl-auto'} key={action.listId}>
-                <ActionConfig action={action}>
-                  {canMvActions && (
-                    <ActionMvBtns i={i}
-                      lastActionIdx={lastActionIdx}
-                      reRender={reRender}
-                      step={step}/>
-                  )}
+            <div class={'row row-deck'}>
+              {actions.map((action, i) => (
+                <div class={'col-xs-12 col-xl-6'} key={action.listId}>
+                  <ActionConfig action={action}>
+                    {canMvActions && (
+                      <ActionMvBtns i={i}
+                        lastActionIdx={lastActionIdx}
+                        reRender={reRender}/>
+                    )}
 
-                </ActionConfig>
-              </div>
-            ))}
-          </div>
-
-          <div class={'text-right'}>
-            <div class={'btn-group btn-group-sm'}>
-              {children}
-              <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
+                  </ActionConfig>
+                </div>
+              ))}
             </div>
-          </div>
-        </BorderedBlock>
+
+            <div class={'text-right'}>
+              <div class={'btn-group btn-group-sm'}>
+                {children}
+                <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
+              </div>
+            </div>
+          </BorderedBlock>
+        </ProvideStep>
       </BorderedBlock>
     </div>
   );
 });
+NewStep.displayName = 'NewStep';
 
 export default NewStep;
 
-interface BtnsProps extends Props {
+interface BtnsProps {
   i: number;
 
   lastActionIdx: number;
@@ -75,8 +83,8 @@ interface BtnsProps extends Props {
   reRender(): void;
 }
 
-const ActionMvBtns = ({i, lastActionIdx, reRender, step}: BtnsProps) => {
-  const [rmAction, shiftActionIdx] = useStepMoveCallbacks(step, reRender);
+const ActionMvBtns: FunctionComponent<BtnsProps> = ({i, lastActionIdx, reRender}) => {
+  const [rmAction, shiftActionIdx] = useStepMoveCallbacks(reRender);
 
   return (
     <Fragment>
@@ -94,6 +102,7 @@ const ActionMvBtns = ({i, lastActionIdx, reRender, step}: BtnsProps) => {
     </Fragment>
   );
 };
+ActionMvBtns.displayName = 'ActionMvBtns';
 
 interface MvBtnProps {
   idx: number;
@@ -117,10 +126,11 @@ const ActionMvBtn = memo<MvBtnProps>(({children, idx, onClick, shift}) => {
     </Btn>
   );
 });
+ActionMvBtn.displayName = 'ActionMvBtn';
 
 type RmBtnProps = Pick<MvBtnProps, 'idx' | 'onClick'>;
 
-const ActionRmBtn = ({idx, onClick}: RmBtnProps): VNode => {
+const ActionRmBtn: FunctionComponent<RmBtnProps> = ({idx, onClick}): VNode => {
   const btnRef = useTippy<HTMLButtonElement>('Remove this action');
 
   return (
@@ -133,8 +143,11 @@ const ActionRmBtn = ({idx, onClick}: RmBtnProps): VNode => {
     </Btn>
   );
 };
+ActionRmBtn.displayName = 'ActionRmBtn';
 
-const useStepMoveCallbacks = (step: WorkflowStep, reRender: () => void) => {
+const useStepMoveCallbacks = (reRender: () => void) => {
+  const step$ = useStep();
+
   const rmAction = useCallback((e: Event): void => {
     const btnEl = getEvtTarget(e, el => el.tagName === 'BUTTON');
     let idx: number;
@@ -142,9 +155,9 @@ const useStepMoveCallbacks = (step: WorkflowStep, reRender: () => void) => {
       return;
     }
 
-    step.actions.splice(idx, 1);
+    step$.peek().actions.splice(idx, 1);
     reRender();
-  }, [step.actions]);
+  }, [step$]);
 
   const shiftActionIdx = useCallback((e: Event): void => {
     const btnEl = getEvtTarget(e, el => el.tagName === 'BUTTON');
@@ -155,12 +168,12 @@ const useStepMoveCallbacks = (step: WorkflowStep, reRender: () => void) => {
     }
 
     const idx = parseInt(btnEl!.dataset.idx!);
-    if (isNaN(idx) || !swapElements(step.actions, idx, idx + shift)) {
+    if (isNaN(idx) || !swapElements(step$.peek().actions, idx, idx + shift)) {
       return;
     }
 
     reRender();
-  }, [step.actions]);
+  }, [step$]);
 
   return [rmAction, shiftActionIdx] as const;
 };

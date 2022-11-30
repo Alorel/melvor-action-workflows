@@ -19,3 +19,4 @@ export const NoDashboardsDefined = staticComponent(() => {
     </div>
   );
 });
+NoDashboardsDefined.displayName = 'NoDashboardsDefined';

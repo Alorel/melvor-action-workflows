@@ -1,25 +1,24 @@
+import type {FunctionComponent} from 'preact/compat';
 import {memo} from 'preact/compat';
 import {useCallback} from 'preact/hooks';
 import type {TriggerDefinitionContext} from '../../../../lib/data/trigger-definition-context.mjs';
-import type {WorkflowStep} from '../../../../lib/data/workflow-step.mjs';
 import useReRender from '../../../hooks/re-render';
 import Td from '../../td';
 import {TriggerSelect} from '../categorised-node-select/categorised-node-select-impl';
+import {useStep} from '../editor-contexts';
 import RenderNodeOption from '../render-node-option/render-node-option';
 
-interface Props {
-  step: WorkflowStep;
-}
-
-const NewStepHeader = memo<Props>(({step}) => {
+const NewStepHeader: FunctionComponent = memo(() => {
   const reRender = useReRender();
+  const step$ = useStep();
   const onTriggerChange = useCallback((newTrigger: TriggerDefinitionContext<any>): void => {
-    step.trigger.trigger = newTrigger;
-    step.trigger.resetOpts();
+    const trigger = step$.peek().trigger;
+    trigger.trigger = newTrigger;
+    trigger.resetOpts();
     reRender();
-  }, [step.trigger]);
+  }, [step$]);
 
-  const stepTrigger = step.trigger;
+  const stepTrigger = step$.value.trigger;
   const triggerId = stepTrigger.trigger.id;
 
   return (
@@ -35,7 +34,7 @@ const NewStepHeader = memo<Props>(({step}) => {
         {stepTrigger.trigger.def.options?.map(opt => (
           <RenderNodeOption key={`${opt.localID}@${triggerId}`}
             onChange={value => {
-              step.trigger.opts = {...stepTrigger.opts, [opt.localID]: value};
+              stepTrigger.opts = {...stepTrigger.opts, [opt.localID]: value};
               reRender();
             }}
             option={opt}
@@ -46,6 +45,7 @@ const NewStepHeader = memo<Props>(({step}) => {
     </table>
   );
 });
+NewStepHeader.displayName = 'NewStepHeader';
 
 export default NewStepHeader;
 

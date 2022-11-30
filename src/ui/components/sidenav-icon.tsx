@@ -1,44 +1,19 @@
-import {memo} from 'preact/compat';
-import {useEffect, useState} from 'preact/hooks';
-import type {Observable} from 'rxjs';
-import {debounceTime, distinctUntilChanged, EMPTY, of, startWith, switchMap} from 'rxjs';
-import type {WorkflowEvent} from '../../lib/execution/workflow-event.mjs';
-import {WorkflowEventType} from '../../lib/execution/workflow-event.mjs';
-import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
-import {EMPTY_ARR} from '../../lib/util.mjs';
+import type {ReadonlySignal} from '@preact/signals-core';
+import type {FunctionComponent} from 'preact/compat';
+import {createPortal, memo} from 'preact/compat';
+import {useRunning} from '../global-ctx';
 import {PauseSvg, PlaySvg} from './svg';
 
-const SidenavIcon = memo(() => {
-  const [running, setRunning] = useState(false);
-  useEffect(() => {
-    const evtMapper = ({type}: WorkflowEvent): Observable<boolean> => {
-      switch (type) {
-        case WorkflowEventType.WORKFLOW_START:
-          return of(true);
-        case WorkflowEventType.WORKFLOW_COMPLETE:
-          return of(false);
-        default:
-          return EMPTY;
-      }
-    };
+interface Props<T extends Element> {
+  container: ReadonlySignal<T | null>;
+}
 
-    const sub = WorkflowRegistry.inst.primaryExecution$
-      .pipe(
-        switchMap((exec): Observable<boolean> => (
-          exec ? exec.pipe(switchMap(evtMapper), startWith(true)) : of(false)
-        )),
-        debounceTime(0),
-        distinctUntilChanged()
-      )
-      .subscribe(setRunning);
-    return () => {
-      sub.unsubscribe();
-    };
-  }, EMPTY_ARR);
+const SidenavIcon = memo(function <T extends Element> ({container: container$}: Props<T>) {
+  const container = container$.value;
+  const Comp = useRunning().value ? PlaySvg : PauseSvg;
 
-  const Comp = running ? PlaySvg : PauseSvg;
-
-  return <Comp class={'mr-1'}/>;
+  return container && createPortal(<Comp class={'mr-1'}/>, container);
 });
+(SidenavIcon as FunctionComponent).displayName = 'SidenavIcon';
 
 export default SidenavIcon;

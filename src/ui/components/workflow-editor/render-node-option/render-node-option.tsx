@@ -24,6 +24,7 @@ const RenderNodeOption = memo<OptionRenderEditCtx<any, any>>(({option: opt, ...r
     </tr>
   );
 });
+RenderNodeOption.displayName = 'RenderNodeOption';
 
 export default RenderNodeOption;
 
@@ -59,6 +60,7 @@ function Inner({option: opt, otherValues, spec, value, onChange: onChangeOut}: I
     </ProvideNodeValidationCtx>
   );
 }
+Inner.displayName = 'RenderNodeOptionInner';
 
 function Label(opt: NodeOption): VNode {
   return (
@@ -69,6 +71,7 @@ function Label(opt: NodeOption): VNode {
     </Td>
   );
 }
+Label.displayName = 'RenderNodeOptionLabel';
 
 function Errors({errors}: {errors: string[]}): VNode {
   return (
@@ -77,6 +80,7 @@ function Errors({errors}: {errors: string[]}): VNode {
     </div>
   );
 }
+Errors.displayName = 'RenderNodeOptionErrors';
 
 export function NodeOptionDesc({description}: Pick<NodeOption, 'description'>): VNode {
   const el = useTippy(description);
@@ -87,3 +91,4 @@ export function NodeOptionDesc({description}: Pick<NodeOption, 'description'>): 
 function Err({type}: Pick<NodeOption, 'type'>): VNode {
   return (<td colSpan={2} class={'text-danger'}>{`Unregistered option type: ${String(type)}`}</td>);
 }
+Err.displayName = 'RenderNodeOptionErr';

@@ -42,11 +42,13 @@ type Out = WorkflowEvent;
 /** Represents a workflow in the middle of being executed */
 @PersistClassName('WorkflowTrigger')
 export class WorkflowExecution extends ShareReplayLike<Out> {
+  public readonly activeStepIdx$: Observable<number>;
+
   @AutoIncrement()
   public readonly id!: number;
 
   /** Currently executed step index */
-  private readonly _activeStepIdx$ = new BehaviorSubject<number>(0);
+  private readonly _activeStepIdx$: BehaviorSubject<number>;
 
   /** Whether {@link #activeStepIdx} was set manually or not */
   private activeStepIdxManual = false;
@@ -91,6 +93,8 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   public constructor(public readonly workflow: Workflow) {
     super();
     this.tick = this.tick.bind(this);
+    this._activeStepIdx$ = new BehaviorSubject<number>(0);
+    this.activeStepIdx$ = this._activeStepIdx$.asObservable();
   }
 
   /** Currently executed step index */
@@ -104,6 +108,10 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       return;
     }
     this._activeStepIdx$.next(v);
+  }
+
+  public get running(): boolean {
+    return !this.finished;
   }
 
   /** Currently executed step */

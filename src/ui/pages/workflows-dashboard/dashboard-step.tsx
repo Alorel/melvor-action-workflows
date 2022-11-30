@@ -63,6 +63,7 @@ const DashboardStep = memo<Props>(
     );
   }
 );
+DashboardStep.displayName = 'DashboardStep';
 
 export default DashboardStep;
 
@@ -118,6 +119,7 @@ const MoveBtn = memo<MoveBtnProps>(({tooltip, ...rest}) => {
 
   return (<Btn kind={'default'} btnRef={btnRef} {...rest}/>);
 });
+MoveBtn.displayName = 'MoveBtn';
 
 function useBorder(stepId: number): string {
   const enum Strings {

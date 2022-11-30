@@ -1,22 +1,21 @@
 import {setDefaultLogger} from '@aloreljs/rxutils';
+import type {Signal} from '@preact/signals';
+import {signal} from '@preact/signals';
 import {render} from 'preact';
 import './actions/actions.mjs';
 import {TRIGGER_REGISTRY} from './lib/registries/trigger-registry.mjs';
 import {errorLog} from './lib/util/log.mjs';
 import './option-types/option-types.mjs';
 import './triggers/index.mjs';
-import SidenavIcon from './ui/components/sidenav-icon';
-import DebugPage, {DEBUG_PAGE_ID} from './ui/pages/debug-page';
-import NewWorkflow, {NEW_WORKFLOW_PAGE_ID} from './ui/pages/new-workflow';
-import WorkflowsDashboard, {WORKFLOWS_DASHBOARD_ID} from './ui/pages/workflows-dashboard';
+import App from './ui/app';
 import {SIDENAV_ITEM} from './ui/sidebar-mgr.mjs';
 import './ui/ui.mjs';
-import {mainIcon} from './ui/ui.mjs';
-import makePageContainer from './ui/util/make-page-container.mjs';
 
 // ctx.api<Readonly<Api>>(api); // rollup will freeze it
 
 setDefaultLogger(errorLog);
+
+let sidenavIconContainer: Signal<HTMLSpanElement | null>;
 
 ctx.onInterfaceAvailable(() => {
   for (const {def, id} of TRIGGER_REGISTRY.registeredObjects.values()) {
@@ -27,24 +26,21 @@ ctx.onInterfaceAvailable(() => {
     }
   }
 
-  render(<NewWorkflow/>, makePageContainer(NEW_WORKFLOW_PAGE_ID));
-  render(<WorkflowsDashboard/>, makePageContainer(WORKFLOWS_DASHBOARD_ID));
-
-  if (!process.env.PRODUCTION) {
-    render(<DebugPage/>, makePageContainer(DEBUG_PAGE_ID));
-  }
+  sidenavIconContainer = signal<HTMLSpanElement | null>(null);
+  render(<App sidenavIcon={sidenavIconContainer}/>, document.createElement('div'));
 });
 
+// This cannot happen earlier, unfortunately
 ctx.onInterfaceReady(() => {
-  sidebar.category('')
+  sidebar
+    .category('')
     .item('Action Workflows', {
       after: 'melvorD:Bank',
-      icon: mainIcon,
     });
 
   const iconContainer = SIDENAV_ITEM.value.iconEl;
   iconContainer.classList.remove('nav-img');
   iconContainer.innerHTML = '';
 
-  render(<SidenavIcon/>, iconContainer);
+  sidenavIconContainer.value = iconContainer;
 });

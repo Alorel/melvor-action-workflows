@@ -28,9 +28,16 @@ const ChevronBase: FunctionComponent<ChevronBaseProps> = ({chevRotate, style, ..
 );
 
 export const ChevronRightSvg = staticComponent<ChevronProps>(ChevronBase);
+ChevronRightSvg.displayName = 'ChevronRightSvg';
+
 export const ChevronDownSvg = staticComponent<ChevronProps>(props => (<ChevronBase chevRotate={90} {...props}/>));
+ChevronDownSvg.displayName = 'ChevronDownSvg';
+
 export const ChevronLeftSvg = staticComponent<ChevronProps>(props => (<ChevronBase chevRotate={180} {...props}/>));
+ChevronLeftSvg.displayName = 'ChevronLeftSvg';
+
 export const ChevronUpSvg = staticComponent<ChevronProps>(props => (<ChevronBase chevRotate={270} {...props}/>));
+ChevronUpSvg.displayName = 'ChevronUpSvg';
 
 type NoSpaceProps = Omit<SvgProps, 'xmlSpace'>;
 export const BinSvg = staticComponent<NoSpaceProps>(props => (
@@ -51,6 +58,7 @@ export const BinSvg = staticComponent<NoSpaceProps>(props => (
       d={'M155.384,119.558H110.33c-20.567,0-37.239,16.672-37.239,37.239v26.133\th45.054v-26.133C118.145,136.23,134.817,119.558,155.384,119.558z'}/>
   </BaseSvg>
 ));
+BinSvg.displayName = 'BinSvg';
 
 export const TargetSvg = staticComponent<NoSpaceProps>(props => (
   <BaseSvg xmlSpace={'preserve'} viewBox={'0 0 512 512'} {...props}>
@@ -64,6 +72,7 @@ export const TargetSvg = staticComponent<NoSpaceProps>(props => (
     <path fill={'#802812'} d={'M256 0H274V134H256zM256 378H274V512H256zM378 238H512V275H378z'}/>
   </BaseSvg>
 ));
+TargetSvg.displayName = 'TargetSvg';
 
 export const PlaySvg = staticComponent<NoSpaceProps>(props => (
   <BaseSvg xmlSpace={'preserve'} viewBox={'0 0 58 58'} {...props}>
@@ -75,6 +84,7 @@ export const PlaySvg = staticComponent<NoSpaceProps>(props => (
     </g>
   </BaseSvg>
 ));
+PlaySvg.displayName = 'PlaySvg';
 
 export const PauseSvg = staticComponent<NoSpaceProps>(props => (
   <BaseSvg xmlSpace={'preserve'} viewBox={'0 0 496 496'} {...props}>
@@ -84,6 +94,7 @@ export const PauseSvg = staticComponent<NoSpaceProps>(props => (
       d={'M223 121h-60c-6 0-10 4-10 10v234c0 6 4 10 10 10h60c6 0 10-4 10-10V131C233 126 229 121 223 121zM333 121h-60c-6 0-10 4-10 10v234c0 6 4 10 10 10h60c6 0 10-4 10-10V131C343 126 339 121 333 121z'}/>
   </BaseSvg>
 ));
+PauseSvg.displayName = 'PauseSvg';
 
 interface BaseProps extends Omit<JSXInternal.SVGAttributes<SVGSVGElement>, 'xmlns' | 'style' | 'className' | 'class'> {
   class?: string;
@@ -92,7 +103,7 @@ interface BaseProps extends Omit<JSXInternal.SVGAttributes<SVGSVGElement>, 'xmln
 }
 
 const svgSheet = makeConstructableCss('svg{width:1rem;height:1rem}');
-const BaseSvg = ({class: className, ...props}: BaseProps): VNode => (
+const BaseSvg: FunctionComponent<BaseProps> = ({class: className, ...props}: BaseProps): VNode => (
   <span class={className}>
     <ShadowHost adoptedStyleSheets={svgSheet}>
       <AdoptedStylesheets/>
