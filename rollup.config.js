@@ -9,6 +9,7 @@ import {assetLoader} from "./build/asset-loader.mjs";
 import jsonPlugin from "@rollup/plugin-json";
 import cleanPlugin from "./build/clean-plugin.mjs";
 import scssLoader from "./build/scss-loader.mjs";
+import loadFirstPlugin from "./build/load-first.mjs";
 
 const srcInclude = /src[\\/].+\.m?tsx?$/;
 const srcExclude = /node_modules[\\/]/;
@@ -42,6 +43,7 @@ export default function (opts) {
       }),
       scssLoader({prod}),
       typescript({exclude: srcExclude, include: srcInclude}),
+      !prod && loadFirstPlugin(),
       replacePlugin({
         exclude: srcExclude,
         include: srcInclude,
@@ -54,37 +56,7 @@ export default function (opts) {
       assetLoader({
         reg: /\.png$/,
       }),
-      prod && iifeWrapPlugin({
-        async: true,
-        vars: [
-          'AltMagicConsumptionID',
-          'Array',
-          'Bank',
-          'Boolean',
-          'cdnMedia',
-          'console',
-          'document',
-          'Error',
-          'game',
-          'isNaN',
-          'JSON',
-          'Map',
-          'NamespacedObject',
-          'NamespaceRegistry',
-          'Number',
-          'Object',
-          'Promise',
-          'RegExp',
-          'SkillWithMastery',
-          'String',
-          'Symbol',
-          'Swal',
-          'TypeError',
-          'undefined',
-          'WeakMap',
-          'window',
-        ],
-      }),
+      prod && mkIifeWrap(),
       modWrapPlugin({prod}),
       prod && threadedTerserPlugin({
         terserOpts: {
@@ -122,6 +94,41 @@ function getOpt(opts, opt) {
 
     return out;
   }
+}
+
+function mkIifeWrap() {
+  return iifeWrapPlugin({
+    async: true,
+    vars: [
+      'AltMagicConsumptionID',
+      'Array',
+      'Bank',
+      'Boolean',
+      'cdnMedia',
+      'console',
+      'document',
+      'Error',
+      'game',
+      'isNaN',
+      'JSON',
+      'Map',
+      'NamespacedObject',
+      'NamespaceRegistry',
+      'Number',
+      'Object',
+      'Promise',
+      'RegExp',
+      'sidebar',
+      'SkillWithMastery',
+      'String',
+      'Symbol',
+      'Swal',
+      'TypeError',
+      'undefined',
+      'WeakMap',
+      'window',
+    ],
+  });
 }
 
 function mkNodeResolve() {

@@ -1,25 +1,29 @@
 import {staticComponent} from '@alorel/preact-static-component';
-import {distinctWithInitial} from '@aloreljs/rxutils/operators';
-import type {ReadonlySignal, Signal} from '@preact/signals';
-import {batch, useComputed, useSignal} from '@preact/signals';
+import type {Signal} from '@preact/signals';
+import {batch, useComputed} from '@preact/signals';
 import type {VNode} from 'preact';
-import {Fragment, h} from 'preact';
+import {Fragment} from 'preact';
 import {memo} from 'preact/compat';
 import {useCallback, useEffect, useRef} from 'preact/hooks';
-import type {Observable, OperatorFunction} from 'rxjs';
-import {debounceTime, distinctUntilChanged, EMPTY, map, merge, of, skip, startWith, switchMap} from 'rxjs';
+import {of, switchMap} from 'rxjs';
 import {Workflow} from '../../lib/data/workflow.mjs';
-import type {WorkflowCompleteEvent, WorkflowEvent} from '../../lib/execution/workflow-event.mjs';
-import {WorkflowEventType} from '../../lib/execution/workflow-event.mjs';
-import type {WorkflowExecution} from '../../lib/execution/workflow-execution.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
 import {EMPTY_ARR} from '../../lib/util.mjs';
 import {alertConfirm} from '../../lib/util/alert';
 import swapElements from '../../lib/util/swap-elements.mjs';
 import {BorderedBlock} from '../components/block';
 import Btn from '../components/btn';
-import {EDITOR_CTX, useEditorCtxProvider} from '../components/workflow-editor/editor-ctx.mjs';
+import PageContainer from '../components/page-container';
+import {
+  useActiveWorkflow,
+  useActiveWorkflowHost,
+  useEditedWorkflow,
+  useEditedWorkflowHost,
+  useTouchedHost,
+  WorkflowContext
+} from '../components/workflow-editor/editor-contexts';
 import WorkflowEditor from '../components/workflow-editor/workflow-editor';
+import {useActiveStepIdx, useActiveStepIdxHost, useBorderClass, useRunning} from '../global-ctx';
 import useReRender from '../hooks/re-render';
 import {useBehaviourSubject} from '../hooks/use-subject.mjs';
 import autoId from '../util/id-gen.mjs';
@@ -27,215 +31,130 @@ import type {DashboardStepProps} from './workflows-dashboard/dashboard-step';
 import DashboardStep from './workflows-dashboard/dashboard-step';
 import {NoDashboardsDefined} from './workflows-dashboard/no-dashboards-defined';
 
-/* eslint-disable max-lines */
-
-const enum Strings {
-  STD_CLASS = 'summoning',
-}
-
 export const WORKFLOWS_DASHBOARD_ID = autoId();
 
-function WithWorkflows({workflows}: {workflows: Workflow[]}): VNode {
-  const props = useEditorProps(workflows);
+function WithWorkflows({workflows}: Pick<EditorProps, 'workflows'>): VNode {
+  const [ProvideEditedWorkflow, editedWorkflow$] = useEditedWorkflowHost();
+  const [ProvideActiveWorkflow] = useActiveWorkflowHost();
 
-  return h<EditorProps>(props.editedWorkflow.value ? Editor : DashboardShell, props);
+  return (
+    <ProvideEditedWorkflow>
+      <ProvideActiveWorkflow>
+        {editedWorkflow$.value ? <Editor/> : <DashboardShell workflows={workflows}/>}
+      </ProvideActiveWorkflow>
+    </ProvideEditedWorkflow>
+  );
 }
 
 export default function WorkflowsDashboard(): VNode {
   return (
-    <div className={'row'}>
-      <div className={'col-12 col-xl-11 m-auto'}>
-        <div className={'block block-rounded'}>
-          <div className={'block-content'}>
-            <Inner/>
+    <PageContainer id={WORKFLOWS_DASHBOARD_ID}>
+      <div className={'row'}>
+        <div className={'col-12 col-xl-11 m-auto'}>
+          <div className={'block block-rounded'}>
+            <div className={'block-content'}>
+              <Inner/>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
-type EditorProps = ReturnType<typeof useEditorProps>;
-
-function useEditorProps(workflows: Workflow[]) {
-  const activeWorkflow = useSignal<Workflow | undefined>(undefined);
-  const activeWorkflowId = useComputed((): number | undefined => activeWorkflow.value?.listId);
-  const editedWorkflow = useSignal<Workflow | undefined>(undefined);
-
-  return {
-    activeWorkflow,
-    activeWorkflowId,
-    editedWorkflow,
-    workflows,
-    ...usePrimaryExecutionSignal(),
-  } as const;
+interface EditorProps {
+  workflows: Workflow[];
 }
 
-function usePrimaryExecutionSignal() {
-
+function DashboardShell({workflows}: EditorProps): VNode {
   const reg = WorkflowRegistry.inst;
-  const running = useSignal(false);
-  const activeStepIdx = useSignal(-1);
-  const borderClass = useSignal<string>(Strings.STD_CLASS);
-
-  useEffect(() => {
-    const sub = reg.primaryExecution$
-      .pipe(
-        switchMap(exec => {
-          if (!exec) {
-            batch(() => {
-              running.value = false;
-              activeStepIdx.value = -1;
-              borderClass.value = Strings.STD_CLASS;
-            });
-
-            return EMPTY;
-          }
-
-          running.value = true;
-
-          const border$ = exec.pipe(
-            eventToBorder(running),
-            startWith(Strings.STD_CLASS),
-            debounceTime(0),
-            distinctUntilChanged()
-          );
-          const stepIdxNever$ = getStepIdx(exec, activeStepIdx);
-
-          return merge(border$, stepIdxNever$);
-        })
-      )
-      .subscribe(border => {
-        borderClass.value = border;
-      });
-
-    return () => {
-      sub.unsubscribe();
-    };
-  }, EMPTY_ARR);
-
-  return {
-    activeStepIdx: activeStepIdx as ReadonlySignal<number>,
-    borderClass: borderClass as ReadonlySignal<string>,
-    running: running as ReadonlySignal<boolean>,
-  } as const;
-}
-
-function eventToBorder(running: Signal<boolean>): OperatorFunction<WorkflowEvent, string> {
-  return switchMap(evt => {
-    switch (evt.type) {
-      case WorkflowEventType.WORKFLOW_START:
-        return of('agility');
-      case WorkflowEventType.WORKFLOW_COMPLETE:
-        running.value = false;
-        return of((evt as WorkflowCompleteEvent).ok ? 'woodcutting' : 'fletching');
-      default:
-        return EMPTY;
-    }
-  });
-}
-
-function getStepIdx(exec: WorkflowExecution, activeStepIdx: Signal<number>): Observable<never> {
-  return exec.pipe(
-    map(() => exec.activeStepIdx),
-    distinctWithInitial(activeStepIdx.peek()),
-    skip(1),
-    switchMap((idx): Observable<never> => {
-      activeStepIdx.value = idx;
-
-      return EMPTY;
-    })
-  );
-}
-
-function DashboardShell({
-  activeWorkflow,
-  activeStepIdx,
-  borderClass,
-  activeWorkflowId,
-  running,
-  editedWorkflow,
-  workflows,
-}: EditorProps): VNode {
+  const activeWorkflow = useActiveWorkflow();
   const reRender = useReRender();
   const hasWorkflow = Boolean(activeWorkflow.value);
 
-  return (
-    <Fragment>
-      <div className={'row'}>
-        <ActiveWorkflowSelect activeWorkflow={activeWorkflow}
-          workflows={workflows}
-          activeWorkflowId={activeWorkflowId}/>
+  const [ProvideActiveStepIdx, activeStepIdx$] = useActiveStepIdxHost(-1);
 
-        {hasWorkflow && (
-          <SelectedWorkflowBtns running={running}
-            refresh={reRender}
-            editedWorkflow={editedWorkflow}
-            activeWorkflow={activeWorkflow}/>
-        )}
+  useEffect(() => {
+    const sub = reg.primaryExecution$
+      .pipe(switchMap(exec => exec?.activeStepIdx$ ?? of(-1)))
+      .subscribe(v => {
+        activeStepIdx$.value = v;
+      });
+    return () => {
+      sub.unsubscribe();
+    };
+  });
+
+  return (
+    <ProvideActiveStepIdx>
+      <div className={'row'}>
+        <ActiveWorkflowSelect workflows={workflows}/>
+        <div class={'col-xs-12 text-center col-md-auto'}>
+          {
+            hasWorkflow
+              ? <SelectedWorkflowBtns refresh={reRender}/>
+              : 'Select a workflow to get started'
+          }
+        </div>
+
       </div>
 
-      {hasWorkflow && (
-        <RenderSteps activeWorkflow={activeWorkflow}
-          activeStepIdx={activeStepIdx}
-          running={running}
-          borderClass={borderClass}/>
-      )}
-    </Fragment>
+      {hasWorkflow && <RenderSteps/>}
+    </ProvideActiveStepIdx>
   );
 }
 
-const RenderSteps = memo<Pick<EditorProps, 'activeWorkflow' | 'borderClass' | 'activeStepIdx' | 'running'>>(
-  ({activeStepIdx, activeWorkflow, borderClass, running}) => {
-    const reRender = useReRender();
+const RenderSteps = memo(() => {
+  const reRender = useReRender();
+  const activeStepIdx = useActiveStepIdx();
+  const running = useRunning();
+  const activeWorkflow = useActiveWorkflow();
+  const borderClass = useBorderClass();
+  const reg = WorkflowRegistry.inst;
 
-    type StepProps = Pick<DashboardStepProps, 'mvLeft' | 'mvRight' | 'setActive'>;
-    const stepProps = useComputed((): StepProps[] => {
-      const activeIdx = activeStepIdx.value;
-      const isRunning = running.value;
+  type StepProps = Pick<DashboardStepProps, 'mvLeft' | 'mvRight' | 'setActive'>;
+  const stepProps = useComputed((): StepProps[] => {
+    const activeIdx = activeStepIdx.value;
+    const isRunning = running.value;
 
-      return activeWorkflow.value!.steps.map((_step, idx, arr): StepProps => ({
-        mvLeft: idx !== 0 && activeIdx !== idx && activeIdx !== idx - 1,
-        mvRight: idx !== (arr.length - 1) && activeIdx !== idx && activeIdx !== idx + 1,
-        setActive: isRunning && activeIdx !== idx,
-      }));
-    }).value;
+    return activeWorkflow.value!.steps.map((_step, idx, arr): StepProps => ({
+      mvLeft: idx !== 0 && activeIdx !== idx && activeIdx !== idx - 1,
+      mvRight: idx !== (arr.length - 1) && activeIdx !== idx && activeIdx !== idx + 1,
+      setActive: isRunning && activeIdx !== idx,
+    }));
+  }).value;
 
-    const onShift = useCallback((idx: number, direction: 1 | -1): void => {
-      const workflow = activeWorkflow.peek()!;
-      if (!swapElements(workflow.steps, idx, idx + direction)) {
-        return;
-      }
+  const onShift = useCallback((idx: number, direction: 1 | -1): void => {
+    const workflow = activeWorkflow.peek()!;
+    if (!swapElements(workflow.steps, idx, idx + direction)) {
+      return;
+    }
 
-      WorkflowRegistry.inst.save();
-      reRender();
-    }, [activeWorkflow]);
+    reg.save();
+    reRender();
+  }, [activeWorkflow]);
 
-    return (
-      <BorderedBlock kind={borderClass.value} size={4} class={'mt-2'}>
-        <div class={'row row-deck'}>
-          {activeWorkflow.value!.steps.map((step, idx) => (
-            <DashboardStep key={step.listId}
-              onShift={direction => {
-                onShift(idx, direction);
-              }}
-              onSetActive={() => {
-                             WorkflowRegistry.inst.primaryExecution!.setActiveStepIdx(idx);
-              }}
-              step={step}
-              {...stepProps[idx]}/>
-          ))}
-        </div>
-      </BorderedBlock>
-    );
-  }
-);
+  return (
+    <BorderedBlock kind={borderClass.value} size={4} class={'mt-2'}>
+      <div class={'row row-deck'}>
+        {activeWorkflow.value!.steps.map((step, idx) => (
+          <DashboardStep key={step.listId}
+            onShift={direction => {
+              onShift(idx, direction);
+            }}
+            onSetActive={() => {
+                           reg.primaryExecution!.setActiveStepIdx(idx);
+            }}
+            step={step}
+            {...stepProps[idx]}/>
+        ))}
+      </div>
+    </BorderedBlock>
+  );
+});
 
-function ActiveWorkflowSelect({
-  activeWorkflow,
-  activeWorkflowId,
-  workflows,
-}: Pick<EditorProps, 'activeWorkflow' | 'activeWorkflowId' | 'workflows'>) {
+function ActiveWorkflowSelect({workflows}: Pick<EditorProps, 'workflows'>): VNode {
+  const activeWorkflow$ = useActiveWorkflow();
   const wfsRef = useRef(workflows);
   wfsRef.current = workflows;
 
@@ -243,16 +162,16 @@ function ActiveWorkflowSelect({
     const listId = parseInt((e.target as HTMLSelectElement).value);
 
     batch(() => {
-      activeWorkflow.value = isNaN(listId) ? undefined : wfsRef.current.find(wf => wf.listId === listId);
+      activeWorkflow$.value = isNaN(listId) ? undefined : wfsRef.current.find(wf => wf.listId === listId);
       WorkflowRegistry.inst.setPrimaryExecution(); // unset, really
     });
-  }, [activeWorkflow, wfsRef]);
+  }, [activeWorkflow$]);
 
   return (
     <Fragment>
-      <div className={'col-auto font-w600 font-size-sm pr-1'}>Active workflow</div>
-      <div className={'col-auto'}>
-        <select className={'form-control form-control-sm'} value={activeWorkflowId.value ?? ''}
+      <div className={'col-xs-12 col-sm-4 col-md-auto font-w600 font-size-sm pr-1'}>Active workflow</div>
+      <div className={'col-xs-12 col-sm-8 col-md-auto'}>
+        <select className={'form-control form-control-sm'} value={activeWorkflow$.value?.listId ?? ''}
           onChange={onWorkflowChange}>
           {workflows.map(wf => <option key={wf.listId} value={wf.listId}>{wf.name}</option>)}
         </select>
@@ -261,16 +180,16 @@ function ActiveWorkflowSelect({
   );
 }
 
-interface SelectedWorkflowBtnsProps extends Pick<EditorProps, 'activeWorkflow' | 'editedWorkflow' | 'running'> {
+interface SelectedWorkflowBtnsProps {
   refresh(): void;
 }
 
 const SelectedWorkflowBtns = memo<SelectedWorkflowBtnsProps>(
-  ({running, ...rest}) => (
-    <div className={'col-auto'}>
-      {running.value ? <BtnsRunning/> : <BtnsNotRunning {...rest}/>}
-    </div>
-  )
+  ({refresh}) => {
+    const running = useRunning().value;
+
+    return running ? <BtnsRunning/> : <BtnsNotRunning refresh={refresh}/>;
+  }
 );
 
 function useNestedRefresh(refresh: () => void): () => void {
@@ -281,52 +200,54 @@ function useNestedRefresh(refresh: () => void): () => void {
   }, [refresh]);
 }
 
-type BtnsNotRunningProps = Omit<SelectedWorkflowBtnsProps, 'running'>;
-const BtnsNotRunning = memo<BtnsNotRunningProps>(
-  ({activeWorkflow, editedWorkflow, refresh}) => {
-    const doRefresh = useNestedRefresh(refresh);
+function BtnsNotRunning({refresh}: SelectedWorkflowBtnsProps): VNode {
+  const activeWorkflow = useActiveWorkflow();
+  const editedWorkflow = useEditedWorkflow();
+  const doRefresh = useNestedRefresh(refresh);
 
-    const reg = WorkflowRegistry.inst;
-    const run = useCallback(() => {
-      reg.setPrimaryExecution(activeWorkflow.peek(), true);
-      doRefresh();
-    }, [activeWorkflow, doRefresh]);
-    const startEditing = useCallback(() => {
-      batch(() => {
-        editedWorkflow.value = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek())));
-        reg.setPrimaryExecution();
-      });
-    }, [editedWorkflow, activeWorkflow]);
-    const del = useCallback(() => {
-      const activeWf = activeWorkflow.peek()!;
+  const reg = WorkflowRegistry.inst;
+  const run = useCallback(() => {
+    reg.setPrimaryExecution(activeWorkflow.peek(), true);
+    doRefresh();
+  }, [activeWorkflow, doRefresh]);
 
-      alertConfirm(`Are you sure you want to delete "${activeWf.name}"?`)
-        .subscribe(() => {
-          batch(() => {
-            activeWorkflow.value = undefined;
-            reg.rmByIdx(reg.workflows.findIndex(wf => wf.listId === activeWf.listId));
-            doRefresh();
-          });
+  const startEditing = useCallback(() => {
+    batch(() => {
+      editedWorkflow.value = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek())));
+      reg.setPrimaryExecution();
+    });
+  }, [editedWorkflow, activeWorkflow]);
+
+  const del = useCallback(() => {
+    const activeWf = activeWorkflow.peek()!;
+
+    alertConfirm(`Are you sure you want to delete "${activeWf.name}"?`)
+      .subscribe(() => {
+        batch(() => {
+          activeWorkflow.value = undefined;
+          reg.rmByIdx(reg.workflows.findIndex(wf => wf.listId === activeWf.listId));
+          doRefresh();
         });
-    }, [activeWorkflow, doRefresh]);
-    const clone = useCallback(() => {
-      const cloned = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek()!)))!;
-      cloned.name += ` [copied ${new Date().toLocaleString()}]`;
+      });
+  }, [activeWorkflow, doRefresh]);
 
-      reg.add(cloned);
-      activeWorkflow.value = cloned;
-    }, [activeWorkflow]);
+  const clone = useCallback(() => {
+    const cloned = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek()!)))!;
+    cloned.name += ` [copied ${new Date().toLocaleString()}]`;
 
-    return (
-      <div class={'btn-group btn-group-sm'}>
-        <Btn kind={'success'} onClick={run}>{'Run'}</Btn>
-        <Btn kind={'primary'} onClick={startEditing}>{'Edit'}</Btn>
-        <Btn kind={'primary'} onClick={clone}>{'Copy'}</Btn>
-        <Btn kind={'danger'} onClick={del}>{'Delete'}</Btn>
-      </div>
-    );
-  }
-);
+    reg.add(cloned);
+    activeWorkflow.value = cloned;
+  }, [activeWorkflow]);
+
+  return (
+    <div class={'btn-group btn-group-sm'}>
+      <Btn kind={'success'} onClick={run}>{'Run'}</Btn>
+      <Btn kind={'primary'} onClick={startEditing}>{'Edit'}</Btn>
+      <Btn kind={'primary'} onClick={clone}>{'Copy'}</Btn>
+      <Btn kind={'danger'} onClick={del}>{'Delete'}</Btn>
+    </div>
+  );
+}
 
 const BtnsRunning = staticComponent(() => {
   const onClick = useCallback(() => {
@@ -336,22 +257,23 @@ const BtnsRunning = staticComponent(() => {
   return (<Btn kind={'danger'} size={'sm'} onClick={onClick}>{'Stop'}</Btn>);
 });
 
-function Editor({activeWorkflow, editedWorkflow: editedWorkflowIn}: EditorProps): VNode {
-  const [editedWorkflow, editorCtx] = useEditorCtxProvider(editedWorkflowIn);
-  const ProvideEditorCtx = EDITOR_CTX.Provider;
+function Editor(): VNode {
+  const editedWorkflow$ = useEditedWorkflow();
+  const activeWorkflow$ = useActiveWorkflow();
+  const [ProvideTouched, touched$] = useTouchedHost(false);
 
   const onCancel = useCallback(() => {
-    editedWorkflow.value = undefined;
-  }, [editedWorkflow]);
+    editedWorkflow$.value = undefined;
+  }, [editedWorkflow$]);
   const onSave = useCallback(() => {
-    const wf = editedWorkflow.peek();
+    const wf = editedWorkflow$.peek();
     if (!wf?.isValid) {
-      editorCtx.peek().touched.value = true;
+      touched$.value = true;
       return;
     }
 
     const reg = WorkflowRegistry.inst;
-    const activeWorkflowId = activeWorkflow.peek()!.listId;
+    const activeWorkflowId = activeWorkflow$.peek()!.listId;
     const idx = reg.workflows.findIndex(w => w.listId === activeWorkflowId);
 
     if (idx === -1) {
@@ -360,17 +282,19 @@ function Editor({activeWorkflow, editedWorkflow: editedWorkflowIn}: EditorProps)
 
     batch(() => {
       reg.patch(wf, idx);
-      activeWorkflow.value = wf;
-      editedWorkflow.value = undefined;
+      activeWorkflow$.value = wf;
+      editedWorkflow$.value = undefined;
     });
-  }, [editedWorkflow, activeWorkflow]);
+  }, [editedWorkflow$, activeWorkflow$]);
 
   return (
-    <ProvideEditorCtx value={editorCtx.value}>
-      <WorkflowEditor onSave={onSave}>
-        <Btn kind={'danger'} size={'sm'} onClick={onCancel}>{'Cancel'}</Btn>
-      </WorkflowEditor>
-    </ProvideEditorCtx>
+    <WorkflowContext.Provider value={editedWorkflow$ as Signal<Workflow>}>
+      <ProvideTouched>
+        <WorkflowEditor onSave={onSave}>
+          <Btn kind={'danger'} size={'sm'} onClick={onCancel}>{'Cancel'}</Btn>
+        </WorkflowEditor>
+      </ProvideTouched>
+    </WorkflowContext.Provider>
   );
 }
 

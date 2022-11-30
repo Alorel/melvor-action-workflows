@@ -21,6 +21,7 @@ export const ActionLi = memo<ActionProps>(({action: a}) => {
     </li>
   );
 });
+ActionLi.displayName = 'StepActionLi';
 
 function useActionLiClass(actionId: number): string {
   const enum Strings {

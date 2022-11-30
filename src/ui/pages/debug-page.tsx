@@ -1,9 +1,11 @@
+import {staticComponent} from '@alorel/preact-static-component';
 import {useComputed, useSignal} from '@preact/signals';
 import {pick, startCase, stubFalse} from 'lodash-es';
 import type {Currency, EquipmentItem, Game, Item, Skill} from 'melvor';
 import type {TypedKeys} from 'mod-util/typed-keys';
 import type {VNode} from 'preact';
 import {Fragment} from 'preact';
+import type {FunctionComponent} from 'preact/compat';
 import {memo} from 'preact/compat';
 import {useCallback, useState} from 'preact/hooks';
 import {ACTION_REGISTRY} from '../../lib/registries/action-registry.mjs';
@@ -14,6 +16,7 @@ import RenderMediaEdit from '../../option-types/media-item/render-media-edit';
 import type {MediaItemNodeOption} from '../../public_api';
 import {BlockDiv, BorderedBlock} from '../components/block';
 import Btn from '../components/btn';
+import PageContainer from '../components/page-container';
 import {ProvideNodeValidationCtx} from '../components/workflow-editor/render-node-option/node-option-validation-ctx';
 import autoId from '../util/id-gen.mjs';
 
@@ -21,8 +24,8 @@ export const DEBUG_PAGE_ID = autoId();
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-export default function DebugPage(): VNode {
-  return (
+const DebugPage = staticComponent(() => (
+  <PageContainer id={DEBUG_PAGE_ID}>
     <BlockDiv>
       <div class={'btn-group btn-group-sm'}>
         <LvAllSkills/>
@@ -33,8 +36,11 @@ export default function DebugPage(): VNode {
       </div>
       <ItemLookup/>
     </BlockDiv>
-  );
-}
+  </PageContainer>
+));
+DebugPage.displayName = 'DebugPage';
+
+export default DebugPage;
 
 const ItemLookup = (() => {
   type TItemFmt = Pick<Item, 'category' | 'name' | 'id' | 'media' | 'type'>
@@ -102,7 +108,7 @@ const ItemLookup = (() => {
     );
   };
 
-  return (): VNode => {
+  const out: FunctionComponent = () => {
     const errors = useSignal(EMPTY_ARR);
     const touched = useSignal(false);
     const invalid = useComputed(stubFalse);
@@ -116,6 +122,9 @@ const ItemLookup = (() => {
       </BorderedBlock>
     );
   };
+  out.displayName = 'ItemLookup';
+
+  return out;
 })();
 
 function PrintLog(): VNode {

@@ -19,6 +19,7 @@ export const DefSection = memo<SectionProps>(({config, node}) => (
     {Boolean(node.options?.length) && <DefSectionOptions opts={node.options!} config={config}/>}
   </Fragment>
 ));
+DefSection.displayName = 'DefSection';
 
 interface DefProps extends Pick<SectionProps, 'config'> {
   opts: Required<NodeDefinition>['options'];

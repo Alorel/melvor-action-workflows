@@ -12,6 +12,7 @@ export const BlockDiv: FunctionComponent<BlockProps> = ({class: inClass, childre
     </div>
   </div>
 );
+BlockDiv.displayName = 'Block';
 
 export interface BorderedBlockProps extends Omit<BlockProps, 'size'> {
   kind: string;
@@ -23,3 +24,4 @@ export const BorderedBlock: FunctionComponent<BorderedBlockProps>
   = ({class: inClass, kind, size, ...rest}) => (
     <BlockDiv class={mkClass(`border-top border-${kind}`, inClass, size && `border-${size}x`)} {...rest}/>
   );
+BorderedBlock.displayName = 'BorderedBlock';

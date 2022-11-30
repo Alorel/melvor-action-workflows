@@ -13,17 +13,9 @@ export const allActions = new LazyValue(() => categoriseRegistryObjects(ACTION_R
 export const allTriggerSelectGroups = new LazyValue(() => categoriseRegistryObjects(TRIGGER_REGISTRY));
 
 export function ActionSelect(props: Props<ActionNodeDefinitionImpl<any>>): VNode {
-  return CategorisedNodeSelect<ActionNodeDefinitionImpl<any>>({
-    ...props,
-    registry: ACTION_REGISTRY,
-    values: allActions.value,
-  });
+  return <CategorisedNodeSelect registry={ACTION_REGISTRY} values={allActions.value} {...props}/>;
 }
 
 export function TriggerSelect(props: Props<TriggerDefinitionContext>): VNode {
-  return CategorisedNodeSelect({
-    ...props,
-    registry: TRIGGER_REGISTRY,
-    values: allTriggerSelectGroups.value,
-  });
+  return <CategorisedNodeSelect registry={TRIGGER_REGISTRY} values={allTriggerSelectGroups.value} {...props}/>;
 }

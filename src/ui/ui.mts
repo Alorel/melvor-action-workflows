@@ -12,10 +12,10 @@ interface BaseCat {
   itemID: string;
 }
 
-export const mainIcon = 'https://i.imgur.com/fMgInFq.png';
-
 // Init package
 {
+  const mainIcon = 'https://i.imgur.com/fMgInFq.png';
+
   const cat = <T extends object = {}>(config?: T): T & BaseCat => ({
     categoryID: '',
     itemID: startCase(namespace),

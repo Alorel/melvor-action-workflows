@@ -34,6 +34,7 @@ const ActionConfig = memo<Props>(({action, children, ...rest}) => {
     </BorderedBlock>
   );
 });
+ActionConfig.displayName = 'ActionConfig';
 
 export default ActionConfig;
 
@@ -49,11 +50,12 @@ function OptsTable({action, opts}: OptsTableProps): VNode {
   return (
     <table className={'table table-sm font-size-sm'}>
       <tbody>
-        {opts!.map(option => {
+        {opts.map(option => {
           const show = option.showIf?.(action.opts);
 
           return show !== false && (
-            <RenderNodeOption option={option}
+            <RenderNodeOption
+              option={option}
               key={`${option.localID}@${action.action.id}`}
               otherValues={action.opts}
               value={action.opts[option.localID]}
@@ -67,3 +69,4 @@ function OptsTable({action, opts}: OptsTableProps): VNode {
     </table>
   );
 }
+OptsTable.displayName = 'ActionConfigOptsTable';
