@@ -186,21 +186,16 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
 
     const src$ = defer((): Observable<ActionExecutionEvent> => {
       const result = action.action.def.execute(action.opts);
-      if (result == null) {
-        return of(makeSuccessEvent());
-      }
 
-      return from(result).pipe(
-        last(null, null),
-        map(() => {
-          debugLog('Executed action', actionIdx, 'in workflow', this.workflow.name, 'step', stepIdx);
-
-          return makeSuccessEvent();
-        })
-      );
+      return result == null
+        ? of(makeSuccessEvent())
+        : from(result).pipe(last(null, null), map(makeSuccessEvent));
     });
 
     return src$.pipe(
+      tap(() => {
+        debugLog('Executed action', actionIdx, 'in workflow', this.workflow.name, 'step', stepIdx);
+      }),
       logError(`[Exec action ${step.actions[actionIdx]?.action.id}[${actionIdx}]@${this.workflow.name}[${stepIdx}]]`),
       prependErrorWith(e => of<ActionExecutionEvent>({
         ...makeSuccessEvent(),
