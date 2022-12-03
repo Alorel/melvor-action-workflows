@@ -118,6 +118,11 @@ export default class WorkflowRegistry {
     this._workflows$.next(out);
   }
 
+  public rmByListId(listId: number): void {
+    const idx = this.workflows.findIndex(w => w.listId === listId);
+    this.rmByIdx(idx);
+  }
+
   /** Save the workflows to mod storage */
   public save(): void {
     store(this.workflows);

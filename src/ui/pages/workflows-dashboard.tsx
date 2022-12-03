@@ -63,6 +63,19 @@ export default function WorkflowsDashboard(): VNode {
   );
 }
 
+function useWorkflowRemovalCorrector(
+  workflows: Workflow[],
+  activeWorkflow$: Signal<Workflow | undefined>
+): void {
+  const activeId = activeWorkflow$.value?.listId;
+
+  useEffect(() => {
+    if (activeId !== undefined && !workflows.some(wf => wf.listId === activeId)) {
+      activeWorkflow$.value = undefined;
+    }
+  }, [activeId, workflows]);
+}
+
 interface EditorProps {
   workflows: Workflow[];
 }
@@ -88,6 +101,8 @@ function DashboardShell({workflows}: EditorProps): VNode {
       sub.unsubscribe();
     };
   });
+
+  useWorkflowRemovalCorrector(workflows, activeWorkflow);
 
   return (
     <ProvideActiveStepIdx>
