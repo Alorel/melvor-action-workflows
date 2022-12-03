@@ -8,7 +8,7 @@ import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
 import type {ReadonlyBehaviorSubject} from '../registries/workflow-registry.mjs';
 import {WorkflowStep} from './workflow-step.mjs';
 
-type Init = Partial<Pick<Workflow, 'name' | 'steps'>>;
+type Init = Partial<Pick<Workflow, 'name' | 'rm' | 'steps'>>;
 
 export interface WorkflowJson extends Pick<Workflow, 'name'> {
   steps: CompressedJsonArray<WorkflowStep>;
@@ -33,12 +33,16 @@ export class Workflow {
   @JsonProp()
   public name: string;
 
+  @JsonProp()
+  public rm: boolean;
+
   public readonly steps$: ReadonlyBehaviorSubject<WorkflowStep[]>;
 
   private readonly _steps$: BehaviorSubject<WorkflowStep[]>;
 
-  public constructor({name, steps}: Init = {}) {
+  public constructor({name, rm, steps}: Init = {}) {
     this.name = name ?? '';
+    this.rm = rm ?? false;
     this.steps$ = this._steps$ = new BehaviorSubject<WorkflowStep[]>(steps?.length ? steps : [new WorkflowStep()]);
   }
 

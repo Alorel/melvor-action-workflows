@@ -28,6 +28,7 @@ import type {WorkflowStep} from '../data/workflow-step.mjs';
 import type {Workflow} from '../data/workflow.mjs';
 import AutoIncrement from '../decorators/auto-increment.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
+import WorkflowRegistry from '../registries/workflow-registry.mjs';
 import {debugLog, errorLog} from '../util/log.mjs';
 import prependErrorWith from '../util/rxjs/prepend-error-with.mjs';
 import ShareReplayLike from '../util/share-replay-like-observable.mjs';
@@ -176,7 +177,11 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       }
     }
 
-    this.patchOnInitEventsOnEnd();
+    if (this.workflow.rm) {
+      WorkflowRegistry.inst.rmByListId(this.workflow.listId);
+    } else {
+      this.patchOnInitEventsOnEnd();
+    }
   }
 
   /**
