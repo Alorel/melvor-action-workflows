@@ -5,6 +5,10 @@ import {createReadStream, createWriteStream} from "node:fs";
 import FormData from "form-data";
 import axios from "axios";
 import {baseHeaders, baseUrl, loadToken, onErr, shouldPrompt} from "./common.mjs";
+import * as tmp from 'tmp';
+import {v4 as uuid} from 'uuid';
+
+tmp.setGracefulCleanup();
 
 export default {
   builder: {
@@ -57,11 +61,8 @@ export default {
           })
       );
 
-      const tmp = await import('tmp');
-      tmp.setGracefulCleanup();
-
       const tmpDir = tmp.dirSync({discardDescriptor: true}).name;
-      const modFileLocation = join(tmpDir, `action-workflows-${modVersion}.zip`);
+      const modFileLocation = join(tmpDir, `action-workflows-${modVersion}-${uuid()}.zip`);
 
       await new Promise((resolve, reject) => {
         zip
