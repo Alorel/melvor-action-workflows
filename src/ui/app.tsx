@@ -13,6 +13,7 @@ import {EMPTY_ARR} from '../lib/util.mjs';
 import SidenavIcon from './components/sidenav-icon';
 import {useBorderClassHost, usePrimaryExecutionHost, useRunningHost} from './global-ctx';
 import DebugPage from './pages/debug-page';
+import HelpPage from './pages/help-page';
 import NewWorkflow from './pages/new-workflow';
 import WorkflowsDashboard from './pages/workflows-dashboard';
 
@@ -30,6 +31,7 @@ export default function App<T extends Element>({sidenavIcon}: AppProps<T>): VNod
   return (
     <Fragment>
       <NewWorkflow/>
+      <HelpPage/>
       <ProvideRunning>
         <SidenavIcon container={sidenavIcon}/>
         <ProvidePrimaryExecution>
