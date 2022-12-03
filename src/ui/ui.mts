@@ -3,6 +3,7 @@ import {namespace} from '../manifest.json';
 import type {Obj} from '../public_api';
 import './assets/styles.scss';
 import {DEBUG_PAGE_ID} from './pages/debug-page';
+import {HELP_PAGE_ID} from './pages/help-page';
 import {NEW_WORKFLOW_PAGE_ID} from './pages/new-workflow';
 import {WORKFLOWS_DASHBOARD_ID} from './pages/workflows-dashboard';
 
@@ -22,6 +23,8 @@ interface BaseCat {
     ...config as T,
   });
 
+  const heading = (head: string): string => `[${process.env.MELVOR_MOD_VERSION}] ${head}`;
+
   const pageCommon = {
     canBeDefault: false,
     hasGameGuide: false,
@@ -33,7 +36,7 @@ interface BaseCat {
     {
       ...pageCommon,
       containerID: WORKFLOWS_DASHBOARD_ID,
-      customName: `[${process.env.MELVOR_MOD_VERSION}] Action Workflows Dashboard`,
+      customName: heading('Action Workflows Dashboard'),
       id: 'actionWorkflowsDashboard',
       sidebarSubItems: [
         cat({name: 'Dashboard'}),
@@ -42,10 +45,19 @@ interface BaseCat {
     {
       ...pageCommon,
       containerID: NEW_WORKFLOW_PAGE_ID,
-      customName: `[${process.env.MELVOR_MOD_VERSION}] New Action Workflow`,
+      customName: heading('New Action Workflow'),
       id: 'newActionWorkflow',
       sidebarSubItems: [
         cat({name: 'New Action Workflow'}),
+      ],
+    },
+    {
+      ...pageCommon,
+      containerID: HELP_PAGE_ID,
+      customName: heading('Help'),
+      id: 'actionWorkflowsHelp',
+      sidebarSubItems: [
+        cat({name: 'Help'}),
       ],
     },
   ];
@@ -54,7 +66,7 @@ interface BaseCat {
     pages.push({
       ...pageCommon,
       containerID: DEBUG_PAGE_ID,
-      customName: `v${process.env.MELVOR_MOD_VERSION}`,
+      customName: 'AWDev',
       id: 'actionWorkflowsDebugPage',
       sidebarSubItems: [
         cat({name: 'Action Workflows Dev'}),
