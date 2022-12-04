@@ -17,7 +17,8 @@ setDefaultLogger(errorLog);
 
 let sidenavIconContainer: Signal<HTMLSpanElement | null>;
 
-ctx.onInterfaceAvailable(() => {
+ctx.onInterfaceReady(() => {
+  // Don't start checking triggers for offline time
   for (const {def, id} of TRIGGER_REGISTRY.registeredObjects.values()) {
     try {
       def.init();
@@ -28,10 +29,7 @@ ctx.onInterfaceAvailable(() => {
 
   sidenavIconContainer = signal<HTMLSpanElement | null>(null);
   render(<App sidenavIcon={sidenavIconContainer}/>, document.createElement('div'));
-});
 
-// This cannot happen earlier, unfortunately
-ctx.onInterfaceReady(() => {
   sidebar
     .category('')
     .item('Action Workflows', {
