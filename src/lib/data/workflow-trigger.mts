@@ -1,3 +1,4 @@
+import type {Observable} from 'rxjs';
 import type {NodeOption, Obj} from '../../public_api';
 import {
   allTriggerSelectGroups
@@ -50,6 +51,16 @@ export class WorkflowTrigger extends OptsListItem {
     if (!this.opts) {
       this.resetOpts();
     }
+  }
+
+  /** Shortcut to {@link TriggerDefinitionContext#listen} */
+  public listen(): Observable<void> {
+    return this.trigger.listen(this.opts);
+  }
+
+  /** Shortcut to {@link TriggerNodeDefinition#check} */
+  public check(): boolean {
+    return this.trigger.def.check(this.opts);
   }
 
   /** Shortcut for getting the trigger ID */

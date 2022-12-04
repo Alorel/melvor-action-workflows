@@ -1,4 +1,4 @@
-import type {Subscriber} from 'rxjs';
+import type {ObservableInput, Subscriber} from 'rxjs';
 import type {TriggerDefinitionContext} from '../data/trigger-definition-context.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 
@@ -7,14 +7,14 @@ export const TRIGGER_REGISTRY = new NamespaceRegistry<TriggerDefinitionContext<a
 
 @PersistClassName('TriggerListener')
 export class TriggerListener<T extends object = {}> {
-  private readonly _sub: Subscriber<void>;
+  readonly #sub: Subscriber<void>;
 
   public constructor(
     public readonly ctx: TriggerDefinitionContext<T>,
     public readonly data: T,
     sub: Subscriber<void>
   ) {
-    this._sub = sub;
+    this.#sub = sub;
   }
 
   /** Check if the trigger's condition currently passes */
@@ -22,8 +22,13 @@ export class TriggerListener<T extends object = {}> {
     return this.ctx.def.check(this.data);
   }
 
+  /** Calls the trigger's custom listening function if one is defined */
+  public customListen(): ObservableInput<any> | undefined {
+    return this.ctx.def.listen?.(this.data);
+  }
+
   /** Notify the subscriber about the trigger firing */
   public notify(): void {
-    this._sub.next();
+    this.#sub.next();
   }
 }

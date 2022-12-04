@@ -1,4 +1,5 @@
-import {Observable} from 'rxjs';
+import {logError} from '@aloreljs/rxutils/operators';
+import {from, Observable} from 'rxjs';
 import type {Obj, TriggerDefinitionContext as ITriggerDefinitionContext, TriggerNodeDefinition} from '../../public_api';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {FromJSON} from '../decorators/to-json.mjs';
@@ -38,8 +39,20 @@ export class TriggerDefinitionContext<T extends object = {}>
         listener.notify();
       }
 
+      const listenInput$ = listener.customListen();
+      const sub = listenInput$
+        ? from(listenInput$)
+          .pipe(logError('[TriggerDefinitionCtx.listen]'))
+          .subscribe({
+            complete: () => {
+              listener.notify();
+            },
+          })
+        : undefined;
+
       return () => {
         debugLog(`Stopping trigger listener ${this.id} with`, data);
+        sub?.unsubscribe();
         listeners.delete(listener);
       };
     });

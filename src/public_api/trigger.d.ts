@@ -1,3 +1,4 @@
+import {ObservableInput} from 'rxjs';
 import type {NodeDefinition} from './core';
 
 /** Context of a defined trigger */
@@ -23,5 +24,10 @@ export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefini
   check(data: T): boolean;
 
   /** Called when the mod gets enabled */
-  init(): void;
+  init?(): void;
+
+  /**
+   * Override the default trigger listener logic & make the trigger fire when the returned observable completes
+   */
+  listen?(data: T): ObservableInput<any>;
 }

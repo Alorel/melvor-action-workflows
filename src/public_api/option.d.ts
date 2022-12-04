@@ -6,6 +6,7 @@ export type NodeOption = AltRecipeCostNodeOption
   | NumberNodeOption
   | StringNodeOption
   | MediaItemNodeOption
+  | TriggerRefOption
   | StepRefNodeOption
   | EquipmentSetOption
   | BooleanNodeOption;
@@ -23,6 +24,12 @@ export interface StringNodeOption extends NodeOptionBase {
   enum?: DynamicOption<Obj<string> | undefined>;
 
   type: StringConstructor;
+}
+
+export interface TriggerRefOption extends NodeOptionBase {
+  multi?: boolean;
+
+  type: 'TriggerRef';
 }
 
 /** A checkbox */

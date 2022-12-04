@@ -9,7 +9,6 @@ export const enum InternalCategory {
   START_SKILL = 'Start skill',
   COMBAT = 'Combat',
   CORE = 'Core',
-  COMBINATION = 'Combination',
 }
 
 @PersistClassName('ActionNodeDefinitionImpl')

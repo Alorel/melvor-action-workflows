@@ -245,7 +245,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       workflow: this.workflow,
     };
 
-    const trigger$ = step.trigger.trigger.listen(step.trigger.opts).pipe(take(1));
+    const trigger$ = step.trigger.listen().pipe(take(1));
 
     const exec$: Observable<Out> = scheduled(trigger$, asyncScheduler)
       .pipe(

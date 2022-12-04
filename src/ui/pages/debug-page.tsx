@@ -28,7 +28,7 @@ const DebugPage = staticComponent(function DebugPage() {
   return (
     <PageContainer id={DEBUG_PAGE_ID}>
       <BlockDiv>
-        <div class={'btn-group btn-group-sm'}>
+        <div class={'btn-group btn-group-sm mb-3'}>
           <LvAllSkills/>
           <UnlockSummoning/>
           <PrintLog/>
