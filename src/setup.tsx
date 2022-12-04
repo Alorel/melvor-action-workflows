@@ -21,7 +21,7 @@ ctx.onInterfaceReady(() => {
   // Don't start checking triggers for offline time
   for (const {def, id} of TRIGGER_REGISTRY.registeredObjects.values()) {
     try {
-      def.init();
+      def.init?.();
     } catch (e) {
       errorLog(`Failed to initialise trigger ${id}:`, e);
     }

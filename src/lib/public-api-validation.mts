@@ -42,9 +42,11 @@ export function isTriggerNodeDefinition(v: any): v is TriggerNodeDefinition {
     return false;
   }
 
-  const {check, init} = v as Partial<TriggerNodeDefinition>;
+  const {check, init, listen} = v as Partial<TriggerNodeDefinition>;
 
-  return typeof check === 'function' && typeof init === 'function';
+  return typeof check === 'function'
+    && isUndefinedOr(listen, 'function')
+    && isUndefinedOr(init, 'function');
 }
 
 export function isOptionDefinition(v: any): v is OptionDefinition<unknown, NodeOptionBase> {

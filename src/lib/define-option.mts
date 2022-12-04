@@ -61,11 +61,12 @@ export function defineOption<Val, Interface extends NodeOptionBase>(opt: OptionD
   }
 
   if (!process.env.PRODUCTION) {
+    const tok = typeof opt.token === 'function' ? opt.token.name : opt.token;
     if (!opt.renderView.displayName) {
-      opt.renderView.displayName = `View[${opt.token}]`;
+      opt.renderView.displayName = `View [${tok}]`;
     }
     if (!opt.renderEdit.displayName) {
-      opt.renderEdit.displayName = `Edit[${opt.token}]`;
+      opt.renderEdit.displayName = `Edit [${tok}]`;
     }
   }
 
