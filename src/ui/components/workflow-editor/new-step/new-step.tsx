@@ -20,7 +20,7 @@ interface Props {
   step: WorkflowStep;
 }
 
-const NewStep = memo<Props>(({children, step: stepIn}): VNode => {
+const NewStep = memo<Props>(function NewStep({children, step: stepIn}) {
   const [ProvideStep, step$] = useStepHost(stepIn);
   step$.value = stepIn;
 
@@ -71,7 +71,6 @@ const NewStep = memo<Props>(({children, step: stepIn}): VNode => {
     </div>
   );
 });
-NewStep.displayName = 'NewStep';
 
 export default NewStep;
 
@@ -102,7 +101,6 @@ const ActionMvBtns: FunctionComponent<BtnsProps> = ({i, lastActionIdx, reRender}
     </Fragment>
   );
 };
-ActionMvBtns.displayName = 'ActionMvBtns';
 
 interface MvBtnProps {
   idx: number;
@@ -112,7 +110,7 @@ interface MvBtnProps {
   onClick(e: Event): void;
 }
 
-const ActionMvBtn = memo<MvBtnProps>(({children, idx, onClick, shift}) => {
+const ActionMvBtn = memo<MvBtnProps>(function ActionMvBtn({children, idx, onClick, shift}) {
   const btnRef = useTippy<HTMLButtonElement>(`Move this action ${shift === 1 ? 'forward' : 'back'}`);
 
   return (
@@ -126,7 +124,6 @@ const ActionMvBtn = memo<MvBtnProps>(({children, idx, onClick, shift}) => {
     </Btn>
   );
 });
-ActionMvBtn.displayName = 'ActionMvBtn';
 
 type RmBtnProps = Pick<MvBtnProps, 'idx' | 'onClick'>;
 
@@ -143,7 +140,6 @@ const ActionRmBtn: FunctionComponent<RmBtnProps> = ({idx, onClick}): VNode => {
     </Btn>
   );
 };
-ActionRmBtn.displayName = 'ActionRmBtn';
 
 const useStepMoveCallbacks = (reRender: () => void) => {
   const step$ = useStep();

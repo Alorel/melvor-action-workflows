@@ -11,15 +11,16 @@ interface SectionProps {
   node: NodeDefinition;
 }
 
-export const DefSection = memo<SectionProps>(({config, node}) => (
-  <Fragment>
-    <div class={'text-center font-size-sm font-w600 ActionWorkflowsCore-underdot'}>
-      <RenderNodeMedia label={node.label} media={node.media}/>
-    </div>
-    {Boolean(node.options?.length) && <DefSectionOptions opts={node.options!} config={config}/>}
-  </Fragment>
-));
-DefSection.displayName = 'DefSection';
+export const DefSection = memo<SectionProps>(function DefSection({config, node}) {
+  return (
+    <Fragment>
+      <div class={'text-center font-size-sm font-w600 ActionWorkflowsCore-underdot'}>
+        <RenderNodeMedia label={node.label} media={node.media}/>
+      </div>
+      {Boolean(node.options?.length) && <DefSectionOptions opts={node.options!} config={config}/>}
+    </Fragment>
+  );
+});
 
 interface DefProps extends Pick<SectionProps, 'config'> {
   opts: Required<NodeDefinition>['options'];

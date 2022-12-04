@@ -17,9 +17,10 @@ function useFactory<T>(
   ctx: Context<Signal<T>> | Context<ReadonlySignal<T>>,
   providedSignal: AnySignal<T>
 ): SignalProvider {
-  return useCallback(({children}: Required<Children>): VNode => (
-    <ctx.Provider value={providedSignal}>{children}</ctx.Provider>
-  ), EMPTY_ARR);
+  return useCallback(function ProvideContextFactory({children}: Required<Children>): VNode {
+
+    return <ctx.Provider value={providedSignal}>{children}</ctx.Provider>;
+  }, EMPTY_ARR);
 }
 
 export function signalContext<T>(
@@ -30,7 +31,9 @@ export function signalContext<T>(
   ctx.displayName = name;
 
   return [
-    () => useContext(ctx),
+    function useAppContext(): Signal<T> {
+      return useContext(ctx);
+    },
     initialValue => {
       const sig = useMemo(() => (
         signal<T>(

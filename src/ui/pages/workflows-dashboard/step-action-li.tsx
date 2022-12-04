@@ -12,7 +12,7 @@ interface ActionProps {
   action: ActionConfigItem;
 }
 
-export const ActionLi = memo<ActionProps>(({action: a}) => {
+export const ActionLi = memo<ActionProps>(function ActionLi({action: a}) {
   const liClass = useActionLiClass(a.listId);
 
   return (
@@ -21,7 +21,6 @@ export const ActionLi = memo<ActionProps>(({action: a}) => {
     </li>
   );
 });
-ActionLi.displayName = 'StepActionLi';
 
 function useActionLiClass(actionId: number): string {
   const enum Strings {

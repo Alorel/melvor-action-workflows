@@ -3,7 +3,7 @@ import {useCallback} from 'preact/hooks';
 import {EMPTY_ARR} from '../../../lib/util.mjs';
 import {sidebarItems} from '../../sidebar-mgr.mjs';
 
-export const NoDashboardsDefined = staticComponent(() => {
+export const NoDashboardsDefined = staticComponent(function NoDashboardsDefined() {
   const openWorkflowPage = useCallback((e: Event) => {
     e.preventDefault();
     sidebarItems.value.newWorkflow.click();
@@ -19,4 +19,3 @@ export const NoDashboardsDefined = staticComponent(() => {
     </div>
   );
 });
-NoDashboardsDefined.displayName = 'NoDashboardsDefined';

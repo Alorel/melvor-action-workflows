@@ -125,7 +125,7 @@ function DashboardShell({workflows}: EditorProps): VNode {
   );
 }
 
-const RenderSteps = memo(() => {
+const RenderSteps = memo(function RenderSteps() {
   const reRender = useReRender();
   const activeStepIdx = useActiveStepIdx();
   const running = useRunning();
@@ -206,7 +206,7 @@ interface SelectedWorkflowBtnsProps {
 }
 
 const SelectedWorkflowBtns = memo<SelectedWorkflowBtnsProps>(
-  ({refresh}) => {
+  function SelectedWorkflowBtns({refresh}) {
     const running = useRunning().value;
 
     return running ? <BtnsRunning/> : <BtnsNotRunning refresh={refresh}/>;
@@ -270,7 +270,7 @@ function BtnsNotRunning({refresh}: SelectedWorkflowBtnsProps): VNode {
   );
 }
 
-const BtnsRunning = staticComponent(() => {
+const BtnsRunning = staticComponent(function BtnsRunning() {
   const onClick = useCallback(() => {
     WorkflowRegistry.inst.setPrimaryExecution(); // unset
   }, EMPTY_ARR);

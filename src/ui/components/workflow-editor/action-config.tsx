@@ -14,7 +14,7 @@ interface Props extends Omit<BorderedBlockProps, 'kind' | 'size' | 'action'> {
   action: ActionConfigItem;
 }
 
-const ActionConfig = memo<Props>(({action, children, ...rest}) => {
+const ActionConfig = memo<Props>(function ActionConfig({action, children, ...rest}) {
   const reRender = useReRender();
   const onActionChange = useCallback((newAction: ActionNodeDefinitionImpl<any>) => {
     action.action = newAction;
@@ -34,7 +34,6 @@ const ActionConfig = memo<Props>(({action, children, ...rest}) => {
     </BorderedBlock>
   );
 });
-ActionConfig.displayName = 'ActionConfig';
 
 export default ActionConfig;
 

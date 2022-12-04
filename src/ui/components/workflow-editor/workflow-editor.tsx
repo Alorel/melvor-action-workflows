@@ -19,7 +19,7 @@ import NewStep from './new-step/new-step';
 
 type Props = WorkflowEditorHeaderBlockProps;
 
-const WorkflowEditor = memo<Props>(props => {
+const WorkflowEditor = memo<Props>(function WorkflowEditor(props) {
   const touched = useTouched();
   const workflow$ = useWorkflow();
 
@@ -52,7 +52,6 @@ const WorkflowEditor = memo<Props>(props => {
     </Fragment>
   );
 });
-WorkflowEditor.displayName = 'WorkflowEditor';
 
 export default WorkflowEditor;
 
@@ -81,7 +80,6 @@ const RmStepsBtns: FunctionComponent<RmStepsBtnsProps> =
       </Fragment>
     );
   };
-RmStepsBtns.displayName = 'RmStepsBtns';
 
 function useRmStepsBtnsCallbacks(reRender: () => void): [(e: Event) => void, (e: Event) => void, Signal<Workflow>] {
   const workflow = useWorkflow();
@@ -127,7 +125,7 @@ interface ShiftStepBtnProps {
   onClick(e: Event): void;
 }
 
-const StepShiftBtn = memo<ShiftStepBtnProps>(({children, idx, shift, onClick}) => {
+const StepShiftBtn = memo<ShiftStepBtnProps>(function StepShiftBtn({children, idx, shift, onClick}) {
   const ref = useTippy<HTMLButtonElement>(`Move this step ${shift === 1 ? 'down' : 'up'}`);
 
   return (
@@ -140,4 +138,3 @@ const StepShiftBtn = memo<ShiftStepBtnProps>(({children, idx, shift, onClick}) =
     </Btn>
   );
 });
-StepShiftBtn.displayName = 'StepShiftBtn';
