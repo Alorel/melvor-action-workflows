@@ -42,4 +42,3 @@ export default function NewWorkflow(): VNode<any> {
     </PageContainer>
   );
 }
-NewWorkflow.displayName = 'NewWorkflow';

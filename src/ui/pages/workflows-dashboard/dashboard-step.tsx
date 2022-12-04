@@ -119,12 +119,11 @@ interface MoveBtnProps extends Omit<BtnProps, 'kind' | 'btnRef'> {
   tooltip: string;
 }
 
-const MoveBtn = memo<MoveBtnProps>(({tooltip, ...rest}) => {
+const MoveBtn = memo<MoveBtnProps>(function MoveBtn({tooltip, ...rest}) {
   const btnRef = useTippy<HTMLButtonElement>(tooltip);
 
   return (<Btn kind={'default'} btnRef={btnRef} {...rest}/>);
 });
-MoveBtn.displayName = 'MoveBtn';
 
 function useBorder(stepId: number): string {
   const enum Strings {

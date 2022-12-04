@@ -12,7 +12,7 @@ import useTippy from '../../../hooks/tippy.mjs';
 import Td from '../../td';
 import {ProvideNodeValidationCtx} from './node-option-validation-ctx';
 
-const RenderNodeOption = memo<OptionRenderEditCtx<any, any>>(({option: opt, ...rest}): VNode => {
+const RenderNodeOption = memo<OptionRenderEditCtx<any, any>>(function RenderNodeOption({option: opt, ...rest}) {
   const spec = OPTION_REGISTRY.get(opt.type);
 
   return (
@@ -24,7 +24,6 @@ const RenderNodeOption = memo<OptionRenderEditCtx<any, any>>(({option: opt, ...r
     </tr>
   );
 });
-RenderNodeOption.displayName = 'RenderNodeOption';
 
 export default RenderNodeOption;
 

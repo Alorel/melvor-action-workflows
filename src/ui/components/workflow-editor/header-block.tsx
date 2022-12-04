@@ -13,20 +13,23 @@ export interface WorkflowEditorHeaderBlockProps {
   onSave(e: Event): void;
 }
 
-const WorkflowEditorHeaderBlock = memo<WorkflowEditorHeaderBlockProps>(({children, onSave}) => (
-  <div className={EDITOR_SECTION_CLASS}>
-    <BorderedBlock kind={'agility'} size={2}>
-      <WorkflowNameEditor/>
-      <WorkflowRemovableEditor/>
+const WorkflowEditorHeaderBlock = memo<WorkflowEditorHeaderBlockProps>(
+  function WorkflowEditorHeaderBlock({children, onSave}) {
+    return (
+      <div className={EDITOR_SECTION_CLASS}>
+        <BorderedBlock kind={'agility'} size={2}>
+          <WorkflowNameEditor/>
+          <WorkflowRemovableEditor/>
 
-      <div className={'text-right mt-3'}>
-        {children}
-        <Btn kind={'success'} size={'sm'} onClick={onSave}>{'Save'}</Btn>
+          <div className={'text-right mt-3'}>
+            {children}
+            <Btn kind={'success'} size={'sm'} onClick={onSave}>{'Save'}</Btn>
+          </div>
+        </BorderedBlock>
       </div>
-    </BorderedBlock>
-  </div>
-));
-WorkflowEditorHeaderBlock.displayName = 'WorkflowEditorHeaderBlock';
+    );
+  }
+);
 
 export default WorkflowEditorHeaderBlock;
 

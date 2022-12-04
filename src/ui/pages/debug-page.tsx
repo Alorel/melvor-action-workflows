@@ -24,25 +24,26 @@ export const DEBUG_PAGE_ID = autoId();
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-const DebugPage = staticComponent(() => (
-  <PageContainer id={DEBUG_PAGE_ID}>
-    <BlockDiv>
-      <div class={'btn-group btn-group-sm'}>
-        <LvAllSkills/>
-        <UnlockSummoning/>
-        <PrintLog/>
-        <GetCurrency path={'gp'}/>
-        <GetCurrency path={'slayerCoins'}/>
-      </div>
-      <ItemLookup/>
-    </BlockDiv>
-  </PageContainer>
-));
-DebugPage.displayName = 'DebugPage';
+const DebugPage = staticComponent(function DebugPage() {
+  return (
+    <PageContainer id={DEBUG_PAGE_ID}>
+      <BlockDiv>
+        <div class={'btn-group btn-group-sm'}>
+          <LvAllSkills/>
+          <UnlockSummoning/>
+          <PrintLog/>
+          <GetCurrency path={'gp'}/>
+          <GetCurrency path={'slayerCoins'}/>
+        </div>
+        <ItemLookup/>
+      </BlockDiv>
+    </PageContainer>
+  );
+});
 
 export default DebugPage;
 
-const ItemLookup = (() => {
+const ItemLookup = ((): FunctionComponent => {
   type TItemFmt = Pick<Item, 'category' | 'name' | 'id' | 'media' | 'type'>
     & Partial<Pick<EquipmentItem, 'validSlots' | 'tier'>>;
 
@@ -54,7 +55,7 @@ const ItemLookup = (() => {
   };
 
   const RenderItemFmt = memo<{item: TItemFmt}>(
-    ({item}): VNode => {
+    function RenderItemFmt({item}) {
       const qty = useSignal('');
       const onChange = useCallback((e: Event): void => {
         qty.value = (e.target as HTMLInputElement).value;
@@ -108,7 +109,7 @@ const ItemLookup = (() => {
     );
   };
 
-  const out: FunctionComponent = () => {
+  return function ItemLookup() { // eslint-disable-line @typescript-eslint/no-shadow
     const errors = useSignal(EMPTY_ARR);
     const touched = useSignal(false);
     const invalid = useComputed(stubFalse);
@@ -122,9 +123,6 @@ const ItemLookup = (() => {
       </BorderedBlock>
     );
   };
-  out.displayName = 'ItemLookup';
-
-  return out;
 })();
 
 function PrintLog(): VNode {
