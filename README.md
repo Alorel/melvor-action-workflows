@@ -1,3 +1,1 @@
-Proper README pending.
-
-`public_api.d.ts` is what will eventually get exposed as the public API.
+A [mod](https://mod.io/g/melvoridle/m/action-workflows) for [Melvor](https://melvoridle.com).

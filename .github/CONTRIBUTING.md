@@ -11,7 +11,7 @@ Therefore:
 1. Actions & triggers should likely be coded as a separate mod. This is especially true for triggers which add a tiny bit of performance overhead whether they're used or not.
 1. Anything else should be discussed via an issue before any work is done
 
-One of Action Workflows' big strengths is its modularity - let's try to capitalise on it whenever it makes sense :slightly_smiling_face: 
+One of Action Workflows' big strengths is its modularity - let's try to capitalise on it whenever it makes sense :slightly_smiling_face: besides, no one will like a massive list of actions of triggers when they only need a small handful
 
 # Commit guidelines & review process
 
