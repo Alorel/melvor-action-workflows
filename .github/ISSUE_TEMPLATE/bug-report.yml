@@ -29,8 +29,8 @@ body:
         - A bugged action
         - Mod API bugs
         - Other/Not sure
-      validations:
-        required: true
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:
@@ -62,7 +62,9 @@ body:
     id: TOS
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow the [Code of Conduct](/Alorel/melvor-mod/.github/CODE_OF_CONDUCT.md)
+      description: By submitting this issue, you agree to follow the [code of conduct](/Alorel/melvor-action-workflows/blob/master/.github/CODE_OF_CONDUCT.md)
       options:
-        - label: "I agree"
+        - label: I agree to follow the code of conduct
+          required: true
+        - label: I have searched for similar issues and nothing similar exists
           required: true

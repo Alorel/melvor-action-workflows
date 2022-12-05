@@ -1,14 +1,16 @@
-name: Question
-description: General queries
+name: Other
+description: Anything else
 labels: ["question"]
 body:
   - type: checkboxes
     id: TOS
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow the [Code of Conduct](/Alorel/melvor-mod/.github/CODE_OF_CONDUCT.md)
+      description: By submitting this issue, you agree to follow the [code of conduct](/Alorel/melvor-action-workflows/blob/master/.github/CODE_OF_CONDUCT.md)
       options:
-        - label: I agree with the code of conduct
+        - label: I agree to follow the code of conduct
+          required: true
+        - label: I have searched for similar issues and nothing similar exists
           required: true
         - label: My issue does not match any other template better
           required: true
