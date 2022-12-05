@@ -16,5 +16,5 @@ body:
     id: body
     attributes:
       label: Body
-    validations:
-      required: true
+      validations:
+        required: true

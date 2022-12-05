@@ -17,8 +17,8 @@ body:
         - Android
         - iOS
         - Other
-    validations:
-      required: true
+      validations:
+        required: true
   - type: dropdown
     id: category
     attributes:
@@ -36,8 +36,8 @@ body:
     attributes:
       label: Bug description
       description: A clear and concise description of what the bug is.
-    validations:
-      required: true
+      validations:
+        required: true
   - type: textarea
     id: steps-to-reproduce
     attributes:
@@ -47,8 +47,8 @@ body:
         1. Go to X
         2. Click on Y
         3. See error
-    validations:
-      required: true
+      validations:
+        required: true
   - type: textarea
     id: screenshots
     attributes:

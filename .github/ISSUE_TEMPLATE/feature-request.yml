@@ -12,14 +12,14 @@ body:
         - A new trigger
         - Additions to the mod API
         - Other
-    validations:
-      required: true
+      validations:
+        required: true
   - type: textarea
     id: description
     attributes:
       label: What are you missing?
-    validations:
-      required: true
+      validations:
+        required: true
   - type: checkboxes
     id: TOS
     attributes:
