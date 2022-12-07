@@ -1,6 +1,6 @@
 import type {Skill, SkillWithMastery as TSkillWithMastery} from 'melvor';
-import {InternalCategory} from '../lib/registries/action-registry.mjs';
-import {defineLocalTrigger} from '../lib/util/define-local.mjs';
+import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 
 interface Data<T> {
   level: number;

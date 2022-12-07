@@ -1,13 +1,13 @@
 import {combineLatest, filter, merge, NEVER} from 'rxjs';
 import {take} from 'rxjs/operators';
-import type {TriggerDefinitionContext} from '../lib/data/trigger-definition-context.mjs';
-import {WorkflowTrigger} from '../lib/data/workflow-trigger.mjs';
-import {InternalCategory} from '../lib/registries/action-registry.mjs';
-import {defineLocalTrigger} from '../lib/util/define-local.mjs';
-import LazyValue from '../lib/util/lazy-value.mjs';
+import type {TriggerDefinitionContext} from '../../lib/data/trigger-definition-context.mjs';
+import {WorkflowTrigger} from '../../lib/data/workflow-trigger.mjs';
+import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
+import LazyValue from '../../lib/util/lazy-value.mjs';
 import {
   allTriggerSelectGroups
-} from '../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
+} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
 
 const enum Cond {
   AND = '&&',

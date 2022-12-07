@@ -1,6 +1,6 @@
 import type {Skill as TSkill} from 'melvor';
-import {InternalCategory} from '../lib/registries/action-registry.mjs';
-import {defineLocalTrigger} from '../lib/util/define-local.mjs';
+import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 
 export interface LevelGainedTriggerData {
   level: number;

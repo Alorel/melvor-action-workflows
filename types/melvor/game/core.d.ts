@@ -1,3 +1,5 @@
+import type {Monster} from './combat';
+import {Attack, AttackStyle} from './combat';
 import type {EquipmentItem, Item} from './item';
 import type {
   CombatManager,
@@ -153,6 +155,10 @@ export class Game {
 
   astrology: Astrology;
 
+  attack: Attack;
+
+  attackStyles: NamespaceRegistry<AttackStyle>;
+
   bank: Bank;
 
   combat: CombatManager;
@@ -178,6 +184,8 @@ export class Game {
   items: ItemRegistry;
 
   mining: Mining;
+
+  monsters: NamespaceRegistry<Monster>;
 
   pages: NamespaceRegistry<Page>;
 
