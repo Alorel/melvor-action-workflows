@@ -1,4 +1,4 @@
-import {NamespacedObject} from './core';
+import {BaseSpell, NamespacedObject} from './core';
 import {Skill} from './skilling';
 import type {Character} from './toon';
 
@@ -8,6 +8,10 @@ export enum AttackTypeID {
   magic,
   unset,
   random
+}
+
+export class CombatSpell extends BaseSpell {
+
 }
 
 export class AttackStyle extends NamespacedObject {

@@ -1,4 +1,4 @@
-import {AttackStyle, AttackTypeID} from 'melvor';
+import {AttackStyle, AttackTypeID, CombatSpell, NamespacedObject} from 'melvor';
 import type {EquipmentItem, Item} from './item';
 
 export const enum EquipSlotType {
@@ -45,12 +45,29 @@ export class EquipmentSet {
 
 export type EquipItemArgSlot = EquipSlotType | 'Default';
 
+export class SpellSelection {
+  ancient?: CombatSpell;
+
+  aurora?: CombatSpell;
+
+  curse?: CombatSpell;
+
+  standard: CombatSpell;
+}
+
+export class ActivePrayer extends NamespacedObject {
+}
+
 export class Player extends Character {
+  activePrayers: Set<ActivePrayer>;
+
   attackType: AttackTypeID;
 
   equipToSet: number;
 
   equipmentSets: EquipmentSet[];
+
+  spellSelection: SpellSelection;
 
   get equipment(): Equipment;
 
@@ -75,6 +92,18 @@ export class Player extends Character {
   isEquipmentSlotUnlocked(slot: EquipSlotType | undefined): boolean;
 
   setAttackStyle(attackType: AttackTypeID, attackStyle: AttackStyle): void;
+
+  toggleAncient(curse: CombatSpell, render?: boolean): void;
+
+  toggleArchaic(curse: CombatSpell, render?: boolean): void;
+
+  toggleAurora(curse: CombatSpell, render?: boolean): void;
+
+  toggleCurse(curse: CombatSpell, render?: boolean): void;
+
+  togglePrayer(prayer: ActivePrayer, render?: boolean): void;
+
+  toggleSpell(curse: CombatSpell, render?: boolean): void;
 }
 
 export class Character extends NamespacedObject {

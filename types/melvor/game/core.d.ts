@@ -1,3 +1,4 @@
+import {ActivePrayer} from 'melvor';
 import type {Monster} from './combat';
 import {Attack, AttackStyle} from './combat';
 import type {EquipmentItem, Item} from './item';
@@ -190,6 +191,10 @@ export class Game {
   pages: NamespaceRegistry<Page>;
 
   potions: PotionManager;
+
+  prayer: Skill;
+
+  prayers: NamespaceRegistry<ActivePrayer>;
 
   registeredNamespaces: NamespaceMap;
 
