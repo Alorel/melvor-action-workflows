@@ -68,6 +68,7 @@ const RenderEditMulti = memo(function <T extends MediaSelectable> ({ // eslint-d
 
   const lastIdx = valNormalised.length - 1;
   const maxLength = (option.multi.maxLength ?? Number.MAX_VALUE) - 1;
+  const showRm = !option.required || valNormalised.length > 1;
 
   return (
     <div class={'ActionWorkflowsCore-d-inline-tbl'}>
@@ -75,7 +76,7 @@ const RenderEditMulti = memo(function <T extends MediaSelectable> ({ // eslint-d
         <div key={idx}>
           <div>
             <div class={'btn-group btn-group-sm'} role={'group'}>
-              {valNormalised.length > 1 && <Btn kind={'danger'} data-idx={idx} onClick={rmAt}><BinSvg/></Btn>}
+              {showRm && <Btn kind={'danger'} data-idx={idx} onClick={rmAt}><BinSvg/></Btn>}
               {idx === lastIdx && idx < maxLength && <Btn kind={'success'} onClick={add}>{'+'}</Btn>}
             </div>
           </div>
