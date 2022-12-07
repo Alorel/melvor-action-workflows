@@ -1,4 +1,5 @@
 import '../option-types/option-types.mjs';
+import './combat/set-attack-style-action.mjs';
 import './core/buy-item-action.mjs';
 import './core/equip-item-action.mjs';
 import './core/sell-item-action.mjs';
