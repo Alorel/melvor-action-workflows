@@ -48,6 +48,8 @@ export type EquipItemArgSlot = EquipSlotType | 'Default';
 export class SpellSelection {
   ancient?: CombatSpell;
 
+  archaic?: CombatSpell;
+
   aurora?: CombatSpell;
 
   curse?: CombatSpell;

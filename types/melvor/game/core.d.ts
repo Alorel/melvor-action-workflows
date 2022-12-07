@@ -1,4 +1,4 @@
-import {ActivePrayer} from 'melvor';
+import {ActivePrayer, CombatSpell} from 'melvor';
 import type {Monster} from './combat';
 import {Attack, AttackStyle} from './combat';
 import type {EquipmentItem, Item} from './item';
@@ -154,11 +154,17 @@ export class Game {
 
   altMagic: AltMagic;
 
+  ancientSpells: NamespaceRegistry<CombatSpell>;
+
+  archaicSpells: NamespaceRegistry<CombatSpell>;
+
   astrology: Astrology;
 
   attack: Attack;
 
   attackStyles: NamespaceRegistry<AttackStyle>;
+
+  auroraSpells: NamespaceRegistry<CombatSpell>;
 
   bank: Bank;
 
@@ -169,6 +175,8 @@ export class Game {
   crafting: Crafting;
 
   readonly currentGamemode: Gamemode;
+
+  curseSpells: NamespaceRegistry<CombatSpell>;
 
   emptyEquipmentItem: EquipmentItem;
 
@@ -207,6 +215,8 @@ export class Game {
   slayerCoins: SlayerCoins;
 
   smithing: Smithing;
+
+  standardSpells: NamespaceRegistry<CombatSpell>;
 
   summoning: Summoning;
 
