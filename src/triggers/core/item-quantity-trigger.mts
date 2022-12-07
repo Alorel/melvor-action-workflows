@@ -1,6 +1,6 @@
 import type {Item as TItem} from 'melvor';
-import {InternalCategory} from '../lib/registries/action-registry.mjs';
-import {defineLocalTrigger} from '../lib/util/define-local.mjs';
+import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 
 const enum Comparator {
   GTE = '>=',
@@ -35,7 +35,7 @@ const triggerCtx = defineLocalTrigger<ItemQuantityTriggerData>({
   initOptions: () => ({comparator: Comparator.GTE}),
   label: 'Item Quantity',
   localID: 'itemQty',
-  media: game.pages.getObject('melvorD', 'Bank')!.media,
+  media: game.pages.getObjectByID('melvorD:Bank')!.media,
   options: [
     {
       label: 'Item',

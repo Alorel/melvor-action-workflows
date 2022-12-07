@@ -1,12 +1,17 @@
+import {Enemy} from 'melvor/game/combat';
 import type {NamespaceRegistry} from './core';
 import type {Item, PotionItem} from './item';
 import type {Skill} from './skilling';
-import type {Enemy, Player} from './toon';
+import type {Player} from './toon';
 
 export class CombatManager {
+  isActive: boolean;
+
   enemy: Enemy;
 
   player: Player;
+
+  spawnEnemy(): void;
 }
 
 export interface PotionUse {

@@ -1,3 +1,4 @@
+import {AttackStyle, AttackTypeID} from 'melvor';
 import type {EquipmentItem, Item} from './item';
 
 export const enum EquipSlotType {
@@ -45,6 +46,8 @@ export class EquipmentSet {
 export type EquipItemArgSlot = EquipSlotType | 'Default';
 
 export class Player extends Character {
+  attackType: AttackTypeID;
+
   equipToSet: number;
 
   equipmentSets: EquipmentSet[];
@@ -70,11 +73,9 @@ export class Player extends Character {
   equipItem(item: EquipmentItem, set: number, slot?: EquipItemArgSlot, quantity?: number): void;
 
   isEquipmentSlotUnlocked(slot: EquipSlotType | undefined): boolean;
+
+  setAttackStyle(attackType: AttackTypeID, attackStyle: AttackStyle): void;
 }
 
-export class Enemy extends Character {
-
-}
-
-export class Character {
+export class Character extends NamespacedObject {
 }
