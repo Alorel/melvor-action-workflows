@@ -1,4 +1,5 @@
 import type {Item} from 'melvor';
+import {ComponentType} from 'preact';
 import type {DynamicOption} from '../lib/util/dynamic-option.mjs';
 import type {NodeOptionBase, Obj} from './core';
 
@@ -74,6 +75,15 @@ export interface MediaItemNodeOptionMultiConfig {
 
 /** Select from pretty much any in-game registry */
 export interface MediaItemNodeOption extends NodeOptionBase {
+  /**
+   * Whether the icon should be shown or not
+   * @default true
+   */
+  icon?: boolean;
+
+  /** Custom component for rendering items in select mode when `icon` is `false` */
+  itemRender?: ComponentType<{item: any;}>;
+
   /**
    * Select one (`false`) or multiple (`true`/`object`) values?
    * @default false

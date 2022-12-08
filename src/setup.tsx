@@ -17,6 +17,11 @@ setDefaultLogger(errorLog);
 
 let sidenavIconContainer: Signal<HTMLSpanElement | null>;
 
+ctx.onCharacterLoaded(() => {
+  sidenavIconContainer = signal<HTMLSpanElement | null>(null);
+  render(<App sidenavIcon={sidenavIconContainer}/>, document.createElement('div'));
+});
+
 ctx.onInterfaceReady(() => {
   // Don't start checking triggers for offline time
   for (const {def, id} of TRIGGER_REGISTRY.registeredObjects.values()) {
@@ -26,9 +31,6 @@ ctx.onInterfaceReady(() => {
       errorLog(`Failed to initialise trigger ${id}:`, e);
     }
   }
-
-  sidenavIconContainer = signal<HTMLSpanElement | null>(null);
-  render(<App sidenavIcon={sidenavIconContainer}/>, document.createElement('div'));
 
   sidebar
     .category('')

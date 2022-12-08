@@ -1,7 +1,7 @@
 import type {ReadonlySignal} from '@preact/signals';
 import {useComputed, useSignal} from '@preact/signals';
-import type {VNode} from 'preact';
-import type {FunctionComponent} from 'preact/compat';
+import type {ComponentType, VNode} from 'preact';
+import {Fragment} from 'preact';
 import {memo} from 'preact/compat';
 import type {Ref} from 'preact/hooks';
 import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
@@ -12,12 +12,15 @@ import Btn from '../../ui/components/btn';
 import useTippy from '../../ui/hooks/tippy.mjs';
 import {useRenderEditTouch} from '../_common.mjs';
 
-interface Props<T> extends Pick<OptionRenderEditCtx<T, MediaItemNodeOption>, 'onChange' | 'value'> {
+interface Props<T> extends
+  Pick<OptionRenderEditCtx<T, MediaItemNodeOption>, 'onChange' | 'value'>,
+  Pick<MediaItemNodeOption, 'itemRender' | 'icon'> {
+
   filterFn(filterText: string): T[];
 }
 
 const RenderMediaItemOptionOneBase = memo(
-  function <T extends MediaSelectable> ({filterFn, value, onChange}: Props<T>): VNode {
+  function <T extends MediaSelectable> ({filterFn, icon, value, onChange, itemRender}: Props<T>): VNode {
     const [focus, setFocus] = useState(false);
     const changeAndFocus = useCallback((val?: T): void => {
       setFocus(true);
@@ -25,33 +28,40 @@ const RenderMediaItemOptionOneBase = memo(
     }, [onChange]);
 
     return value
-      ? (<RenderBtn onChange={changeAndFocus} value={value}/>)
-      : (<RenderFilter focus={focus} onChange={changeAndFocus} filterFn={filterFn}/>);
+      ? (<RenderBtn icon={icon} onChange={changeAndFocus} value={value}/>)
+      : (
+        <RenderFilter
+          itemRender={itemRender}
+          icon={icon}
+          focus={focus}
+          onChange={changeAndFocus}
+          filterFn={filterFn}/>
+      );
   }
 );
 
 export default RenderMediaItemOptionOneBase;
 
-type BtnProps<T> = Required<Pick<Props<T>, 'value' | 'onChange'>>;
+type BtnProps<T> = Required<Pick<Props<T>, 'value' | 'onChange'>> & Pick<Props<T>, 'icon'>;
 
-function RenderBtn<T extends MediaSelectable>({value, onChange}: BtnProps<T>): VNode {
+function RenderBtn<T extends MediaSelectable>({icon = true, value, onChange}: BtnProps<T>): VNode {
   const unselect = useCallback(() => {
     onChange(undefined);
   }, [onChange]);
 
   return (
     <Btn kind={'primary'} size={'sm'} onClick={unselect}>
-      <img class={'ActionWorkflowsCore-font-sized mr-1'} src={value.media}/>
+      {icon && <img class={'ActionWorkflowsCore-font-sized mr-1'} src={value.media}/>}
       <span>{value.name}</span>
     </Btn>
   );
 }
 
-interface InnerProps<T> extends Pick<Props<T>, 'filterFn' | 'onChange'> {
+interface InnerProps<T> extends Pick<Props<T>, 'filterFn' | 'onChange' | 'itemRender' | 'icon'> {
   focus: boolean;
 }
 
-function RenderFilter<T extends MediaSelectable>({focus, filterFn, onChange}: InnerProps<T>) {
+function RenderFilter<T extends MediaSelectable>({focus, filterFn, icon, itemRender, onChange}: InnerProps<T>) {
   const filterText = useSignal('');
   const results = useComputed((): T[] => {
     const txt = filterText.value;
@@ -88,29 +98,55 @@ function RenderFilter<T extends MediaSelectable>({focus, filterFn, onChange}: In
 
   return (
     <div>
-      <input class={'form-control form-control-sm'}
+      <input
+        class={'form-control form-control-sm'}
         ref={inputRef}
         onKeyUp={onKeyup}
         onInput={onInp}
         onBlur={onBlur}
         placeholder={'Search by name…'}/>
-      <ItemsRender results={results} onItemClick={onItemClick}/>
+      <ItemsRender icon={icon} itemRender={itemRender} results={results} onItemClick={onItemClick}/>
     </div>
   );
 }
 
 interface ItemsRenderProps<T> {
+
+  /** @default true */
+  icon?: boolean;
+
+  itemRender?: ComponentType<{item: T;}>
+
   results: ReadonlySignal<T[]>;
   onItemClick(e: Event): void;
 }
-const ItemsRender = memo(function <T extends MediaSelectable> ({onItemClick, results}: ItemsRenderProps<T>): VNode {
-  return (
-    <div onClick={onItemClick}>
-      {results.value.map(itemMapper)}
-    </div>
-  );
-});
-(ItemsRender as FunctionComponent).displayName = 'ItemsRender';
+function DefaultItemRender<T extends MediaSelectable>({item}: {item: T}): VNode {
+  return <Fragment>{item.name}</Fragment>;
+}
+const ItemsRender = memo(
+  function <T extends MediaSelectable> ({
+    icon = true,
+    itemRender: ItemRender = DefaultItemRender,
+    onItemClick,
+    results,
+  }: ItemsRenderProps<T>): VNode {
+    const classKey = icon ? '' : 'p-1 pl-2 pr-2 list-group-item list-group-item-dark list-group-item-action';
+
+    return (
+      <div onClick={onItemClick} class={icon ? '' : 'list-group ActionWorkflowsCore-list-mh'}>
+        {results.value.map((item, idx) => (
+          <a key={item.id} role={'button'} data-idx={idx} class={classKey}>
+            {
+              icon
+                ? <ItemImg item={item}/>
+                : <ItemRender item={item}/>
+            }
+          </a>
+        ))}
+      </div>
+    );
+  }
+);
 
 /** Focus an element this ref gets attached to on init if `focus` is true */
 function useFocus<T extends HTMLElement>(focus: boolean): Ref<T> {
@@ -122,14 +158,6 @@ function useFocus<T extends HTMLElement>(focus: boolean): Ref<T> {
   }, []);
 
   return ref;
-}
-
-function itemMapper<T extends MediaSelectable>(item: T, idx: number): VNode {
-  return (
-    <a key={item.id} role={'button'} data-idx={idx}>
-      <ItemImg item={item}/>
-    </a>
-  );
 }
 
 function ItemImg<T extends MediaSelectable>({item: {media, name}}: {item: T}): VNode {

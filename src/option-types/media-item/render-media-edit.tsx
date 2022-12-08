@@ -104,7 +104,7 @@ interface EditOneProps<T> extends OptionRenderEditCtx<T, MediaItemNodeOption> {
 
 const RenderEditOne = memo(function <T extends MediaSelectable> ({
   onChange,
-  option: {mediaFilter, registry},
+  option: {itemRender, icon, mediaFilter, registry},
   otherValues,
   value,
 }: EditOneProps<T>) {
@@ -118,7 +118,10 @@ const RenderEditOne = memo(function <T extends MediaSelectable> ({
   })]), [otherValues, reg, mediaFilter]);
 
   return (
-    <RenderMediaItemOptionOneBase value={value}
+    <RenderMediaItemOptionOneBase
+      itemRender={itemRender}
+      icon={icon}
+      value={value}
       filterFn={filterFn}
       onChange={onChange}/>
   );

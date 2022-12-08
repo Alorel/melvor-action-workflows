@@ -70,10 +70,11 @@ defineOption<MediaOptionValue, MediaItemNodeOption>({
 });
 
 export default function isMediaItemOption(v: NodeOptionBase & Obj<any>): v is MediaItemNodeOption {
-  const {type, mediaFilter, registry, multi} = v as Partial<MediaItemNodeOption>;
+  const {type, itemRender, mediaFilter, registry, multi} = v as Partial<MediaItemNodeOption>;
 
   return type === 'MediaItem'
     && isUndefinedOr(mediaFilter, 'function')
+    && isUndefinedOr(itemRender, 'function')
     && (
       typeof registry === 'function'
       || (

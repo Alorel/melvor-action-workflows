@@ -3,7 +3,7 @@ import {h} from 'preact';
 import {useCallback} from 'preact/hooks';
 import type {OptionRenderViewCtx} from '../lib/define-option.mjs';
 import {defineOption} from '../lib/define-option.mjs';
-import {EMPTY_ARR} from '../lib/util.mjs';
+import {EMPTY_ARR, EMPTY_OBJ} from '../lib/util.mjs';
 import type {AltRecipeCostNodeOption, MediaSelectable, Obj} from '../public_api';
 import type {MediaOptionValue} from './media-item-option.mjs';
 import RenderMediaItemOptionOneBase from './media-item/media-edit-base';
@@ -64,7 +64,10 @@ defineOption<number, AltRecipeCostNodeOption>({
       return null;
     }
 
-    const ctx: Partial<OptionRenderViewCtx<Item, any>> = {value: altCostItem};
+    const ctx: Partial<OptionRenderViewCtx<Item, any>> = {
+      option: EMPTY_OBJ,
+      value: altCostItem,
+    };
 
     return h(RenderMediaSelectView, ctx as OptionRenderViewCtx<Item, any>);
   },

@@ -1,4 +1,4 @@
-import {ActivePrayer, CombatSpell} from 'melvor';
+import {ActivePrayer, CombatSpell, SpecialAttack} from 'melvor';
 import type {Monster} from './combat';
 import {Attack, AttackStyle} from './combat';
 import type {EquipmentItem, Item} from './item';
@@ -215,6 +215,8 @@ export class Game {
   slayerCoins: SlayerCoins;
 
   smithing: Smithing;
+
+  specialAttacks: NamespaceRegistry<SpecialAttack>;
 
   standardSpells: NamespaceRegistry<CombatSpell>;
 
