@@ -1,6 +1,11 @@
 $colour-err: #e56767;
 
 .ActionWorkflowsCore- {
+  &list-mh {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
   &font-sized {
     width: 1rem;
     height: 1rem;

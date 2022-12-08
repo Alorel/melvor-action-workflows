@@ -15,12 +15,12 @@ export class CombatSpell extends BaseSpell {
 }
 
 export class AttackStyle extends NamespacedObject {
+  attackType: AttackTypeID;
+
   experienceGain: Array<{
     ratio: number;
     skill: Skill;
   }>;
-
-  attackType: AttackTypeID;
 }
 
 export class Attack extends CombatSkill {
@@ -41,6 +41,10 @@ export class Enemy extends Character {
   curse?: any;
 
   monster: Monster;
+
+  nextAttack: SpecialAttack;
+
+  queueNextAction(noSpec?: boolean, tickOffset?: boolean): void;
 }
 
 export interface Enemy extends MobLikePartial {
@@ -74,7 +78,7 @@ export interface Monster extends MobLikePartial {
 }
 
 export class SpecialAttack extends NamespacedObject {
-
+  get description(): string;
 }
 
 export class CombatPassive extends NamespacedObject {

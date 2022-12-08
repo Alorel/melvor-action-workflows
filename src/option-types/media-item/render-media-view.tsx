@@ -9,7 +9,7 @@ import type {MediaOptionValue} from '../media-item-option.mjs';
 type PartialMedia = Pick<MediaSelectable, 'name' | 'media'>;
 
 const RenderMediaSelectView: OptionDefinition<MediaOptionValue, MediaItemNodeOption>['renderView']
-  = ({value}) => {
+  = ({value, option: {icon = true}}) => {
     if (Array.isArray(value)) {
       const items: RenderNodeMediaProps[] = [];
       for (const v of value) {
@@ -20,9 +20,11 @@ const RenderMediaSelectView: OptionDefinition<MediaOptionValue, MediaItemNodeOpt
         }
       }
 
-      return (<RenderViewMulti items={items}/>);
-    } else if (isPartialMediaSelectable(value)) {
-      return (<RenderNodeMedia media={value.media} label={value.name}/>);
+      return (<RenderViewMulti icon={icon} items={items}/>);
+    } else if (icon && isPartialMediaSelectable(value)) {
+      return <RenderNodeMedia media={value.media} label={value.name}/>;
+    } else if (value?.name) {
+      return <span>{value.name}</span>;
     }
 
     return null;
@@ -34,11 +36,16 @@ function isPartialMediaSelectable(v: any): v is PartialMedia {
   return typeof v?.name === 'string' && typeof v.media === 'string';
 }
 
-const RenderViewMulti = ({items}: {items: RenderNodeMediaProps[]}): VNode => (
+interface MultiProps {
+  icon: boolean;
+
+  items: RenderNodeMediaProps[];
+}
+const RenderViewMulti = ({items, icon}: MultiProps): VNode => (
   <Fragment>
     {items.map(item => (
       <div key={`${item.media}:${item.label}`}>
-        <RenderNodeMedia media={item.media} label={item.label}/>
+        {icon ? <RenderNodeMedia media={item.media} label={item.label}/> : item.label}
       </div>
     ))}
   </Fragment>
