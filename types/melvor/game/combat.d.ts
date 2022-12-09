@@ -31,7 +31,7 @@ export class CombatSkill extends Skill {
 }
 
 export class Enemy extends Character {
-  attackType: AttackTypeID;
+  attackType: Exclude<keyof typeof AttackTypeID, 'random' | 'unset'>;
 
   availableAttacks: Array<{
     attack: SpecialAttack;
