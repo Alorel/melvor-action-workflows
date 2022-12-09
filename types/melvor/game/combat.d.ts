@@ -30,6 +30,19 @@ export class CombatSkill extends Skill {
 
 }
 
+export class CombatArea extends NamespacedObject {
+  monsters: Monster[];
+  get media(): string;
+}
+
+export class SlayerArea extends CombatArea {
+
+}
+
+export class Dungeon extends CombatArea {
+
+}
+
 export class Enemy extends Character {
   attackType: Exclude<keyof typeof AttackTypeID, 'random' | 'unset'>;
 

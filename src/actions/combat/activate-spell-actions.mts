@@ -50,8 +50,6 @@ const mkAction = ({media, registry, ...init}: Init) => {
   return out;
 };
 
-/* eslint-disable no-new */
-
 mkAction({
   label: 'Cast Standard spell',
   localID: 'castStdSpell',
