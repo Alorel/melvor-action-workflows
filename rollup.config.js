@@ -102,9 +102,11 @@ function mkIifeWrap() {
     vars: [
       'AltMagicConsumptionID',
       'Array',
+      'AttackTypeID',
       'Bank',
       'Boolean',
       'cdnMedia',
+      'CombatManager',
       'console',
       'document',
       'Error',

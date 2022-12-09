@@ -1,15 +1,21 @@
-import {Enemy} from 'melvor/game/combat';
+import {CombatArea, Dungeon, Enemy, Monster} from 'melvor/game/combat';
 import type {NamespaceRegistry} from './core';
 import type {Item, PotionItem} from './item';
 import type {Skill} from './skilling';
 import type {Player} from './toon';
 
 export class CombatManager {
-  isActive: boolean;
 
   enemy: Enemy;
 
+  isActive: boolean;
+
   player: Player;
+
+  get media(): string;
+
+  selectMonster(monster: Monster, area: CombatArea): void;
+  selectDungeon(dungeon: Dungeon): void;
 
   spawnEnemy(): void;
 }
@@ -54,8 +60,6 @@ export interface Requirement {
   [k: string]: any;
 }
 
-
-
 export class Page extends NamespacedObject {
   canBeDefault: boolean;
 
@@ -67,7 +71,6 @@ export class Page extends NamespacedObject {
 
   get media(): string;
 }
-
 
 export class ShopPurchase extends NamespacedObject {
   public allowQuantityPurchase: boolean;

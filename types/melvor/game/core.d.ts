@@ -1,4 +1,4 @@
-import {ActivePrayer, CombatSpell, SpecialAttack} from 'melvor';
+import {ActivePrayer, CombatArea, CombatSpell, Dungeon, SlayerArea, SpecialAttack} from 'melvor';
 import type {Monster} from './combat';
 import {Attack, AttackStyle} from './combat';
 import type {EquipmentItem, Item} from './item';
@@ -148,6 +148,7 @@ export interface Namespace {
 }
 
 export class Game {
+
   activeAction?: Skill;
 
   agility: Agility;
@@ -170,6 +171,8 @@ export class Game {
 
   combat: CombatManager;
 
+  combatAreas: NamespaceRegistry<CombatArea>;
+
   cooking: Cooking;
 
   crafting: Crafting;
@@ -177,6 +180,8 @@ export class Game {
   readonly currentGamemode: Gamemode;
 
   curseSpells: NamespaceRegistry<CombatSpell>;
+
+  dungeons: NamespaceRegistry<Dungeon>;
 
   emptyEquipmentItem: EquipmentItem;
 
@@ -211,6 +216,10 @@ export class Game {
   shop: Shop;
 
   skills: NamespaceRegistry<Skill>;
+
+  slayer: Skill;
+
+  slayerAreas: NamespaceRegistry<SlayerArea>;
 
   slayerCoins: SlayerCoins;
 
