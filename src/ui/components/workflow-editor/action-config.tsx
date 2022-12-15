@@ -61,6 +61,9 @@ function OptsTable({action, opts}: OptsTableProps): VNode {
                 value={action.opts[option.localID]}
                 onChange={value => {
                   action.opts = {...action.opts, [option.localID]: value};
+                  option.resets?.forEach(prop => {
+                    delete action.opts[prop];
+                  });
                   reRender();
                 }}/>
             );
