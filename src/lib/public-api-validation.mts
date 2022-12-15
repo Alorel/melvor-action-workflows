@@ -43,9 +43,10 @@ export function isTriggerNodeDefinition(v: any): v is TriggerNodeDefinition {
     return false;
   }
 
-  const {check, init, listen} = v as Partial<TriggerNodeDefinition>;
+  const {canBeDefault, check, init, listen} = v as Partial<TriggerNodeDefinition>;
 
   return typeof check === 'function'
+    && isUndefinedOr(canBeDefault, 'boolean')
     && isUndefinedOr(listen, 'function')
     && isUndefinedOr(init, 'function');
 }
