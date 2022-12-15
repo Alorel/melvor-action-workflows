@@ -21,5 +21,5 @@ export default function Btn({btnRef, kind, size, ...rest}: Props): VNode {
     clazz += ` btn-${size}`;
   }
 
-  return <button type={'button'} className={clazz} ref={btnRef} {...rest}></button>;
+  return <button type={'button'} class={clazz} ref={btnRef} {...rest}></button>;
 }

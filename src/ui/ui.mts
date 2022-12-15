@@ -4,6 +4,7 @@ import type {Obj} from '../public_api';
 import './assets/styles.scss';
 import {DEBUG_PAGE_ID} from './pages/debug-page';
 import {HELP_PAGE_ID} from './pages/help-page';
+import {IMPORT_PAGE_ID} from './pages/import-export-page';
 import {NEW_WORKFLOW_PAGE_ID} from './pages/new-workflow';
 import {WORKFLOWS_DASHBOARD_ID} from './pages/workflows-dashboard';
 
@@ -49,6 +50,15 @@ interface BaseCat {
       id: 'newActionWorkflow',
       sidebarSubItems: [
         cat({name: 'New Action Workflow'}),
+      ],
+    },
+    {
+      ...pageCommon,
+      containerID: IMPORT_PAGE_ID,
+      customName: heading('Import/export'),
+      id: 'importExportWorkflows',
+      sidebarSubItems: [
+        cat({name: 'Import/export'}),
       ],
     },
     {

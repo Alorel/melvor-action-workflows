@@ -10,6 +10,7 @@ import {Workflow} from '../../lib/data/workflow.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
 import {EMPTY_ARR} from '../../lib/util.mjs';
 import {alertConfirm} from '../../lib/util/alert';
+import {showExportModal} from '../../lib/util/export-modal.mjs';
 import swapElements from '../../lib/util/swap-elements.mjs';
 import {BorderedBlock} from '../components/block';
 import Btn from '../components/btn';
@@ -260,11 +261,17 @@ function BtnsNotRunning({refresh}: SelectedWorkflowBtnsProps): VNode {
     activeWorkflow.value = cloned;
   }, [activeWorkflow]);
 
+  const doExport = useCallback(() => {
+    const wf = activeWorkflow.peek()!;
+    showExportModal(`Export ${wf.name}`, wf);
+  }, [activeWorkflow]);
+
   return (
     <div class={'btn-group btn-group-sm'}>
       <Btn kind={'success'} onClick={run}>{'Run'}</Btn>
       <Btn kind={'primary'} onClick={startEditing}>{'Edit'}</Btn>
       <Btn kind={'primary'} onClick={clone}>{'Copy'}</Btn>
+      <Btn kind={'info'} onClick={doExport}>{'Export'}</Btn>
       <Btn kind={'danger'} onClick={del}>{'Delete'}</Btn>
     </div>
   );

@@ -92,8 +92,10 @@ export default class WorkflowRegistry {
   }
 
   /** Add a new workflow to the list */
-  public add(workflow: Workflow): void {
-    this.setWorkflows([...this.workflows, workflow]);
+  public add(first: Workflow, ...rest: Workflow[]): void;
+
+  public add(...workflow: Workflow[]): void {
+    this.setWorkflows([...this.workflows, ...workflow]);
   }
 
   /** Overwrite the workflow at the given index */
