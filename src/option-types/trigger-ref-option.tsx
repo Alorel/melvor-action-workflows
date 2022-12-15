@@ -10,7 +10,6 @@ import Btn from '../ui/components/btn';
 import {BinSvg} from '../ui/components/svg';
 import type {TriggerConfigValue} from '../ui/components/trigger-config';
 import TriggerConfig from '../ui/components/trigger-config';
-import useReRender from '../ui/hooks/re-render';
 import {RenderNodeMedia} from '../ui/pages/workflows-dashboard/render-node-media';
 import getEvtTarget from '../ui/util/get-evt-target.mjs';
 import {isTriggerRefOption} from './trigger-ref/is-trigger-ref-option.mjs';
@@ -107,8 +106,6 @@ interface EditOneProps extends ViewOneProps {
 }
 
 function EditOne({trigger, onChange}: EditOneProps): VNode | null {
-  const reRender = useReRender();
-
   const value = useMemo((): TriggerConfigValue => ({
     opts: trigger?.opts ?? {},
     trigger: trigger?.trigger,
@@ -119,7 +116,6 @@ function EditOne({trigger, onChange}: EditOneProps): VNode | null {
       trigger.trigger = newVal.trigger!;
       trigger.opts = newVal.opts;
       onChange(trigger);
-      reRender();
     } else {
       onChange(new WorkflowTrigger(newVal));
     }

@@ -16,6 +16,13 @@ export default interface Api {
 
 /** Common node option */
 export interface NodeOptionBase extends Omit<Referenceable, 'namespace'> {
+  /**
+   * Some options, such as and/or triggers, can cause infinite recursion in the UI if they're selected as the
+   * default/initial
+   * @default true
+   */
+  canBeDefault?: boolean;
+
   /** Info tooltip */
   description?: string;
 

@@ -8,6 +8,7 @@ import {NamespacedDefinition} from '../namespaced-definition.mjs';
 export const enum InternalCategory {
   START_SKILL = 'Start skill',
   COMBAT = 'Combat',
+  COMBINATION = 'Combination',
   CORE = 'Core',
 }
 
