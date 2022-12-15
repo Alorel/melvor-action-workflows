@@ -19,7 +19,8 @@ function isNodeOptionBase(v: any): v is IsBase {
   return isReferenceableNoNamespace(v)
     && isUndefinedOr(v.showIf, 'function')
     && isUndefinedOr(v.required, 'boolean')
-    && isUndefinedOr(v.description, 'string');
+    && isUndefinedOr(v.description, 'string')
+    && (Array.isArray(v.resets) || typeof v.resets === 'undefined');
 }
 
 function isNodeOption(v: any): v is NodeOption {

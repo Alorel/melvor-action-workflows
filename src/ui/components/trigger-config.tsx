@@ -39,21 +39,28 @@ const TriggerConfig = memo<Props>(
           <tbody>
             <Trigger value={trigger} onChange={onTriggerInput}/>
 
-            {trigger?.def.options?.map(opt => (
-              <RenderNodeOption key={`${opt.localID}@${triggerId}`}
-                onChange={newVal => {
-                  onChange({
-                    ...value,
-                    opts: {
+            {trigger?.def.options?.map(opt => {
+              const show = opt.showIf?.(opts);
+
+              return show !== false && (
+                <RenderNodeOption
+                  key={`${opt.localID}@${triggerId}`}
+                  onChange={newVal => {
+                    const newOpts = {
                       ...opts,
                       [opt.localID]: newVal,
-                    },
-                  });
-                }}
-                option={opt}
-                otherValues={opts}
-                value={opts[opt.localID]}/>
-            ))}
+                    };
+                    opt.resets?.forEach(prop => {
+                      delete newOpts[prop];
+                    });
+
+                    onChange({...value, opts: newOpts});
+                  }}
+                  option={opt}
+                  otherValues={opts}
+                  value={opts[opt.localID]}/>
+              );
+            })}
           </tbody>
         </table>
       </div>

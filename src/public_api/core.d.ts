@@ -24,6 +24,9 @@ export interface NodeOptionBase extends Omit<Referenceable, 'namespace'> {
    */
   required?: boolean;
 
+  /** Option names to reset when this option changes */
+  resets?: string[];
+
   type: any;
 
   /**

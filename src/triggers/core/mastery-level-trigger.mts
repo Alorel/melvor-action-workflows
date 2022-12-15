@@ -28,6 +28,7 @@ const triggerCtx = defineLocalTrigger<Data<any>>({
       mediaFilter: (skill: Skill) => skill.hasMastery,
       registry: 'skills',
       required: true,
+      resets: ['recipe'],
       type: 'MediaItem',
     },
     {
