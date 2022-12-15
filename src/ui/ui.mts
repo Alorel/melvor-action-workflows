@@ -15,7 +15,7 @@ interface BaseCat {
 
 // Init package
 {
-  const mainIcon = 'https://i.imgur.com/fMgInFq.png';
+  const mainIcon = 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.4.2/src/ui/assets/icon.png';
 
   const cat = <T extends object = {}>(config?: T): T & BaseCat => ({
     categoryID: '',

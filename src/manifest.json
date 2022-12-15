@@ -1,7 +1,7 @@
 {
   "namespace": "ActionWorkflows",
   "setup": "setup.mjs",
-  "icon": "https://i.imgur.com/fMgInFq.png",
+  "icon": "https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.4.2/src/ui/assets/icon-lg.png",
   "load": [
     "styles.css"
   ]
