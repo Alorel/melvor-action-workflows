@@ -1,5 +1,5 @@
 import type {NodeOption} from '../../public_api';
-import {allActions} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
+import {defaultAction} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {CompressedJsonArray} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {FormatToJson} from '../decorators/to-json-formatters/format-to-json.mjs';
@@ -36,7 +36,7 @@ class ActionConfigItem extends OptsListItem {
 
   public constructor(init: Init = EMPTY_OBJ) {
     super(init);
-    this.action = init.action ?? allActions.value[0].items[0];
+    this.action = init.action ?? defaultAction.value;
     if (!this.opts) {
       this.resetOpts();
     }

@@ -1,8 +1,6 @@
 import type {Observable} from 'rxjs';
 import type {NodeOption, Obj} from '../../public_api';
-import {
-  allTriggerSelectGroups
-} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
+import {defaultTrigger} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
 import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
@@ -47,7 +45,7 @@ export class WorkflowTrigger extends OptsListItem {
 
   public constructor(init: Init = EMPTY_OBJ) {
     super(init);
-    this.trigger = init.trigger ?? allTriggerSelectGroups.value[0].items[0];
+    this.trigger = init.trigger ?? defaultTrigger.value;
     if (!this.opts) {
       this.resetOpts();
     }
