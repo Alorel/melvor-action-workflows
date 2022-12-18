@@ -1,38 +1,30 @@
 import type {Item as TItem} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
-
-const enum Comparator {
-  GTE = '>=',
-  LTE = '<=',
-}
+import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-compare.mjs';
 
 export interface ItemQuantityTriggerData {
-  comparator: Comparator;
+  comparator: NumComparator;
 
   item: TItem;
 
   qty: number;
 }
 
-function compare(lhs: number, comp: Comparator, rhs: number): boolean {
-  return comp === Comparator.GTE ? lhs >= rhs : lhs <= rhs;
-}
-
 const triggerCtx = defineLocalTrigger<ItemQuantityTriggerData>({
   category: InternalCategory.CORE,
-  check: ({comparator, item, qty}) => compare(game.bank.getQty(item), comparator, qty),
+  check: ({comparator, item, qty}) => numCompare(game.bank.getQty(item), comparator, qty),
   init() {
     function patcher(_returnValue: any, {id}: TItem) {
       const liveQty = game.bank.getQty(game.items.getObjectByID(id));
 
-      triggerCtx.notifyListeners(({comparator, item, qty}) => item.id === id && compare(liveQty, comparator, qty));
+      triggerCtx.notifyListeners(({comparator, item, qty}) => item.id === id && numCompare(liveQty, comparator, qty));
     }
 
     ctx.patch(Bank, 'addItem').after(patcher);
     ctx.patch(Bank, 'removeItemQuantity').after(patcher);
   },
-  initOptions: () => ({comparator: Comparator.GTE}),
+  initOptions: () => ({comparator: NumComparator.GTE}),
   label: 'Item Quantity',
   localID: 'itemQty',
   media: game.pages.getObjectByID('melvorD:Bank')!.media,
@@ -45,12 +37,7 @@ const triggerCtx = defineLocalTrigger<ItemQuantityTriggerData>({
       type: 'MediaItem',
     },
     {
-      enum: {
-        /* eslint-disable sort-keys */
-        [Comparator.GTE]: '≥',
-        [Comparator.LTE]: '≤',
-        /* eslint-enable sort-keys */
-      },
+      enum: NUM_COMPARE_ENUM,
       label: 'Comparator',
       localID: 'comparator',
       required: true,

@@ -14,8 +14,9 @@ export class CombatManager {
 
   get media(): string;
 
-  selectMonster(monster: Monster, area: CombatArea): void;
   selectDungeon(dungeon: Dungeon): void;
+
+  selectMonster(monster: Monster, area: CombatArea): void;
 
   spawnEnemy(): void;
 }
@@ -95,7 +96,15 @@ export class Shop extends NamespacedObject {
 }
 
 export class Currency {
-  add(num: number): void;
+  get amount(): number;
+
+  add(amount: number): void;
+
+  onAmountChange(): void;
+
+  remove(amount: number): void;
+
+  set(amount: number): void;
 }
 
 export class GP extends Currency {

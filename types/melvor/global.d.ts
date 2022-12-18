@@ -10,6 +10,8 @@ declare const NamespacedObject: typeof import('./index').NamespacedObject;
 declare const EquipmentItem: typeof import('./index').EquipmentItem;
 declare const SkillWithMastery: typeof import('./index').SkillWithMastery;
 declare const AltMagicConsumptionID: typeof import('./index').AltMagicConsumptionID;
+declare const GP: typeof import('./index').GP;
+declare const SlayerCoins: typeof import('./index').SlayerCoins;
 
 declare const ctx: import('./index').ModContext;
 declare const ui: import('./index').UiContext;
