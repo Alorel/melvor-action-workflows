@@ -10,6 +10,8 @@ export const enum InternalCategory {
   COMBAT = 'Combat',
   COMBINATION = 'Combination',
   CORE = 'Core',
+
+  CURRENCY = 'Currency',
 }
 
 @PersistClassName('ActionNodeDefinitionImpl')
