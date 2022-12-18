@@ -17,7 +17,7 @@ export const ActionLi = memo<ActionProps>(function ActionLi({action: a}) {
 
   return (
     <li class={`list-group-item pt-0 pb-0 pl-1 pr-1 ${liClass}`} key={a.listId}>
-      <DefSection config={a.opts} node={a.action.def}/>
+      <DefSection config={a.opts} node={a.action.def} type={'action'}/>
     </li>
   );
 });

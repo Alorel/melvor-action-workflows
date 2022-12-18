@@ -1,7 +1,9 @@
 import type {EquipmentItem as TEquipmentItem} from 'melvor';
 import {EquipSlotType} from 'melvor';
+import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
 
 interface Props {
   item: TEquipmentItem;
@@ -13,6 +15,19 @@ interface Props {
 
 defineLocalAction<Props>({
   category: InternalCategory.CORE,
+  compactRender: ({item, qty, slot}) => (
+    <Fragment>
+      <span>{'Equip '}</span>
+      {qty != null && <span class={'text-primary'}>{`${qty.toLocaleString()}x `}</span>}
+      <RenderNodeMedia label={item.name} media={item.media}/>
+      {slot && (
+        <Fragment>
+          <span>{' to '}</span>
+          <span class={'text-primary'}>{slot}</span>
+        </Fragment>
+      )}
+    </Fragment>
+  ),
   execute({item, qty, slot}) {
     const bankQty = game.bank.getQty(item);
     if (!bankQty) {
@@ -44,6 +59,7 @@ defineLocalAction<Props>({
       type: String,
     },
     {
+      description: 'Equips however much you have in the bank if unspecified & supported.',
       label: 'Quantity',
       localID: 'qty',
       min: 1,

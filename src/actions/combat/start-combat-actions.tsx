@@ -1,9 +1,12 @@
 import type {CombatArea, Dungeon, Game, NamespaceRegistry} from 'melvor';
 import type {TypedKeys} from 'mod-util/typed-keys';
+import type {VNode} from 'preact';
+import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {EMPTY_ARR} from '../../lib/util.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import type {ActionNodeDefinition, NodeOption} from '../../public_api';
+import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
 
 interface Props {
   area: CombatArea;
@@ -20,11 +23,20 @@ interface Init extends Omit<ActionNodeDefinition<Props>, 'namespace' | 'category
   registry: TypedKeys<Game, NamespaceRegistry<CombatArea>>;
 }
 
-type This = ReturnType<typeof mkAction>;
-
-function execMob(this: This, {area, mob}: Props) {
+function execMob({area, mob}: Props) {
   game.stopActiveAction();
   game.combat.selectMonster(area.monsters[mob!], area);
+}
+
+function renderMob({area, mob: mobIdx}: Props): VNode | null {
+  const mob = area.monsters[mobIdx!];
+
+  return (
+    <Fragment>
+      <span>{'Kill '}</span>
+      <RenderNodeMedia label={mob.name} media={mob.media}/>
+    </Fragment>
+  );
 }
 
 const mkAction = ({extraOpts, registry, optionLabel, ...init}: Init) => {
@@ -63,6 +75,7 @@ const areaMobOption: [NodeOption] = [{
 }];
 
 mkAction({
+  compactRender: renderMob,
   execute: execMob,
   extraOpts: areaMobOption,
   label: 'Start Combat Area',
@@ -73,6 +86,7 @@ mkAction({
 });
 
 mkAction({
+  compactRender: renderMob,
   execute: execMob,
   extraOpts: areaMobOption,
   label: 'Start Slayer Area',
@@ -83,6 +97,12 @@ mkAction({
 });
 
 mkAction({
+  compactRender: ({area}) => (
+    <Fragment>
+      <span>{'Clear '}</span>
+      <RenderNodeMedia label={area.name} media={area.media}/>
+    </Fragment>
+  ),
   execute({area}) {
     game.stopActiveAction();
     game.combat.selectDungeon(area as Dungeon);

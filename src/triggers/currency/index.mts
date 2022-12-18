@@ -1,1 +1,1 @@
-import './currency-trigger.mjs';
+import './currency-trigger';

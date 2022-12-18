@@ -1,3 +1,4 @@
+import {Fragment} from 'preact';
 import {map, noop, timer} from 'rxjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
@@ -8,6 +9,12 @@ interface Props {
 
 defineLocalAction<Props>({
   category: InternalCategory.CORE,
+  compactRender: ({duration}) => (
+    <Fragment>
+      <span>{'Wait for '}</span>
+      <span class={'text-primary'}>{`${duration.toLocaleString()}ms`}</span>
+    </Fragment>
+  ),
   execute: ({duration}) => timer(duration).pipe(map(noop)),
   label: 'Wait',
   localID: 'wait',

@@ -108,6 +108,8 @@ export class BaseSpell extends NamespacedObject {
   requirements: any[];
 
   runesRequired: RuneRequirement[];
+
+  get media(): string;
 }
 
 export class NamespaceRegistry<T> {

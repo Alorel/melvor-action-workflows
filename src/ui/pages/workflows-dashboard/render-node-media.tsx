@@ -1,8 +1,10 @@
-import type {VNode} from 'preact';
+import type {ComponentChild, VNode} from 'preact';
 import {Fragment} from 'preact';
 import type {NodeDefinition} from '../../../public_api';
 
-export type RenderNodeMediaProps = Pick<NodeDefinition, 'label' | 'media'>;
+export interface RenderNodeMediaProps extends Pick<NodeDefinition, 'media'> {
+  label: ComponentChild;
+}
 
 export function RenderNodeMedia({label, media}: RenderNodeMediaProps): VNode {
   return (

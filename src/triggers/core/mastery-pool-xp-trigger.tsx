@@ -1,6 +1,8 @@
 import type {Skill, SkillWithMastery as TSkillWithMastery} from 'melvor';
+import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
+import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
 
 interface Data {
   pool: number;
@@ -11,6 +13,13 @@ interface Data {
 const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.CORE,
   check: ({pool, skill}) => skill.masteryPoolProgress >= pool,
+  compactRender: ({pool, skill}) => (
+    <Fragment>
+      <RenderNodeMedia label={skill.name} media={skill.media}/>
+      <span>{' mastery pool '}</span>
+      <span class={'text-primary'}>{`${pool}%`}</span>
+    </Fragment>
+  ),
   init() {
     ctx.patch(SkillWithMastery, 'addMasteryPoolXP').after(function () {
       triggerCtx.notifyListeners();

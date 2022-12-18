@@ -10,15 +10,16 @@ import {useRenderEditTouch} from './_common.mjs';
 
 defineOption<number, NumberNodeOption>({
   is(v): v is NumberNodeOption {
-    const {type, max, min, step} = v as Partial<NumberNodeOption>;
+    const {type, max, min, placeholder, step} = v as Partial<NumberNodeOption>;
 
     return type === Number
       && (min == null || typeIs(min, 'number', 'function'))
       && (max == null || typeIs(max, 'number', 'function'))
+      && isUndefinedOr(placeholder, 'string')
       && isUndefinedOr(step, 'number');
   },
   renderEdit({
-    option: {max, min, step},
+    option: {max, min, placeholder, step},
     value,
     onChange,
     otherValues,
@@ -40,11 +41,13 @@ defineOption<number, NumberNodeOption>({
     }, [onChange]);
 
     return (
-      <input class={'form-control form-control-sm'}
+      <input
+        class={'form-control form-control-sm'}
         type={'number'}
         onBlur={onBlur}
         value={value ?? ''}
         onInput={onInp}
+        placeholder={placeholder ?? ''}
         max={resolveDynamicOptionObject(max, otherValues) ?? ''}
         min={resolveDynamicOptionObject(min, otherValues) ?? ''}
         step={step ?? ''}/>

@@ -1,7 +1,7 @@
 import type {VNode} from 'preact';
 import type {HTMLAttributes} from 'preact/compat';
-import {memo, useMemo} from 'preact/compat';
-import {useCallback, useEffect, useState} from 'preact/hooks';
+import {memo} from 'preact/compat';
+import {useCallback, useEffect, useMemo, useState} from 'preact/hooks';
 import type {Observable} from 'rxjs';
 import {debounceTime, distinctUntilChanged, EMPTY, of, startWith, switchMap} from 'rxjs';
 import type {WorkflowStep} from '../../../lib/data/workflow-step.mjs';
@@ -44,7 +44,7 @@ const DashboardStep = memo<Props>(
     step,
   }) => {
     const border = useBorder(step.listId);
-    const contentProps = useMemo((): HTMLAttributes<HTMLDivElement> => ({class: 'pt-2 pl-2'}), EMPTY_ARR);
+    const contentProps = useMemo((): HTMLAttributes<HTMLDivElement> => ({class: 'p-0'}), EMPTY_ARR);
     const [ProvideStep, step$] = useStepHost(step);
     step$.value = step;
 
@@ -52,7 +52,9 @@ const DashboardStep = memo<Props>(
       <div class={'col-auto'}>
         <BorderedBlock kind={border} size={2} contentProps={contentProps}>
           <ProvideStep>
-            <DefSection config={step.trigger.opts} node={step.trigger.trigger.def}/>
+            <div class={'pt-2 pl-2 pr-2'}>
+              <DefSection config={step.trigger.opts} node={step.trigger.trigger.def} type={'trigger'}/>
+            </div>
             <hr class={'mt-1 mb-1'}/>
             <ul class={'list-group'}>
               {step.actions.map(a => <ActionLi action={a} key={a.listId}></ActionLi>)}

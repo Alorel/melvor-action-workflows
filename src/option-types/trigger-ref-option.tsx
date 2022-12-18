@@ -139,7 +139,11 @@ interface ViewOneProps {
 }
 
 function ViewOne({trigger}: ViewOneProps): VNode | null {
-  const def = trigger?.trigger?.def;
+  if (!trigger) {
+    return null;
+  }
 
-  return def ? <RenderNodeMedia media={def.media} label={def.label}/> : null;
+  const {trigger: {def}, opts} = trigger;
+
+  return def.compactRender?.(opts) || <RenderNodeMedia media={def.media} label={def.label}/>;
 }

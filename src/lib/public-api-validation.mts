@@ -11,13 +11,14 @@ import type {
 } from '../public_api';
 import type {OptionDefinition} from './define-option.mjs';
 import {OPTION_REGISTRY} from './registries/option-registry.mjs';
-import {isUndefinedOr} from './util/type-is.mjs';
+import {isUndefinedOr, typeIs} from './util/type-is.mjs';
 
 type IsBase = NodeOptionBase & Obj<any>;
 
 function isNodeOptionBase(v: any): v is IsBase {
   return isReferenceableNoNamespace(v)
     && isUndefinedOr(v.showIf, 'function')
+    && isUndefinedOr(v.compactRender, 'function')
     && isUndefinedOr(v.required, 'boolean')
     && isUndefinedOr(v.description, 'string')
     && (Array.isArray(v.resets) || typeof v.resets === 'undefined');
@@ -76,5 +77,5 @@ function isReferenceable(v: any): v is (Referenceable & Obj<any>) {
 
 function isReferenceableNoNamespace(v: any): v is (Omit<Referenceable, 'namespace'> & Obj<any>) {
   return typeof v?.localID === 'string'
-    && typeof v.label === 'string';
+    && typeIs(v.label, 'string', 'function');
 }
