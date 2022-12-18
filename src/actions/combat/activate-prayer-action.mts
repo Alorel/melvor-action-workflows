@@ -3,7 +3,7 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 
 interface Props {
-  prayers: ActivePrayer[];
+  prayers?: ActivePrayer[];
 }
 
 defineLocalAction<Props>({
@@ -13,9 +13,13 @@ defineLocalAction<Props>({
 
     // Deactivate prayers that aren't selected
     for (const p of player.activePrayers) {
-      if (!prayers.includes(p)) {
+      if (!prayers?.includes(p)) {
         player.togglePrayer(p);
       }
+    }
+
+    if (!prayers?.length) {
+      return;
     }
 
     // Activate prayers that are
