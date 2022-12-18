@@ -1,14 +1,9 @@
 import {combineLatest, filter, merge, NEVER} from 'rxjs';
 import {take} from 'rxjs/operators';
-import type {TriggerDefinitionContext} from '../../lib/data/trigger-definition-context.mjs';
 import {WorkflowTrigger} from '../../lib/data/workflow-trigger.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
-import LazyValue from '../../lib/util/lazy-value.mjs';
 import type {TriggerNodeDefinition} from '../../public_api';
-import {
-  allTriggerSelectGroups
-} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
 
 interface Data {
   triggers: WorkflowTrigger[];
@@ -17,9 +12,7 @@ interface Data {
 const baseDef: Omit<TriggerNodeDefinition<Data>, 'namespace' | 'label' | 'localID' | 'check' | 'media'> = {
   canBeDefault: false,
   category: InternalCategory.COMBINATION,
-  initOptions: () => ({
-    triggers: [new WorkflowTrigger({trigger: defaultTrigger.value})],
-  }),
+  initOptions: () => ({triggers: [new WorkflowTrigger()]}),
   options: [
     {
       label: 'Triggers',
@@ -69,18 +62,6 @@ defineLocalTrigger<Data>({
   },
   localID: 'or',
   media: 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.8.0/src/ui/assets/or.png',
-});
-
-const defaultTrigger = new LazyValue<TriggerDefinitionContext<any>>(() => {
-  for (const cat of allTriggerSelectGroups.value) {
-    for (const trigger of cat.items) {
-      if (trigger.def.canBeDefault !== false) {
-        return trigger;
-      }
-    }
-  }
-
-  throw new Error('Can\'t resolve default and/or trigger');
 });
 
 function triggerPasses(trigger: WorkflowTrigger): boolean {

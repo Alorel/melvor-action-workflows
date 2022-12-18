@@ -6,6 +6,7 @@ export function showExportModal(title: string, contents: any): void {
   html.addEventListener('click', () => {
     html.select();
   });
+  html.classList.add('form-control');
   html.textContent = JSON.stringify(contents);
   html.readOnly = true;
 

@@ -46,6 +46,11 @@ export class Workflow {
     this.steps$ = this._steps$ = new BehaviorSubject<WorkflowStep[]>(steps?.length ? steps : [new WorkflowStep()]);
   }
 
+  /** Reset the steps array to its defaults state */
+  public resetSteps(): void {
+    this._steps$.next([new WorkflowStep()]);
+  }
+
   public get canRemoveSteps(): boolean {
     return this.steps.length > 1;
   }
