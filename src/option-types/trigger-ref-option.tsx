@@ -1,11 +1,12 @@
 import type {VNode} from 'preact';
 import {Fragment} from 'preact';
-import {useCallback, useMemo} from 'preact/hooks';
+import {useCallback} from 'preact/hooks';
 import {WorkflowTrigger} from '../lib/data/workflow-trigger.mjs';
 import type {OptionRenderEditCtx} from '../lib/define-option.mjs';
 import {defineOption} from '../lib/define-option.mjs';
 import {EMPTY_ARR} from '../lib/util.mjs';
 import type {TriggerRefOption} from '../public_api';
+import {BorderedBlock} from '../ui/components/block';
 import Btn from '../ui/components/btn';
 import {BinSvg} from '../ui/components/svg';
 import type {TriggerConfigValue} from '../ui/components/trigger-config';
@@ -65,10 +66,14 @@ function EditMulti(
   }, [value, onChange]);
 
   const onAdd = useCallback((evt: Event): void => {
-    const idx = getEvtTarget(evt, el => el.tagName === 'DIV')!.dataset.idx!;
+    const idx = parseInt(getEvtTarget(evt, el => el.tagName === 'DIV')!.dataset.idx!);
+    if (isNaN(idx)) {
+      return;
+    }
+
     const out = value?.slice() ?? [];
 
-    out.splice(parseInt(idx) + 1, 0, new WorkflowTrigger());
+    out.splice(idx + 1, 0, new WorkflowTrigger());
     onChange(out);
   }, [value, onChange]);
 
@@ -106,10 +111,10 @@ interface EditOneProps extends ViewOneProps {
 }
 
 function EditOne({trigger, onChange}: EditOneProps): VNode | null {
-  const value = useMemo((): TriggerConfigValue => ({
-    opts: trigger?.opts ?? {},
+  const value: TriggerConfigValue = {
+    opts: trigger?.opts ?? trigger?.trigger.def.initOptions?.() ?? {},
     trigger: trigger?.trigger,
-  }), [trigger?.opts, trigger?.trigger]);
+  };
 
   const onChangeInner = useCallback((newVal: TriggerConfigValue): void => {
     if (trigger) {
@@ -122,7 +127,11 @@ function EditOne({trigger, onChange}: EditOneProps): VNode | null {
 
   }, [trigger]);
 
-  return <TriggerConfig value={value} onChange={onChangeInner}/>;
+  return (
+    <BorderedBlock kind={'summoning'}>
+      <TriggerConfig value={value} onChange={onChangeInner}/>
+    </BorderedBlock>
+  );
 }
 
 interface ViewOneProps {
