@@ -1,3 +1,4 @@
+import {VNode} from 'preact';
 import type {Observable} from 'rxjs';
 import type {ActionNodeDefinition} from './action';
 import type {NodeOption} from './option';
@@ -41,6 +42,16 @@ export interface NodeOptionBase extends Omit<Referenceable, 'namespace'> {
 /** Common node definition */
 export interface NodeDefinition<T extends object = {}> extends Referenceable {
   category?: string;
+
+  /**
+   * Receive the node's options as props and render them in a more fitting way.
+   *
+   * - The default renderer will be used if this returns `null`/`undefined`
+   * - A Preact-renderable response - {@link VNode}, `string`, `number` etc will override the default renderer
+   *
+   * @see https://github.com/Alorel/melvor-action-workflows/issues/111
+   */
+  compactRender?: (props: T) => VNode | null | undefined;
 
   /** The icon */
   media: string;

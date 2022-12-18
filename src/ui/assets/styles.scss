@@ -19,6 +19,10 @@ $colour-err: #e56767;
     border-bottom: 1px dotted #fff;
   }
 
+  &undecorate {
+    text-decoration: none;
+  }
+
   &d-inline-tbl {
     display: inline-table;
 

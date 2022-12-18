@@ -17,12 +17,16 @@ export type NodeOption = AltRecipeCostNodeOption
 export interface StepRefNodeOption extends NodeOptionBase {
   type: 'StepRef';
 }
+
 export interface StringNodeOption extends NodeOptionBase {
   /**
    * Render a `<select/>` of these options instead of an `<input type="text"/>`.
    * key = model value, value = display label
    */
   enum?: DynamicOption<Obj<string> | undefined>;
+
+  /** The `placeholder` attribute for the `<input/>` element */
+  placeholder?: string;
 
   type: StringConstructor;
 }
@@ -50,6 +54,9 @@ export interface NumberNodeOption extends NodeOptionBase {
 
   /** "min" attribute */
   min?: DynamicOption<number | undefined>;
+
+  /** The `placeholder` attribute for the `<input/>` element */
+  placeholder?: string;
 
   /** "step" attribute */
   step?: number;

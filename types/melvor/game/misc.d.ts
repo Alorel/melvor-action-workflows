@@ -80,6 +80,8 @@ export class ShopPurchase extends NamespacedObject {
 
   unlockRequirements: Requirement[];
 
+  get media(): string;
+
   getBuyLimit(mode: Gamemode): number;
 }
 

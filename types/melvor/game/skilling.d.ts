@@ -41,6 +41,7 @@ export class AltMagic extends CraftingSkill<AltMagicSpell> {
 
   selectSpellOnClick(spell: AltMagicSpell): void;
 }
+
 export enum AltMagicConsumptionID {
   AnyItem = -1,
   AnyNormalFood = -7,
@@ -254,7 +255,6 @@ export class WoodcuttingTree extends SingleProductRecipe {
   canDropRavenNest: boolean;
 }
 
-
 export class SingleProductRecipe extends BasicSkillRecipe {
   get media(): string;
 }
@@ -312,4 +312,6 @@ export class BasicSkillRecipe extends NamespacedObject {
   product: Item;
 
   shopItemPurchased?: ShopPurchase;
+
+  get media(): string;
 }

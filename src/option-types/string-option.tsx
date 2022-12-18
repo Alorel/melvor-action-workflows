@@ -6,6 +6,7 @@ import type {OptionRenderEditCtx} from '../lib/define-option.mjs';
 import {defineOption} from '../lib/define-option.mjs';
 import {EMPTY_ARR, EMPTY_OBJ} from '../lib/util.mjs';
 import {resolveDynamicOptionObject} from '../lib/util/dynamic-option.mjs';
+import {isUndefinedOr} from '../lib/util/type-is.mjs';
 import type {Obj, StringNodeOption} from '../public_api';
 import Btn from '../ui/components/btn';
 import {BinSvg} from '../ui/components/svg';
@@ -13,9 +14,10 @@ import {useRenderEditTouch} from './_common.mjs';
 
 defineOption<string, StringNodeOption>({
   is(v): v is StringNodeOption {
-    const {type, enum: vEnum} = v as Partial<StringNodeOption>;
+    const {type, enum: vEnum, placeholder} = v as Partial<StringNodeOption>;
 
     return type === String
+      && isUndefinedOr(placeholder, 'string')
       && (vEnum == null || isPlainObject(vEnum) || typeof vEnum === 'function');
   },
   renderEdit: ctx => h(ctx.option.enum ? RenderEnumOpts : RenderInput, ctx),
@@ -42,12 +44,17 @@ defineOption<string, StringNodeOption>({
 
 function RenderInput({
   value = '',
+  option: {placeholder},
   onChange,
 }: OptionRenderEditCtx<string, StringNodeOption>): VNode {
   const [onBlur, onInp] = useInput(onChange);
 
   return (
-    <input class={'form-control form-control-sm'} onBlur={onBlur} onChange={onInp} value={value}/>
+    <input class={'form-control form-control-sm'}
+      placeholder={placeholder ?? ''}
+      onBlur={onBlur}
+      onChange={onInp}
+      value={value}/>
   );
 }
 

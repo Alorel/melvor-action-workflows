@@ -13,6 +13,16 @@ interface Data {
 const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.COMBAT,
   check: d => game.combat.isActive && getEqNeqFn(d.match)(game.combat.enemy.nextAttack.id, d.atk.id),
+  compactRender: ({atk, match}) => (
+    <Fragment>
+      <span>{'Enemy '}</span>
+      <strong class={match === EqNeq.EQ ? 'text-success' : 'text-danger'}>
+        {match === EqNeq.NEQ && 'NOT '}
+        {'casting '}
+      </strong>
+      <span>{atk?.name}</span>
+    </Fragment>
+  ),
   init() {
     ctx.patch(Enemy, 'queueNextAction').after(() => {
       const atk = game.combat.enemy.nextAttack.id;

@@ -1,4 +1,5 @@
 import type {ActivePrayer} from 'melvor';
+import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 
@@ -8,6 +9,11 @@ interface Props {
 
 defineLocalAction<Props>({
   category: InternalCategory.COMBAT,
+  compactRender({prayers}) {
+    if (!prayers?.length) {
+      return <Fragment>Deactivate prayers</Fragment>;
+    }
+  },
   execute({prayers}) {
     const player = game.combat.player;
 
