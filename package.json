@@ -74,6 +74,6 @@
     "lazy-get-decorator": "^2.2.1",
     "lodash-es": "^4.17.21",
     "preact": "^10.11.3",
-    "rxjs": "^7.6.0"
+    "rxjs": "^7.8.0"
   }
 }
