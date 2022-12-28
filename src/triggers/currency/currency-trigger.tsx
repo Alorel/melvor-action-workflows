@@ -2,10 +2,10 @@ import type {Class, Currency, Game} from 'melvor';
 import type {TypedKeys} from 'mod-util/typed-keys';
 import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import {humaniseNum} from '../../lib/util.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-compare.mjs';
 import type {TriggerNodeDefinition} from '../../public_api';
+import {BigNum} from '../../ui/components/big-num';
 
 interface Data {
   amount: number;
@@ -48,9 +48,7 @@ const makeTrigger = (
     compactRender: ({amount, comparator}) => (
       <Fragment>
         <span>{`${label} ${NUM_COMPARE_ENUM[comparator]} `}</span>
-        <abbr
-          class={'text-primary ActionWorkflowsCore-undecorate ActionWorkflowsCore-underdot'}
-          title={amount.toLocaleString()}>{humaniseNum(amount)}</abbr>
+        <BigNum num={amount}/>
       </Fragment>
     ),
     init() {
