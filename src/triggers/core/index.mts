@@ -1,3 +1,4 @@
+import './equipped-item-count';
 import './item-quantity-trigger';
 import './level-gained-trigger';
 import './mastery-level-trigger.mjs';

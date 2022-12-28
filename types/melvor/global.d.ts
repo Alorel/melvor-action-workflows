@@ -10,6 +10,7 @@ declare const CombatManager: typeof import('./index').CombatManager;
 declare const Enemy: typeof import('./index').Enemy;
 declare const NamespacedObject: typeof import('./index').NamespacedObject;
 declare const EquipmentItem: typeof import('./index').EquipmentItem;
+declare const Equipment: typeof import('./index').Equipment;
 declare const SkillWithMastery: typeof import('./index').SkillWithMastery;
 declare const AltMagicConsumptionID: typeof import('./index').AltMagicConsumptionID;
 declare const GP: typeof import('./index').GP;
