@@ -22,9 +22,13 @@ export const enum EquipSlotType {
 export class Equipment {
   slotArray: EquipSlot[];
 
-  slotMap: Map<EquipmentItem, string>;
+  slotMap: Map<EquipmentItem, EquipSlotType>;
 
   slots: Record<EquipSlotType, EquipSlot>;
+
+  addQuantityToSlot(slot: EquipSlot, quantity: number): void;
+
+  removeQuantityFromSlot(slot: EquipSlot, quantity: number): void;
 }
 
 export class EquipSlot {
@@ -35,6 +39,8 @@ export class EquipSlot {
   occupiedBy: string;
 
   occupies: any[];
+
+  quantity: number;
 
   type: EquipSlotType;
 }
@@ -114,6 +120,8 @@ export class Player extends Character {
   togglePrayer(prayer: ActivePrayer, render?: boolean): void;
 
   toggleSpell(curse: CombatSpell, render?: boolean): void;
+
+  unequipItem(set: number, slot?: EquipItemArgSlot, quantity?: number): void;
 }
 
 export class Character extends NamespacedObject {

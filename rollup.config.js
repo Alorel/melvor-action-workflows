@@ -109,6 +109,7 @@ function mkIifeWrap() {
       'CombatManager',
       'console',
       'document',
+      'Equipment',
       'Error',
       'game',
       'isNaN',

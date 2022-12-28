@@ -1,4 +1,4 @@
-import type {Item as TItem} from 'melvor';
+import type {EquipmentItem as TEquipmentItem} from 'melvor';
 import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
@@ -6,42 +6,52 @@ import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-co
 import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
 
-export interface ItemQuantityTriggerData {
+interface Data {
   comparator: NumComparator;
 
-  item: TItem;
+  item: TEquipmentItem;
 
   qty: number;
 }
 
-const triggerCtx = defineLocalTrigger<ItemQuantityTriggerData>({
+function check({comparator, item, qty}: Data): boolean {
+  const eq = game.combat.player.equipment;
+  const slot = eq.slotMap.get(item);
+
+  return slot != null && numCompare(eq.slots[slot].quantity, comparator, qty);
+}
+
+const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.CORE,
-  check: ({comparator, item, qty}) => numCompare(game.bank.getQty(item), comparator, qty),
+  check,
   compactRender: ({comparator, item, qty}) => (
     <Fragment>
-      <RenderNodeMedia label={item.name} media={item.media}/>
-      <span>{` ${NUM_COMPARE_ENUM[comparator]} `}</span>
+      <span>{`${NUM_COMPARE_ENUM[comparator]} `}</span>
       <BigNum num={qty}/>
+      <span>{' '}</span>
+      <RenderNodeMedia label={item.name} media={item.media}/>
+      <span>{' equipped'}</span>
     </Fragment>
   ),
   init() {
-    function patcher(_returnValue: any, {id}: TItem) {
-      const liveQty = game.bank.getQty(game.items.getObjectByID(id));
-
-      triggerCtx.notifyListeners(({comparator, item, qty}) => item.id === id && numCompare(liveQty, comparator, qty));
+    function patch() {
+      triggerCtx.notifyListeners(check);
     }
 
-    ctx.patch(Bank, 'addItem').after(patcher);
-    ctx.patch(Bank, 'removeItemQuantity').after(patcher);
+    ctx.patch(Equipment, 'addQuantityToSlot').after(patch);
+    ctx.patch(Equipment, 'removeQuantityFromSlot').after(patch);
+    ctx.patch(Player, 'equipItem').after(patch);
+    ctx.patch(Player, 'unequipItem').after(patch);
   },
   initOptions: () => ({comparator: NumComparator.GTE}),
-  label: 'Item Quantity (bank)',
-  localID: 'itemQty',
-  media: game.pages.getObjectByID('melvorD:Bank')!.media,
+  label: 'Item Quantity (equipped)',
+  localID: 'equippedQty',
+  media: cdnMedia('assets/media/bank/armour_helmet.png'),
   options: [
     {
       label: 'Item',
       localID: 'item',
+      mediaFilter: item => item instanceof EquipmentItem,
       registry: 'items',
       required: true,
       type: 'MediaItem',
