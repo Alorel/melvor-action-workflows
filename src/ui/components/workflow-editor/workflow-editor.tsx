@@ -5,15 +5,14 @@ import type {FunctionComponent} from 'preact/compat';
 import {memo} from 'preact/compat';
 import {useCallback, useErrorBoundary} from 'preact/hooks';
 import type {Workflow} from '../../../lib/data/workflow.mjs';
-import {EMPTY_ARR} from '../../../lib/util.mjs';
 import swapElements from '../../../lib/util/swap-elements.mjs';
 import useReRender from '../../hooks/re-render';
 import useTippy from '../../hooks/tippy.mjs';
 import getEvtTarget from '../../util/get-evt-target.mjs';
 import {mkClass} from '../../util/mk-class.mjs';
-import {BlockDiv} from '../block';
 import Btn from '../btn';
 import {ChevronDownSvg, ChevronUpSvg} from '../svg';
+import {UncaughtErrorBoilerplate} from '../uncaught-error-boilerplate';
 import {useTouched, useWorkflow} from './editor-contexts';
 import type {WorkflowEditorHeaderBlockProps} from './header-block';
 import WorkflowEditorHeaderBlock from './header-block';
@@ -40,28 +39,15 @@ interface ErrProps {
 function WorkflowEditorErrored({err, reset}: ErrProps): VNode {
   const workflow = useWorkflow();
 
-  const focusTA = useCallback((e: Event) => {
-    (e.target as HTMLTextAreaElement).select();
-  }, EMPTY_ARR);
-
   const doReset = useCallback(() => {
     workflow.peek().resetSteps();
     reset();
   }, [reset, workflow]);
 
   return (
-    <BlockDiv>
-      <div class={'alert alert-danger text-center'}>
-        <div class={'font-w600'}>An uncaught error occurred</div>
-        <span>{'Please open a bug report on the mod\'s '}</span>
-        <a href={'https://github.com/Alorel/melvor-action-workflows/issues/new/choose'}
-          target={'_blank'}
-          rel={'noopener'}>GitHub</a>
-        <span>{' and include the stack trace below:'}</span>
-      </div>
-      <textarea class={'form-control'} readonly={true} onClick={focusTA}>{err.stack}</textarea>
+    <UncaughtErrorBoilerplate err={err}>
       <Btn kind={'primary'} size={'block'} onClick={doReset}>Reset workflow</Btn>
-    </BlockDiv>
+    </UncaughtErrorBoilerplate>
   );
 }
 
