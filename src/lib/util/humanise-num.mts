@@ -11,17 +11,10 @@ export function humaniseNum(num: number): string {
     return num.toLocaleString();
   }
 
-  let div: number;
-  let abbr: string;
   if (num < 10_000_000) {
-    div = 1_000;
-    abbr = 'K';
-  } else {
-    div = 1_000_000;
-    abbr = 'M';
+    return `${round(num / 1_000).toLocaleString()}K`;
   }
 
-  return round(num / div, 3).toLocaleString() + abbr;
-
+  return `${round(num / 1_000_000, 3).toLocaleString()}M`;
   /* eslint-enable @typescript-eslint/no-magic-numbers */
 }

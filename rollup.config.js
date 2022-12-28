@@ -110,6 +110,7 @@ function mkIifeWrap() {
       'console',
       'document',
       'Equipment',
+      'EquippedFood',
       'Error',
       'game',
       'isNaN',

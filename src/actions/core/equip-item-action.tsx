@@ -3,6 +3,7 @@ import {EquipSlotType} from 'melvor';
 import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
 
 interface Props {
@@ -18,7 +19,12 @@ defineLocalAction<Props>({
   compactRender: ({item, qty, slot}) => (
     <Fragment>
       <span>{'Equip '}</span>
-      {qty != null && <span class={'text-primary'}>{`${qty.toLocaleString()}x `}</span>}
+      {qty != null && (
+        <Fragment>
+          <BigNum num={qty}/>
+          <span>{' '}</span>
+        </Fragment>
+      )}
       <RenderNodeMedia label={item.name} media={item.media}/>
       {slot && (
         <Fragment>

@@ -1,4 +1,4 @@
-import {AttackStyle, AttackTypeID, CombatSpell, NamespacedObject} from 'melvor';
+import {AttackStyle, AttackTypeID, CombatSpell, FoodItem, NamespacedObject} from 'melvor';
 import type {EquipmentItem, Item} from './item';
 
 export const enum EquipSlotType {
@@ -66,6 +66,28 @@ export class SpellSelection {
 export class ActivePrayer extends NamespacedObject {
 }
 
+export class EquippedFood {
+  maxSlots: number;
+
+  selectedSlot: number;
+
+  slots: EquippedFoodSlot[];
+
+  get currentSlot(): EquippedFoodSlot;
+
+  consume(quantity?: number): void;
+
+  equip(item: FoodItem, quantity: number): void;
+
+  unequipSelected(): void;
+}
+
+export interface EquippedFoodSlot {
+  item: FoodItem;
+
+  quantity: number;
+}
+
 export class Player extends Character {
   activePrayers: Set<ActivePrayer>;
 
@@ -74,6 +96,8 @@ export class Player extends Character {
   equipToSet: number;
 
   equipmentSets: EquipmentSet[];
+
+  food: EquippedFood;
 
   prayerPoints: number;
 

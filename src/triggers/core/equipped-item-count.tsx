@@ -1,4 +1,5 @@
 import type {EquipmentItem as TEquipmentItem} from 'melvor';
+import type {VNode} from 'preact';
 import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
@@ -24,15 +25,7 @@ function check({comparator, item, qty}: Data): boolean {
 const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.CORE,
   check,
-  compactRender: ({comparator, item, qty}) => (
-    <Fragment>
-      <span>{`${NUM_COMPARE_ENUM[comparator]} `}</span>
-      <BigNum num={qty}/>
-      <span>{' '}</span>
-      <RenderNodeMedia label={item.name} media={item.media}/>
-      <span>{' equipped'}</span>
-    </Fragment>
-  ),
+  compactRender: EquippedItemCountCompactRender,
   init() {
     function patch() {
       triggerCtx.notifyListeners(check);
@@ -72,3 +65,15 @@ const triggerCtx = defineLocalTrigger<Data>({
     },
   ],
 });
+
+export function EquippedItemCountCompactRender({comparator, item, qty}: Data): VNode {
+  return (
+    <Fragment>
+      <span>{`${NUM_COMPARE_ENUM[comparator]} `}</span>
+      <BigNum num={qty}/>
+      <span>{' '}</span>
+      <RenderNodeMedia label={item.name} media={item.media}/>
+      <span>{' equipped'}</span>
+    </Fragment>
+  );
+}
