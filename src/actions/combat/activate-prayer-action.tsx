@@ -40,6 +40,7 @@ defineLocalAction<Props>({
   media: game.prayer.media,
   options: [
     {
+      description: 'Leave empty to disable all prayers',
       label: 'Prayers',
       localID: 'prayers',
       multi: {
