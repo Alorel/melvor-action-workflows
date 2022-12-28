@@ -69,6 +69,8 @@ export class Player extends Character {
 
   equipmentSets: EquipmentSet[];
 
+  prayerPoints: number;
+
   spellSelection: SpellSelection;
 
   get equipment(): Equipment;
@@ -77,9 +79,15 @@ export class Player extends Character {
 
   get selectedEquipmentSet(): number;
 
+  addPrayerPoints(amount: number): void;
+
   changeEquipToSet(setIdx: number): void;
 
   changeEquipmentSet(setId: number): void;
+
+  consumePrayerPoints(amount: number): void;
+
+  disableActivePrayers(): void;
 
   equipFood(food: Item, quantity: number): void;
 

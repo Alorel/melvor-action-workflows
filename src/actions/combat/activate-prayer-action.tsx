@@ -16,13 +16,7 @@ defineLocalAction<Props>({
   },
   execute({prayers}) {
     const player = game.combat.player;
-
-    // Deactivate prayers that aren't selected
-    for (const p of player.activePrayers) {
-      if (!prayers?.includes(p)) {
-        player.togglePrayer(p);
-      }
-    }
+    player.disableActivePrayers();
 
     if (!prayers?.length) {
       return;
