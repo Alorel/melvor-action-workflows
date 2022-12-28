@@ -4,6 +4,18 @@ import type {Item, PotionItem} from './item';
 import type {Skill} from './skilling';
 import type {Player} from './toon';
 
+export class PetManager {
+  unlocked: Set<Pet>;
+
+  unlockPet(pet: Pet): void;
+
+  unlockPetByID(id: string): void;
+}
+
+export class Pet extends NamespacedObject {
+  get media(): string;
+}
+
 export class CombatManager {
 
   enemy: Enemy;

@@ -1,4 +1,4 @@
-import {ActivePrayer, CombatArea, CombatSpell, Dungeon, SlayerArea, SpecialAttack} from 'melvor';
+import {ActivePrayer, CombatArea, CombatSpell, Dungeon, Pet, PetManager, SlayerArea, SpecialAttack} from 'melvor';
 import type {Monster} from './combat';
 import {Attack, AttackStyle} from './combat';
 import type {EquipmentItem, Item} from './item';
@@ -204,6 +204,10 @@ export class Game {
   monsters: NamespaceRegistry<Monster>;
 
   pages: NamespaceRegistry<Page>;
+
+  petManager: PetManager;
+
+  pets: NamespaceRegistry<Pet>;
 
   potions: PotionManager;
 
