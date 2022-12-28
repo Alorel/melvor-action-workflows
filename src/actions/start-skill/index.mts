@@ -1,5 +1,3 @@
-import '../../option-types/option-types.mjs';
-
 import './agility.mjs';
 import './alt-magic.mjs';
 import './astrology.mjs';

@@ -1,3 +1,4 @@
+import './equipped-food-count';
 import './equipped-item-count';
 import './item-quantity-trigger';
 import './level-gained-trigger';
