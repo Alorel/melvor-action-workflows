@@ -118,6 +118,7 @@ function mkIifeWrap() {
       'NamespaceRegistry',
       'Number',
       'Object',
+      'Player',
       'Promise',
       'RegExp',
       'sidebar',
