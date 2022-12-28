@@ -1,20 +1,16 @@
-import {staticComponent} from '@alorel/preact-static-component';
 import type {Signal} from '@preact/signals';
 import {batch, useComputed} from '@preact/signals';
 import type {VNode} from 'preact';
-import {Fragment} from 'preact';
 import {memo} from 'preact/compat';
-import {useCallback, useEffect, useRef} from 'preact/hooks';
+import {useCallback, useEffect, useErrorBoundary} from 'preact/hooks';
 import {of, switchMap} from 'rxjs';
-import {Workflow} from '../../lib/data/workflow.mjs';
+import type {Workflow} from '../../lib/data/workflow.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
-import {EMPTY_ARR} from '../../lib/util.mjs';
-import {alertConfirm} from '../../lib/util/alert';
-import {showExportModal} from '../../lib/util/export-modal.mjs';
 import swapElements from '../../lib/util/swap-elements.mjs';
 import {BorderedBlock} from '../components/block';
 import Btn from '../components/btn';
 import PageContainer from '../components/page-container';
+import {UncaughtErrorBoilerplate} from '../components/uncaught-error-boilerplate';
 import {
   useActiveWorkflow,
   useActiveWorkflowHost,
@@ -29,6 +25,8 @@ import {useActiveStepIdx, useActiveStepIdxHost, useBorderClass, useRunning} from
 import useReRender from '../hooks/re-render';
 import {useBehaviourSubject} from '../hooks/use-subject.mjs';
 import autoId from '../util/id-gen.mjs';
+import {ActiveWorkflowSelect} from './workflows-dashboard/active-workflow-select';
+import {SelectedWorkflowBtns} from './workflows-dashboard/btns';
 import type {DashboardStepProps} from './workflows-dashboard/dashboard-step';
 import DashboardStep from './workflows-dashboard/dashboard-step';
 import {NoDashboardsDefined} from './workflows-dashboard/no-dashboards-defined';
@@ -127,6 +125,31 @@ function DashboardShell({workflows}: EditorProps): VNode {
 }
 
 const RenderSteps = memo(function RenderSteps() {
+  const [error, resetError] = useErrorBoundary();
+  const activeWorkflow$ = useActiveWorkflow();
+
+  const doReset = useCallback(() => {
+    batch(() => {
+      activeWorkflow$.value = undefined;
+      WorkflowRegistry.inst.setPrimaryExecution();
+    });
+    resetError();
+  }, [activeWorkflow$, resetError]);
+
+  if (error) {
+    return (
+      <UncaughtErrorBoilerplate err={error}>
+        <Btn kind={'primary'} size={'block'} onClick={doReset}>Reset</Btn>
+      </UncaughtErrorBoilerplate>
+    );
+  }
+
+  return error
+    ? <UncaughtErrorBoilerplate err={error}/>
+    : <RenderStepsInner/>;
+});
+
+function RenderStepsInner() {
   const reRender = useReRender();
   const activeStepIdx = useActiveStepIdx();
   const running = useRunning();
@@ -173,117 +196,7 @@ const RenderSteps = memo(function RenderSteps() {
       </div>
     </BorderedBlock>
   );
-});
-
-function ActiveWorkflowSelect({workflows}: Pick<EditorProps, 'workflows'>): VNode {
-  const activeWorkflow$ = useActiveWorkflow();
-  const wfsRef = useRef(workflows);
-  wfsRef.current = workflows;
-
-  const onWorkflowChange = useCallback((e: Event) => {
-    const listId = parseInt((e.target as HTMLSelectElement).value);
-
-    batch(() => {
-      activeWorkflow$.value = isNaN(listId) ? undefined : wfsRef.current.find(wf => wf.listId === listId);
-      WorkflowRegistry.inst.setPrimaryExecution(); // unset, really
-    });
-  }, [activeWorkflow$]);
-
-  return (
-    <Fragment>
-      <div className={'col-xs-12 col-sm-4 col-md-auto font-w600 font-size-sm pr-1'}>Active workflow</div>
-      <div className={'col-xs-12 col-sm-8 col-md-auto'}>
-        <select className={'form-control form-control-sm'} value={activeWorkflow$.value?.listId ?? ''}
-          onChange={onWorkflowChange}>
-          {workflows.map(wf => <option key={wf.listId} value={wf.listId}>{wf.name}</option>)}
-        </select>
-      </div>
-    </Fragment>
-  );
 }
-
-interface SelectedWorkflowBtnsProps {
-  refresh(): void;
-}
-
-const SelectedWorkflowBtns = memo<SelectedWorkflowBtnsProps>(
-  function SelectedWorkflowBtns({refresh}) {
-    const running = useRunning().value;
-
-    return running ? <BtnsRunning/> : <BtnsNotRunning refresh={refresh}/>;
-  }
-);
-
-function useNestedRefresh(refresh: () => void): () => void {
-  const ownRefresh = useReRender();
-  return useCallback(() => {
-    ownRefresh();
-    refresh();
-  }, [refresh]);
-}
-
-function BtnsNotRunning({refresh}: SelectedWorkflowBtnsProps): VNode {
-  const activeWorkflow = useActiveWorkflow();
-  const editedWorkflow = useEditedWorkflow();
-  const doRefresh = useNestedRefresh(refresh);
-
-  const reg = WorkflowRegistry.inst;
-  const run = useCallback(() => {
-    reg.setPrimaryExecution(activeWorkflow.peek(), true);
-    doRefresh();
-  }, [activeWorkflow, doRefresh]);
-
-  const startEditing = useCallback(() => {
-    batch(() => {
-      editedWorkflow.value = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek())));
-      reg.setPrimaryExecution();
-    });
-  }, [editedWorkflow, activeWorkflow]);
-
-  const del = useCallback(() => {
-    const activeWf = activeWorkflow.peek()!;
-
-    alertConfirm(`Are you sure you want to delete "${activeWf.name}"?`)
-      .subscribe(() => {
-        batch(() => {
-          activeWorkflow.value = undefined;
-          reg.rmByIdx(reg.workflows.findIndex(wf => wf.listId === activeWf.listId));
-          doRefresh();
-        });
-      });
-  }, [activeWorkflow, doRefresh]);
-
-  const clone = useCallback(() => {
-    const cloned = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek()!)))!;
-    cloned.name += ` [copied ${new Date().toLocaleString()}]`;
-
-    reg.add(cloned);
-    activeWorkflow.value = cloned;
-  }, [activeWorkflow]);
-
-  const doExport = useCallback(() => {
-    const wf = activeWorkflow.peek()!;
-    showExportModal(`Export ${wf.name}`, wf);
-  }, [activeWorkflow]);
-
-  return (
-    <div class={'btn-group btn-group-sm'}>
-      <Btn kind={'success'} onClick={run}>{'Run'}</Btn>
-      <Btn kind={'primary'} onClick={startEditing}>{'Edit'}</Btn>
-      <Btn kind={'primary'} onClick={clone}>{'Copy'}</Btn>
-      <Btn kind={'info'} onClick={doExport}>{'Export'}</Btn>
-      <Btn kind={'danger'} onClick={del}>{'Delete'}</Btn>
-    </div>
-  );
-}
-
-const BtnsRunning = staticComponent(function BtnsRunning() {
-  const onClick = useCallback(() => {
-    WorkflowRegistry.inst.setPrimaryExecution(); // unset
-  }, EMPTY_ARR);
-
-  return (<Btn kind={'danger'} size={'sm'} onClick={onClick}>{'Stop'}</Btn>);
-});
 
 function Editor(): VNode {
   const editedWorkflow$ = useEditedWorkflow();
