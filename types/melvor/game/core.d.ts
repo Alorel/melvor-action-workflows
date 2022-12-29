@@ -32,6 +32,10 @@ import type {
   Woodcutting,
 } from './skilling';
 
+export class ItemCharges {
+  charges: Map<Item, number>;
+}
+
 export class NamespacedObject {
   constructor(namespace: Pick<Namespace, 'name'>, localID: string);
 
@@ -196,6 +200,8 @@ export class Game {
   gp: GP;
 
   herblore: Herblore;
+
+  itemCharges: ItemCharges;
 
   items: ItemRegistry;
 
