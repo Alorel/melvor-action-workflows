@@ -249,5 +249,9 @@ export class Game {
 
   checkRequirement(req: Requirement): boolean;
 
+  public clearActiveAction(save?: boolean): void;
+
   public stopActiveAction(): void;
+
+  tick(): void;
 }

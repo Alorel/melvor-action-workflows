@@ -23,8 +23,7 @@ interface Init extends Omit<ActionNodeDefinition<Props>, 'namespace' | 'category
   registry: TypedKeys<Game, NamespaceRegistry<CombatArea>>;
 }
 
-function execMob({area, mob}: Props) {
-  game.stopActiveAction();
+function execMob({area, mob}: Props): void {
   game.combat.selectMonster(area.monsters[mob!], area);
 }
 
@@ -104,7 +103,6 @@ mkAction({
     </Fragment>
   ),
   execute({area}) {
-    game.stopActiveAction();
     game.combat.selectDungeon(area as Dungeon);
   },
   label: 'Start Dungeon',

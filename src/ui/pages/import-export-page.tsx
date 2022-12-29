@@ -26,7 +26,7 @@ export default function ImportExportPage(): VNode {
 
 function ImportAll(): VNode {
   const onClick = useCallback(() => {
-    showImportModal('Import workflow', json => {
+    const import$ = showImportModal('Import workflow', json => {
       try {
         const parsed = JSON.parse(json);
         if (!Array.isArray(parsed)) {
@@ -45,10 +45,22 @@ function ImportAll(): VNode {
       } catch (e) {
         return e.message;
       }
-    })
+    });
+
+    import$
       .subscribe(rsp => {
-        const parsed = (JSON.parse(rsp) as any[]).map(Workflow.fromJSON);
-        WorkflowRegistry.inst.add(...parsed as [Workflow, ...Workflow[]]);
+        const reg = WorkflowRegistry.inst;
+
+        // Overwrite workflows with duplicate names, add workflows with unique names
+        for (const workflow of (JSON.parse(rsp) as any[]).map(Workflow.fromJSON) as Workflow[]) {
+          const idx = reg.workflows.findIndex(w => w.name === workflow.name);
+          if (idx === -1) {
+            reg.add(workflow);
+          } else {
+            reg.patch(workflow, idx);
+          }
+        }
+
         alertDone();
       });
   }, EMPTY_ARR);
@@ -58,15 +70,26 @@ function ImportAll(): VNode {
 
 function ImportOne(): VNode {
   const onClick = useCallback(() => {
-    showImportModal('Import workflow', json => {
+    const import$ = showImportModal('Import workflow', json => {
       try {
         return Workflow.fromJSON(JSON.parse(json)) ? null : 'Invalid workflow';
       } catch (e) {
         return e.message;
       }
-    })
+    });
+
+    import$
       .subscribe(rsp => {
-        WorkflowRegistry.inst.add(Workflow.fromJSON(JSON.parse(rsp))!);
+        const reg = WorkflowRegistry.inst;
+        const workflow = Workflow.fromJSON(JSON.parse(rsp))!;
+
+        // Overwrite on duplicate name
+        const existingIdx = reg.workflows.findIndex(w => w.name === workflow.name);
+        if (existingIdx === -1) {
+          reg.add(workflow);
+        } else {
+          reg.patch(workflow, existingIdx);
+        }
         alertDone();
       });
   }, EMPTY_ARR);

@@ -1,6 +1,7 @@
 import {nextComplete} from '@aloreljs/rxutils';
+import {noop} from 'lodash-es';
 import type {GatheringSkill} from 'melvor';
-import {noop, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
 import type {Obj} from '../../public_api';
 import type {SkillActionInit} from './skill-action.mjs';
@@ -86,11 +87,9 @@ export class RecipeAction<T extends object, S extends Gathering, R>
 
   /** @inheritDoc */
   public execute(data: T): Observable<void> {
-    return new Observable<void>(s => {
-      const prep = this.prepareExec(data);
-      game.stopActiveAction();
-      this.exec(data, prep);
-      nextComplete(s);
+    return new Observable<void>(subscriber => {
+      this.exec(data, this.prepareExec(data));
+      nextComplete(subscriber);
     });
   }
 }

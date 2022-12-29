@@ -28,7 +28,7 @@ export function LoopsHelp(): VNode {
 export function OfflineHelp(): VNode {
   return (
     <HelpPageSection heading={'Does the mod work offline?'}>
-      The mod doesn't work offline
+      Yes! Only actions with an explicit wait time (e.g. the Wait action) don't work.
     </HelpPageSection>
   );
 }

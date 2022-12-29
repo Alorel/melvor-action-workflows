@@ -6,6 +6,7 @@ import {FormatToJsonArrayCompressed} from '../decorators/to-json-formatters/form
 import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
 import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
 import type {ReadonlyBehaviorSubject} from '../registries/workflow-registry.mjs';
+import WorkflowRegistry from '../registries/workflow-registry.mjs';
 import {WorkflowStep} from './workflow-step.mjs';
 
 type Init = Partial<Pick<Workflow, 'name' | 'rm' | 'steps'>>;
@@ -55,9 +56,14 @@ export class Workflow {
     return this.steps.length > 1;
   }
 
-  public get isValid(): boolean {
+  /**
+   * @param editedName Duplicate workflow names aren't permitted, but this check would trigger on itself when editing
+   * a workflow, so the workflow's original name should be provided on edits so it can be used as an exception.
+   */
+  public isValid(editedName?: string): boolean {
     return this.name.trim().length !== 0
       && this.steps.length !== 0
+      && (editedName === this.name || !WorkflowRegistry.inst.workflows.some(w => w.name === editedName))
       && this.steps.every(s => s.isValid);
   }
 

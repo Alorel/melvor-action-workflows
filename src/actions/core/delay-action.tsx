@@ -1,5 +1,6 @@
+import {noop} from 'lodash-es';
 import {Fragment} from 'preact';
-import {map, noop, timer} from 'rxjs';
+import {map, timer} from 'rxjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 
@@ -21,7 +22,7 @@ defineLocalAction<Props>({
   media: cdnMedia('assets/media/main/timer.svg'),
   options: [
     {
-      description: 'Wait for the given number of milliseconds. The actual wait may be significantly longer if the game is minimised in the browser.',
+      description: 'Wait for the given number of milliseconds. The actual wait may be significantly longer if the game is minimised in the browser. Does NOT work offline.',
       label: 'Duration',
       localID: 'duration',
       min: 0,

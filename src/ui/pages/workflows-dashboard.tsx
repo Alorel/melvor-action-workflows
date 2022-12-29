@@ -35,7 +35,7 @@ export const WORKFLOWS_DASHBOARD_ID = autoId();
 
 function WithWorkflows({workflows}: Pick<EditorProps, 'workflows'>): VNode {
   const [ProvideEditedWorkflow, editedWorkflow$] = useEditedWorkflowHost();
-  const [ProvideActiveWorkflow] = useActiveWorkflowHost();
+  const [ProvideActiveWorkflow] = useActiveWorkflowHost(WorkflowRegistry.inst.primaryExecution?.workflow);
 
   return (
     <ProvideEditedWorkflow>
@@ -208,13 +208,17 @@ function Editor(): VNode {
   }, [editedWorkflow$]);
   const onSave = useCallback(() => {
     const wf = editedWorkflow$.peek();
-    if (!wf?.isValid) {
+    const {
+      listId: activeWorkflowId,
+      name: activeWorkflowName,
+    } = activeWorkflow$.peek()!;
+
+    if (!wf?.isValid(activeWorkflowName)) {
       touched$.value = true;
       return;
     }
 
     const reg = WorkflowRegistry.inst;
-    const activeWorkflowId = activeWorkflow$.peek()!.listId;
     const idx = reg.workflows.findIndex(w => w.listId === activeWorkflowId);
 
     if (idx === -1) {
@@ -231,7 +235,7 @@ function Editor(): VNode {
   return (
     <WorkflowContext.Provider value={editedWorkflow$ as Signal<Workflow>}>
       <ProvideTouched>
-        <WorkflowEditor onSave={onSave}>
+        <WorkflowEditor onSave={onSave} permitDupeName={activeWorkflow$.value?.name}>
           <Btn kind={'danger'} size={'sm'} onClick={onCancel}>{'Cancel'}</Btn>
         </WorkflowEditor>
       </ProvideTouched>
