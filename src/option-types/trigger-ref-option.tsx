@@ -6,9 +6,8 @@ import type {OptionRenderEditCtx} from '../lib/define-option.mjs';
 import {defineOption} from '../lib/define-option.mjs';
 import {EMPTY_ARR} from '../lib/util.mjs';
 import type {TriggerRefOption} from '../public_api';
-import {BorderedBlock} from '../ui/components/block';
+import {BlockDiv} from '../ui/components/block';
 import Btn from '../ui/components/btn';
-import {BinSvg} from '../ui/components/svg';
 import type {TriggerConfigValue} from '../ui/components/trigger-config';
 import TriggerConfig from '../ui/components/trigger-config';
 import {RenderNodeMedia} from '../ui/pages/workflows-dashboard/render-node-media';
@@ -20,7 +19,7 @@ defineOption<WorkflowTrigger | WorkflowTrigger[], TriggerRefOption>({
   renderEdit({value, onChange, option: {multi}}) {
     return multi
       ? <EditMulti onChange={onChange} value={value as WorkflowTrigger[] | undefined}/>
-      : <EditOne onChange={onChange} trigger={value as WorkflowTrigger | undefined}/>;
+      : <EditOne border={true} onChange={onChange} trigger={value as WorkflowTrigger | undefined}/>;
   },
   renderView({value}) {
     if (!Array.isArray(value)) {
@@ -84,7 +83,7 @@ function EditMulti(
   }
 
   return (
-    <div>
+    <div class={'ActionWorkflowsCore-bordered border-fishing'}>
       {value.map((trigger, idx) => (
         <div key={trigger.listId}>
           <EditOne
@@ -93,11 +92,12 @@ function EditMulti(
               out[idx] = newTrigger;
               onChange(out);
             }}
+            border={idx !== 0}
             trigger={trigger}/>
-          <div class={'text-right'}>
+          <div class={'text-right pr-1 pb-2'}>
             <div class={'btn-group btn-group-sm'} data-idx={idx}>
-              <Btn kind={'danger'} onClick={onRm}><BinSvg/></Btn>
-              <Btn kind={'success'} onClick={onAdd}>+</Btn>
+              <Btn kind={'danger'} onClick={onRm}>Remove condition</Btn>
+              <Btn kind={'success'} onClick={onAdd}>Add condition</Btn>
             </div>
           </div>
         </div>
@@ -107,10 +107,12 @@ function EditMulti(
 }
 
 interface EditOneProps extends ViewOneProps {
+  border?: boolean;
+
   onChange(val: WorkflowTrigger): void;
 }
 
-function EditOne({trigger, onChange}: EditOneProps): VNode | null {
+function EditOne({border, trigger, onChange}: EditOneProps): VNode | null {
   const value: TriggerConfigValue = {
     opts: trigger?.opts ?? trigger?.trigger.def.initOptions?.() ?? {},
     trigger: trigger?.trigger,
@@ -128,9 +130,9 @@ function EditOne({trigger, onChange}: EditOneProps): VNode | null {
   }, [trigger]);
 
   return (
-    <BorderedBlock kind={'summoning'}>
+    <BlockDiv class={border ? 'border-top border-summoning' : ''}>
       <TriggerConfig value={value} onChange={onChangeInner}/>
-    </BorderedBlock>
+    </BlockDiv>
   );
 }
 

@@ -15,6 +15,11 @@ $colour-err: #e56767;
     cursor: pointer;
   }
 
+  // The game's !important css makes it impossible to override the colour or width
+  &bordered {
+    border: 1px solid;
+  }
+
   &underdot {
     border-bottom: 1px dotted #fff;
   }
