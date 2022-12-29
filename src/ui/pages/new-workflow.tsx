@@ -18,7 +18,7 @@ export default function NewWorkflow(): VNode<any> {
 
   const onSave = useCallback((): void => {
     const wf = workflow.peek();
-    if (!wf.isValid) {
+    if (!wf.isValid()) {
       touched.value = true;
       return;
     }

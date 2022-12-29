@@ -4,6 +4,7 @@ declare const Skill: typeof import('./index').Skill;
 declare const Player: typeof import('./index').Player;
 declare const PetManager: typeof import('./index').PetManager;
 declare const Bank: typeof import('./index').Bank;
+declare const Game: typeof import('./index').Game;
 declare const NamespaceRegistry: typeof import('./index').NamespaceRegistry;
 declare const AttackTypeID: typeof import('./index').AttackTypeID;
 declare const CombatManager: typeof import('./index').CombatManager;

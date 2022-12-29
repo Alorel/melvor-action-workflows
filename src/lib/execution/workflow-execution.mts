@@ -4,8 +4,6 @@ import {nextComplete} from '@aloreljs/rxutils';
 import {logError} from '@aloreljs/rxutils/operators';
 import type {MonoTypeOperatorFunction, Observer, Subscription, TeardownLogic} from 'rxjs';
 import {
-  asapScheduler,
-  asyncScheduler,
   BehaviorSubject,
   concat,
   defer,
@@ -16,7 +14,6 @@ import {
   map,
   Observable,
   of,
-  scheduled,
   startWith,
   takeUntil,
   tap
@@ -32,6 +29,7 @@ import WorkflowRegistry from '../registries/workflow-registry.mjs';
 import {debugLog, errorLog} from '../util/log.mjs';
 import prependErrorWith from '../util/rxjs/prepend-error-with.mjs';
 import ShareReplayLike from '../util/share-replay-like-observable.mjs';
+import {stopAction} from '../util/stop-action.mjs';
 import type {
   ActionExecutionEvent,
   StepCompleteEvent,
@@ -42,6 +40,8 @@ import type {
 import {WorkflowEventType} from './workflow-event.mjs';
 
 type Out = WorkflowEvent;
+
+const DESC_EVENTS = Object.getOwnPropertyDescriptor(ShareReplayLike.prototype, 'events')!;
 
 /** Represents a workflow in the middle of being executed */
 @PersistClassName('WorkflowTrigger')
@@ -79,7 +79,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
         this.activeStepIdxManual = false;
         ++this.activeStepIdx;
       }
-      this.mainSub = asapScheduler.schedule(this.tick);
+      this.tick();
     },
     error: (e: Error) => {
       const evt = this.mkCompleteEvent(false, e.message);
@@ -94,9 +94,12 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     },
   };
 
-  public constructor(public readonly workflow: Workflow) {
+  public constructor(
+    public readonly workflow: Workflow,
+    step = 0
+  ) {
     super();
-    this._activeStepIdx$ = new BehaviorSubject<number>(0);
+    this._activeStepIdx$ = new BehaviorSubject<number>(step);
     this.activeStepIdx$ = this._activeStepIdx$.asObservable();
   }
 
@@ -111,6 +114,10 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       return;
     }
     this._activeStepIdx$.next(v);
+  }
+
+  public get isFinished(): boolean {
+    return this.finished;
   }
 
   public get running(): boolean {
@@ -161,6 +168,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       }
       this.finished = false;
     }
+
     this.tick();
   }
 
@@ -231,7 +239,9 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       return EMPTY;
     }
 
-    return concat(...step.actions.map((_, i) => this.executeAction(step, stepIdx, i)));
+    return stopAction().pipe(
+      switchMap(() => concat(...step.actions.map((_, i) => this.executeAction(step, stepIdx, i))))
+    );
   }
 
   /**
@@ -245,10 +255,9 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       workflow: this.workflow,
     };
 
-    const trigger$ = step.trigger.listen().pipe(take(1));
-
-    const exec$: Observable<Out> = scheduled(trigger$, asyncScheduler)
+    const exec$: Observable<Out> = step.trigger.listen()
       .pipe(
+        take(1),
         switchMap(() => this.executeActions(step, stepIdx)),
         logError(`Error executing step ${stepIdx} in workflow ${this.workflow.name}:`),
         prependErrorWith(e => of<StepCompleteEvent>({
@@ -351,7 +360,6 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   }
 
   /** Main ticking function for the workflow */
-  @BoundMethod()
   private tick(): void {
     const step = this.activeStep;
     if (!step) {
@@ -368,5 +376,3 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     return takeUntil(this._activeStepIdx$.pipe(filter(i => i !== idx)));
   }
 }
-
-const DESC_EVENTS = Object.getOwnPropertyDescriptor(WorkflowExecution.prototype, 'events')!;

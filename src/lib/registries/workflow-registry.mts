@@ -1,6 +1,7 @@
 import {LazyGetter} from 'lazy-get-decorator';
 import type {Observable} from 'rxjs';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, distinctUntilChanged, map, of, switchMap} from 'rxjs';
+import {getUpdateNumber, runUpdates} from '../data-update.mjs';
 import {Workflow} from '../data/workflow.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import {
@@ -9,15 +10,31 @@ import {
 } from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {WorkflowExecution} from '../execution/workflow-execution.mjs';
 import {alertError} from '../util/alert';
-import {debugLog, errorLog} from '../util/log.mjs';
+import {errorLog, warnLog} from '../util/log.mjs';
 
-const enum Strings {
-  CFG_KEY = 'workflows:v2',
+const enum StorageKey {
+  WORKFLOWS = 'workflows:v2',
+
+  DATA_VERSION = 'dataVersion',
+
+  PRIMARY_EXECUTION = 'primaryExec',
+}
+
+interface PrimaryExecutionRef {
+
+  /** Active step idx */
+  step: number;
+
+  /** Name */
+  workflow: string;
 }
 
 export type ReadonlyBehaviorSubject<T> = Pick<BehaviorSubject<T>, 'value' | keyof Observable<T>>;
 
-/** Container for all the workflows */
+/**
+ * Container for all the workflows.
+ * As long as anything is subscribed to the primary execution, it'll keep on ticking.
+ */
 @PersistClassName('WorkflowRegistry')
 export default class WorkflowRegistry {
 
@@ -34,8 +51,12 @@ export default class WorkflowRegistry {
   private readonly _workflows$: BehaviorSubject<Workflow[]>;
 
   /** Use the singleton @ {@link #inst} */
-  private constructor(workflows: Workflow[]) {
-    this.primaryExecution$ = this._primaryExecution$ = new BehaviorSubject<undefined | WorkflowExecution>(undefined);
+  private constructor(
+    workflows: Workflow[] = [], // eslint-disable-line default-param-last
+    primaryExecution?: WorkflowExecution
+  ) {
+    this.primaryExecution$ = this._primaryExecution$
+      = new BehaviorSubject<undefined | WorkflowExecution>(primaryExecution);
     this.workflows$ = this._workflows$ = new BehaviorSubject(workflows);
   }
 
@@ -47,10 +68,8 @@ export default class WorkflowRegistry {
       out = WorkflowRegistry.fromStorage();
     } catch (e) {
       errorLog('Error initialising workflow registry from storage', e);
-      return new WorkflowRegistry([]);
+      return new WorkflowRegistry();
     }
-
-    debugLog('Initialised workflow registry', out);
 
     return out;
   }
@@ -66,29 +85,45 @@ export default class WorkflowRegistry {
 
   /** Load from storage */
   private static fromStorage(): WorkflowRegistry {
-    const out: Workflow[] = [];
+    const workflowsOut: Workflow[] = [];
 
-    const raw = ctx.accountStorage.getItem(Strings.CFG_KEY);
+    // Get workflows from storage
+    const raw = ctx.accountStorage.getItem(StorageKey.WORKFLOWS);
     if (!raw) {
-      return new WorkflowRegistry(out);
+      storeDataVersion();
+
+      return new WorkflowRegistry(workflowsOut);
     }
 
-    const rawWorkflows = instantiateCompressedToJsonArray(raw);
+    // Decompress their JSON
+    const rawWorkflows: any[] | undefined = instantiateCompressedToJsonArray(raw);
     if (!rawWorkflows) {
       errorLog('Malformed workflows in storage: not a compressed array');
-      return new WorkflowRegistry(out);
+      storeDataVersion();
+
+      return new WorkflowRegistry(workflowsOut);
     }
 
+    // Run data format updates
+    const updateResult = runUpdates(ctx.accountStorage.getItem<number>(StorageKey.DATA_VERSION) ?? -1, rawWorkflows);
+
+    // Instantiate Workflow classes
     for (const rawWF of rawWorkflows) {
       const instance = Workflow.fromJSON(rawWF);
       if (instance) {
-        out.push(instance);
+        workflowsOut.push(instance);
       } else {
         errorLog('Error instantiating workflow', rawWF, 'from storage: malformed data');
       }
     }
 
-    return new WorkflowRegistry(out);
+    const registryOut = new WorkflowRegistry(workflowsOut, loadPrimaryExecution(workflowsOut));
+    if (updateResult.applied) {
+      registryOut.save();
+      storeDataVersion(updateResult.update);
+    }
+
+    return registryOut;
   }
 
   /** Add a new workflow to the list */
@@ -98,10 +133,56 @@ export default class WorkflowRegistry {
     this.setWorkflows([...this.workflows, ...workflow]);
   }
 
+  /** Should be called ONCE, enabled offline support by subscribing to the primary execution at an appropriate time. */
+  public monitorPrimaryExecutionState(): void {
+    this.primaryExecution$
+      .pipe(
+        switchMap((exec): Observable<PrimaryExecutionRef | null> => {
+          if (!exec) {
+            return of(null);
+          }
+
+          // Need to subscribe to the execution itself and not just the primary step index as that's what controls ticks
+          return exec.pipe(
+            map(() => exec.activeStepIdx),
+            distinctUntilChanged(),
+            map((step): PrimaryExecutionRef | null => {
+              if (step >= exec.workflow.steps.length) {
+                return null;
+              }
+
+              return {
+                step,
+                workflow: exec.workflow.name,
+              };
+            })
+          );
+        })
+      )
+      .subscribe(state => {
+        const storage = ctx.characterStorage;
+        if (state) {
+          try {
+            storage.setItem(StorageKey.PRIMARY_EXECUTION, state);
+          } catch (e) {
+            errorLog('Failed to save primary execution state', e);
+          }
+        } else {
+          storage.removeItem(StorageKey.PRIMARY_EXECUTION);
+        }
+      });
+  }
+
   /** Overwrite the workflow at the given index */
   public patch(workflow: Workflow, idx: number): void {
     if (idx < 0 || idx >= this.workflows.length) {
       return;
+    }
+
+    // Don't patch the current workflow - unset it first
+    const executedWorkflow = this.primaryExecution?.workflow?.listId;
+    if (executedWorkflow && this.workflows.findIndex(w => w.listId === executedWorkflow) === idx) {
+      this.setPrimaryExecution();
     }
 
     const out = [...this.workflows];
@@ -143,9 +224,24 @@ export default class WorkflowRegistry {
   }
 }
 
+function loadPrimaryExecution(liveWorkflows: Workflow[]): WorkflowExecution | undefined {
+  const execRef = ctx.characterStorage.getItem<PrimaryExecutionRef>(StorageKey.PRIMARY_EXECUTION);
+  if (!execRef) {
+    return;
+  }
+
+  const workflow = liveWorkflows.find(w => w.name === execRef!.workflow);
+  if (!workflow) {
+    warnLog('Got primary execution', execRef, 'from storage, but the workflow can\'t be found');
+    return;
+  }
+
+  return new WorkflowExecution(workflow, execRef.step);
+}
+
 function store(workflows: Workflow[] | readonly Workflow[]): void | never {
   try {
-    ctx.accountStorage.setItem(Strings.CFG_KEY, compressArray(workflows));
+    ctx.accountStorage.setItem(StorageKey.WORKFLOWS, compressArray(workflows));
   } catch (e) {
     alertError(
       'Melvor mods have a 8kB storage limit and we\'ve reached it. Gonna have to delete some workflows.',
@@ -156,4 +252,10 @@ function store(workflows: Workflow[] | readonly Workflow[]): void | never {
   }
 }
 
-
+function storeDataVersion(version: number = getUpdateNumber()): void {
+  try {
+    ctx.accountStorage.setItem(StorageKey.DATA_VERSION, version);
+  } catch (e) {
+    errorLog('Error storing data version', e);
+  }
+}
