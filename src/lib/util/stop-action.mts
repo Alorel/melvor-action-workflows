@@ -1,10 +1,10 @@
 import type {Observable} from 'rxjs';
-import {of, Subject, tap} from 'rxjs';
+import {defer, of, Subject, tap} from 'rxjs';
 import {take} from 'rxjs/operators';
 import LazyValue from './lazy-value.mjs';
 import {debugLog} from './log.mjs';
 
-const tick$ = new LazyValue<Subject<void>>(() => {
+const nextTick$ = new LazyValue<Subject<void>>(() => {
   const out = new Subject<void>();
   ctx.patch(Game, 'tick').after(() => {
     out.next();
@@ -20,17 +20,20 @@ const tick$ = new LazyValue<Subject<void>>(() => {
  * to boot.
  */
 export function stopAction(): Observable<void> {
-  const action: any = game.activeAction;
-  if (!action) {
-    debugLog('No action to stop');
+  return defer(() => {
+    const action: any = game.activeAction;
 
-    return of(undefined);
-  }
+    if (!action) {
+      debugLog('No action to stop');
 
-  return tick$.value.pipe(
-    take(1),
-    tap(() => {
-      action.stop();
-    })
-  );
+      return of(undefined);
+    }
+
+    return nextTick$.value.pipe(
+      take(1),
+      tap(() => {
+        action.stop();
+      })
+    );
+  });
 }
