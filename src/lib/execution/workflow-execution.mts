@@ -3,21 +3,7 @@ import {Memoise} from '@aloreljs/memoise-decorator';
 import {nextComplete} from '@aloreljs/rxutils';
 import {logError} from '@aloreljs/rxutils/operators';
 import type {MonoTypeOperatorFunction, Observer, Subscription, TeardownLogic} from 'rxjs';
-import {
-  BehaviorSubject,
-  concat,
-  defer,
-  EMPTY,
-  filter,
-  from,
-  last,
-  map,
-  Observable,
-  of,
-  startWith,
-  takeUntil,
-  tap
-} from 'rxjs';
+import {BehaviorSubject, concat, EMPTY, filter, from, Observable, of, startWith, takeUntil, tap} from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
 import type {WorkflowExecutionCtx} from '../../public_api';
 import type ActionConfigItem from '../data/action-config-item.mjs';
@@ -27,9 +13,9 @@ import AutoIncrement from '../decorators/auto-increment.mjs';
 import PersistClassName from '../decorators/PersistClassName.mjs';
 import WorkflowRegistry from '../registries/workflow-registry.mjs';
 import {debugLog, errorLog} from '../util/log.mjs';
+import {nextTickEnd$} from '../util/next-tick.mjs';
 import prependErrorWith from '../util/rxjs/prepend-error-with.mjs';
 import ShareReplayLike from '../util/share-replay-like-observable.mjs';
-import {stopAction} from '../util/stop-action.mjs';
 import type {
   ActionExecutionEvent,
   StepCompleteEvent,
@@ -200,26 +186,32 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
    */
   private executeAction(step: WorkflowStep, stepIdx: number, actionIdx: number): Observable<ActionExecutionEvent> {
     const action = step.actions[actionIdx];
+    const logBase = `${step.actions[actionIdx]?.action.id}[${actionIdx}]@${this.workflow.name}[${stepIdx}]`;
 
-    const src$ = defer((): Observable<ActionExecutionEvent> => {
+    const src$ = new Observable<ActionExecutionEvent>(subscriber => {
+      debugLog('[ExecAction] START', logBase);
+
       const def = action.action.def;
       const result = def
         .execute(action.opts, def.execContext ? this.makeExecCtx(stepIdx) : undefined);
 
       const successEvent = this.makeSuccessEvent(action, step);
-      return result == null
-        ? of(successEvent)
-        : from(result).pipe(
-          last(null, null),
-          map(() => successEvent)
-        );
+      if (result == null) {
+        return nextComplete(subscriber, successEvent);
+      }
+
+      return from(result)
+        .subscribe({
+          complete() {
+            debugLog('[ExecAction] OK', logBase);
+            nextComplete(subscriber, successEvent);
+          },
+          error: subscriber.error.bind(subscriber),
+        });
     });
 
     return src$.pipe(
-      tap(() => {
-        debugLog('Executed action', actionIdx, 'in workflow', this.workflow.name, 'step', stepIdx);
-      }),
-      logError(`[Exec action ${step.actions[actionIdx]?.action.id}[${actionIdx}]@${this.workflow.name}[${stepIdx}]]`),
+      logError(`[ExecAction] ERR ${logBase}`),
       prependErrorWith(e => of<ActionExecutionEvent>({
         ...this.makeSuccessEvent(action, step),
         err: e.message,
@@ -239,9 +231,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       return EMPTY;
     }
 
-    return stopAction().pipe(
-      switchMap(() => concat(...step.actions.map((_, i) => this.executeAction(step, stepIdx, i))))
-    );
+    return concat(...step.actions.map((_, i) => this.executeAction(step, stepIdx, i)));
   }
 
   /**
@@ -258,6 +248,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     const exec$: Observable<Out> = step.trigger.listen()
       .pipe(
         take(1),
+        switchMap(() => nextTickEnd$.value),
         switchMap(() => this.executeActions(step, stepIdx)),
         logError(`Error executing step ${stepIdx} in workflow ${this.workflow.name}:`),
         prependErrorWith(e => of<StepCompleteEvent>({

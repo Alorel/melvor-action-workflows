@@ -132,6 +132,8 @@ export class Skill extends NamespacedObject {
    * @param newLevel
    */
   onLevelUp(oldLevel: number, newLevel: number): void;
+
+  stop(): void;
 }
 
 export class SkillWithMastery<T> extends Skill {
