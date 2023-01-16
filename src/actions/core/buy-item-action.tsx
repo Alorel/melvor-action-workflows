@@ -20,6 +20,9 @@ defineLocalAction<Props>({
     </Fragment>
   ),
   execute({item, qty}) {
+    if (!passesLimitCount(item)) {
+      return;
+    }
     game.shop.buyQuantity = item.allowQuantityPurchase ? (qty ?? 1) : 1;
     game.shop.buyItemOnClick(item, true);
   },
@@ -30,10 +33,11 @@ defineLocalAction<Props>({
     {
       label: 'Item',
       localID: 'item',
-      mediaFilter: (item: ShopPurchase) => item.getBuyLimit(game.currentGamemode) > game.shop.getPurchaseCount(item),
+      mediaFilter: passesLimitCount,
       registry: 'shop.purchases',
       required: true,
       type: 'MediaItem',
+      validateIgnoreMediaFilter: true,
     },
     {
       label: 'Quantity',
@@ -45,3 +49,7 @@ defineLocalAction<Props>({
     },
   ],
 });
+
+function passesLimitCount(item: ShopPurchase): boolean {
+  return item.getBuyLimit(game.currentGamemode) > game.shop.getPurchaseCount(item);
+}

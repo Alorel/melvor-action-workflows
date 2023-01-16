@@ -70,11 +70,19 @@ defineOption<MediaOptionValue, MediaItemNodeOption>({
 });
 
 export default function isMediaItemOption(v: NodeOptionBase & Obj<any>): v is MediaItemNodeOption {
-  const {type, itemRender, mediaFilter, registry, multi} = v as Partial<MediaItemNodeOption>;
+  const {
+    type,
+    itemRender,
+    mediaFilter,
+    registry,
+    multi,
+    validateIgnoreMediaFilter,
+  } = v as Partial<MediaItemNodeOption>;
 
   return type === 'MediaItem'
     && isUndefinedOr(mediaFilter, 'function')
     && isUndefinedOr(itemRender, 'function')
+    && isUndefinedOr(validateIgnoreMediaFilter, 'boolean')
     && (
       typeof registry === 'function'
       || (
@@ -109,14 +117,14 @@ function validateMulti<T extends MediaSelectable>(
 function validateItem<T extends MediaSelectable>(
   item: T,
   reg: TNamespaceRegistry<T>,
-  {mediaFilter}: MediaItemNodeOption,
+  {mediaFilter, validateIgnoreMediaFilter}: MediaItemNodeOption,
   otherOpts: Obj<any>,
   errors: string[]
 ): void {
   if (!reg.registeredObjects.has(item.id)) {
     errors.push(`Item not found in selected registry: ${item.name}`);
   }
-  if (mediaFilter && !mediaFilter(item, otherOpts)) {
+  if (mediaFilter && !validateIgnoreMediaFilter && !mediaFilter(item, otherOpts)) {
     errors.push(`Item doesn't pass filter: ${item.name}`);
   }
 }
