@@ -108,6 +108,12 @@ export interface MediaItemNodeOption extends NodeOptionBase {
 
   type: 'MediaItem';
 
+  /**
+   * Validation will ignore media filter items that don't pass if this is set to `true`
+   * @default false
+   */
+  validateIgnoreMediaFilter?: boolean;
+
   /** Filter out irrelevant items in the registry */
   mediaFilter?(item: any, optionValues: Obj<any>): boolean;
 }
