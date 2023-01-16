@@ -44,17 +44,15 @@ export class TriggerDefinitionContext<T extends object = {}>
       const sub = listenInput$
         ? from(listenInput$)
           .pipe(logError('[TriggerDefinitionCtx.listen]'))
-          .subscribe({
-            complete: () => {
-              listener.notify();
-            },
+          .subscribe(() => {
+            listener.notify();
           })
         : undefined;
 
       return () => {
         debugLog(`Stopping trigger listener ${this.id} with`, data);
-        sub?.unsubscribe();
         listeners.delete(listener);
+        sub?.unsubscribe();
       };
     });
   }

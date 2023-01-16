@@ -51,14 +51,9 @@ defineLocalTrigger<Data>({
   check: ({triggers}) => triggers.some(triggerPasses),
   label: 'Or',
   listen({triggers}) {
-    if (!triggers.length) {
-      return NEVER; // EMPTY won't work as it we're listening for completion and it completes immediately
-    }
-
-    const src$ = triggers.map(trigger => trigger.listen());
-
-    // As soon as one of them emits we're good to go
-    return merge(...src$).pipe(take(1));
+    return triggers.length
+      ? merge(...triggers.map(trigger => trigger.listen()))
+      : NEVER;
   },
   localID: 'or',
   media: 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.8.0/src/ui/assets/or.png',
