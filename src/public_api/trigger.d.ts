@@ -34,7 +34,7 @@ export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefini
   init?(): void;
 
   /**
-   * Override the default trigger listener logic & make the trigger fire when the returned observable completes
+   * Override the default trigger listener logic & make the trigger fire when the returned observable emits
    */
   listen?(data: T): ObservableInput<any>;
 }

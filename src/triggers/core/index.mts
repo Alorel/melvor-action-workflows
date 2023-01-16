@@ -1,5 +1,6 @@
 import './equipped-food-count';
 import './equipped-item-count';
+import './idle-trigger.mjs';
 import './item-charges-trigger';
 import './item-quantity-trigger';
 import './level-gained-trigger';
