@@ -27,7 +27,8 @@ body:
       options:
         - A bugged trigger
         - A bugged action
-        - Mod API bugs
+        - A bugged option type
+#        - Mod API bugs
         - Other/Not sure
     validations:
       required: true

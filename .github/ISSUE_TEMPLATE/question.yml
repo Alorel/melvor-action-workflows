@@ -12,7 +12,7 @@ body:
         - Question about an Action
         - Question about a Trigger
         - Question about workflows
-        - Question about the mod API
+#        - Question about the mod API
         - Something else
     validations:
       required: true
