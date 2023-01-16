@@ -1,5 +1,4 @@
 import {combineLatest, filter, merge, NEVER} from 'rxjs';
-import {take} from 'rxjs/operators';
 import {WorkflowTrigger} from '../../lib/data/workflow-trigger.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
@@ -38,8 +37,7 @@ defineLocalTrigger<Data>({
     return combineLatest(src$).pipe(
 
       // Check that every trigger passes
-      filter(() => triggers.every(triggerPasses)),
-      take(1)
+      filter(() => triggers.every(triggerPasses))
     );
   },
   localID: 'and',
