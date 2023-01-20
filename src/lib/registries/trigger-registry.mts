@@ -1,6 +1,6 @@
 import type {ObservableInput, Subscriber} from 'rxjs';
 import type {TriggerDefinitionContext} from '../data/trigger-definition-context.mjs';
-import PersistClassName from '../decorators/PersistClassName.mjs';
+import PersistClassName from '../util/decorators/PersistClassName.mjs';
 
 /** All possible triggers */
 export const TRIGGER_REGISTRY = new NamespaceRegistry<TriggerDefinitionContext<any>>(game.registeredNamespaces);

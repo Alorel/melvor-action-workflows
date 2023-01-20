@@ -12,8 +12,7 @@ import Btn from '../../ui/components/btn';
 import useTippy from '../../ui/hooks/tippy.mjs';
 import {useRenderEditTouch} from '../_common.mjs';
 
-interface Props<T> extends
-  Pick<OptionRenderEditCtx<T, MediaItemNodeOption>, 'onChange' | 'value'>,
+interface Props<T> extends Pick<OptionRenderEditCtx<T, MediaItemNodeOption>, 'onChange' | 'value'>,
   Pick<MediaItemNodeOption, 'itemRender' | 'icon'> {
 
   filterFn(filterText: string): T[];
@@ -115,14 +114,17 @@ interface ItemsRenderProps<T> {
   /** @default true */
   icon?: boolean;
 
-  itemRender?: ComponentType<{item: T;}>
+  itemRender?: ComponentType<{item: T;}>;
 
   results: ReadonlySignal<T[]>;
+
   onItemClick(e: Event): void;
 }
+
 function DefaultItemRender<T extends MediaSelectable>({item}: {item: T}): VNode {
   return <Fragment>{item.name}</Fragment>;
 }
+
 const ItemsRender = memo(
   function <T extends MediaSelectable> ({
     icon = true,

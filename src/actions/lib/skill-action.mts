@@ -1,7 +1,7 @@
 import type {Game, GatheringSkill, Skill} from 'melvor';
 import type {TypedKeys} from 'mod-util/typed-keys';
 import type {ObservableInput} from 'rxjs';
-import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
+import PersistClassName from '../../lib/util/decorators/PersistClassName.mjs';
 import {namespace} from '../../manifest.json';
 import type {ActionNodeDefinition, NodeOption, Obj} from '../../public_api';
 import type {RecipeOf} from './recipe-action.mjs';

@@ -2,14 +2,11 @@ import {LazyGetter} from 'lazy-get-decorator';
 import type {Observable} from 'rxjs';
 import {BehaviorSubject, distinctUntilChanged, map, of, switchMap} from 'rxjs';
 import {getUpdateNumber, runUpdates} from '../data-update.mjs';
+import type {WorkflowJson} from '../data/workflow.mjs';
 import {Workflow} from '../data/workflow.mjs';
-import PersistClassName from '../decorators/PersistClassName.mjs';
-import {
-  compressArray,
-  instantiateCompressedToJsonArray
-} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
 import {WorkflowExecution} from '../execution/workflow-execution.mjs';
 import {alertError} from '../util/alert';
+import PersistClassName from '../util/decorators/PersistClassName.mjs';
 import {errorLog, warnLog} from '../util/log.mjs';
 
 const enum StorageKey {
@@ -85,35 +82,25 @@ export default class WorkflowRegistry {
 
   /** Load from storage */
   private static fromStorage(): WorkflowRegistry {
-    const workflowsOut: Workflow[] = [];
-
     // Get workflows from storage
-    const raw = ctx.accountStorage.getItem(StorageKey.WORKFLOWS);
+    const raw = ctx.accountStorage.getItem<WorkflowJson[]>(StorageKey.WORKFLOWS);
     if (!raw) {
       storeDataVersion();
 
-      return new WorkflowRegistry(workflowsOut);
-    }
-
-    // Decompress their JSON
-    const rawWorkflows: any[] | undefined = instantiateCompressedToJsonArray(raw);
-    if (!rawWorkflows) {
-      errorLog('Malformed workflows in storage: not a compressed array');
-      storeDataVersion();
-
-      return new WorkflowRegistry(workflowsOut);
+      return new WorkflowRegistry();
     }
 
     // Run data format updates
-    const updateResult = runUpdates(ctx.accountStorage.getItem<number>(StorageKey.DATA_VERSION) ?? -1, rawWorkflows);
+    const updateResult = runUpdates(ctx.accountStorage.getItem<number>(StorageKey.DATA_VERSION) ?? -1, raw);
+
+    const workflowsOut: Workflow[] = [];
 
     // Instantiate Workflow classes
-    for (const rawWF of rawWorkflows) {
-      const instance = Workflow.fromJSON(rawWF);
-      if (instance) {
-        workflowsOut.push(instance);
-      } else {
-        errorLog('Error instantiating workflow', rawWF, 'from storage: malformed data');
+    for (const rawWF of raw) {
+      try {
+        workflowsOut.push(Workflow.fromJSON(rawWF));
+      } catch (e) {
+        errorLog('Error instantiating workflow', rawWF, 'from storage:', e);
       }
     }
 
@@ -241,8 +228,9 @@ function loadPrimaryExecution(liveWorkflows: Workflow[]): WorkflowExecution | un
 
 function store(workflows: Workflow[] | readonly Workflow[]): void | never {
   try {
-    ctx.accountStorage.setItem(StorageKey.WORKFLOWS, compressArray(workflows));
+    ctx.accountStorage.setItem(StorageKey.WORKFLOWS, workflows.map(w => w.toJSON()));
   } catch (e) {
+    console.error(e);
     alertError(
       'Melvor mods have a 8kB storage limit and we\'ve reached it. Gonna have to delete some workflows.',
       'Failed to save'

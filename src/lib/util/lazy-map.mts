@@ -1,4 +1,4 @@
-import PersistClassName from '../decorators/PersistClassName.mjs';
+import PersistClassName from './decorators/PersistClassName.mjs';
 
 /** A Map that can lazily instantiate keys */
 @PersistClassName('LazyMap')

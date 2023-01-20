@@ -1,6 +1,7 @@
 import {staticComponent} from '@alorel/preact-static-component';
 import {batch} from '@preact/signals';
 import type {VNode} from 'preact';
+import {Fragment} from 'preact';
 import {memo} from 'preact/compat';
 import {useCallback} from 'preact/hooks';
 import {Workflow} from '../../../lib/data/workflow.mjs';
@@ -9,6 +10,7 @@ import {EMPTY_ARR} from '../../../lib/util.mjs';
 import {alertConfirm} from '../../../lib/util/alert';
 import {showExportModal} from '../../../lib/util/export-modal.mjs';
 import Btn from '../../components/btn';
+import {ConfigCheckbox, ConfigCheckboxKey} from '../../components/config-checkbox';
 import {useActiveWorkflow, useEditedWorkflow} from '../../components/workflow-editor/editor-contexts';
 import {useRunning} from '../../global-ctx';
 import useReRender from '../../hooks/re-render';
@@ -21,7 +23,16 @@ export const SelectedWorkflowBtns = memo<SelectedWorkflowBtnsProps>(
   function SelectedWorkflowBtns({refresh}) {
     const running = useRunning().value;
 
-    return running ? <BtnsRunning/> : <BtnsNotRunning refresh={refresh}/>;
+    return (
+      <Fragment>
+        {running ? <BtnsRunning/> : <BtnsNotRunning refresh={refresh}/>}
+        <div class={'mt-1'}>
+          <ConfigCheckbox configKey={ConfigCheckboxKey.RM_WORKFLOW_ON_COMPLETE}>
+            Remove workflow on completion
+          </ConfigCheckbox>
+        </div>
+      </Fragment>
+    );
   }
 );
 
@@ -65,7 +76,8 @@ function BtnsNotRunning({refresh}: SelectedWorkflowBtnsProps): VNode {
   }, [activeWorkflow, doRefresh]);
 
   const clone = useCallback(() => {
-    const cloned = Workflow.fromJSON(JSON.parse(JSON.stringify(activeWorkflow.peek()!)))!;
+    const active = activeWorkflow.peek()!;
+    const cloned = Workflow.fromJSON(JSON.parse(JSON.stringify(active)))!;
     cloned.name += ` [copied ${new Date().toLocaleString()}]`;
 
     reg.add(cloned);

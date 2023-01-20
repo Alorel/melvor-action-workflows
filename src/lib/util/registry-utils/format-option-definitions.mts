@@ -5,7 +5,7 @@ import {isTriggerRefOption} from '../../../option-types/trigger-ref/is-trigger-r
 import type {MediaItemNodeOption, NodeOption, Obj, TriggerRefOption} from '../../../public_api';
 import {WorkflowTrigger} from '../../data/workflow-trigger.mjs';
 import {TRIGGER_REGISTRY} from '../../registries/trigger-registry.mjs';
-import {errorLog} from '../log.mjs';
+import {DeserialisationError} from '../to-json.mjs';
 
 /**
  * Serialisation util for formatting option definition objects
@@ -18,79 +18,70 @@ export function formatOptionDefinitions(
   init: Obj<any>,
   optDefinitions: NodeOption[] | undefined,
   opts: Obj<any>
-): boolean {
+): void {
   if (!optDefinitions?.length) {
-    return true;
+    return;
   }
 
   for (const opt of optDefinitions) {
     if (isMediaItemOption(opt)) {
-      if (!formatMediaItem(opt, init, opts)) {
-        return false;
-      }
+      formatMediaItem(opt, init, opts);
     } else if (isTriggerRefOption(opt)) {
-      if (!formatTriggerRef(opt, init, opts)) {
-        return false;
-      }
+      formatTriggerRef(opt, init, opts);
     }
   }
-
-  return true;
 }
 
 function formatTriggerRef(
   opt: TriggerRefOption,
   init: Obj<any>,
   opts: Obj<any>
-): boolean {
+): void {
   type PartialTrigger = Pick<WorkflowTrigger, 'id' | 'opts'>;
   const optValue: PartialTrigger | Array<PartialTrigger | null> | null = opts[opt.localID];
 
   if (Array.isArray(optValue)) {
     const mapped: Array<WorkflowTrigger | null> = Array(optValue.length);
     for (let i = 0; i < optValue.length; ++i) {
-      if (!optValue[i]) {
+      const currOptValue = optValue[i];
+      if (!currOptValue) {
         mapped[i] = null;
         continue;
       }
 
-      const trigger = TRIGGER_REGISTRY.getObjectByID(optValue[i]!.id);
+      const trigger = TRIGGER_REGISTRY.getObjectByID(currOptValue.id);
 
       if (!trigger) {
-        errorLog('Error initialising option', opt.label, 'from', init, '- value', optValue, 'not found');
-        return false;
+        throw new DeserialisationError(init, `No trigger with the given ID: ${currOptValue.id}`);
       }
 
-      formatOptionDefinitions(optValue[i]!.opts, trigger.def.options, optValue[i]!.opts);
+      formatOptionDefinitions(currOptValue.opts, trigger.def.options, currOptValue.opts);
 
-      mapped[i] = new WorkflowTrigger({opts: optValue[i]!.opts, trigger});
+      mapped[i] = new WorkflowTrigger({opts: currOptValue.opts, trigger});
     }
 
     opts[opt.localID] = mapped;
   } else {
     if (!optValue) {
-      return true;
+      return;
     }
 
     const trigger = TRIGGER_REGISTRY.getObjectByID(optValue.id);
     if (!trigger) {
-      errorLog('Error initialising option', opt.label, 'from', init, '- value', optValue, 'not found');
-      return false;
+      throw new DeserialisationError(init, `No trigger with the given ID: ${optValue.id}`);
     }
 
     formatOptionDefinitions(optValue.opts, trigger.def.options, optValue.opts);
 
     opts[opt.localID] = trigger;
   }
-
-  return true;
 }
 
 function formatMediaItem(
   opt: MediaItemNodeOption,
   init: Obj<any>,
   opts: Obj<any>
-): boolean {
+): void {
   const reg: NamespaceRegistry<unknown> | undefined = get(
     game,
     typeof opt.registry === 'function'
@@ -99,23 +90,21 @@ function formatMediaItem(
   );
 
   if (!reg) {
-    errorLog('Error initialising option', opt.label, 'from', init, '- registry', opt.registry, 'not found on game object');
-    return false;
+    throw new DeserialisationError(init, `Registry ${opt.registry} not found`);
   }
 
   const optValue = opts[opt.localID];
 
   if (Array.isArray(optValue)) {
     if (!optValue.every(v => typeof v === 'string')) {
-      return true;
+      return;
     }
 
     const mapped: any[] = Array(optValue.length);
     for (let i = 0; i < optValue.length; ++i) {
       mapped[i] = reg.getObjectByID(optValue[i]);
       if (mapped[i] == null) {
-        errorLog('Error initialising option', opt.label, 'from', init, '- value', optValue, 'at idx', i, 'not found in', opt.registry, 'registry');
-        return false;
+        throw new DeserialisationError(init, `Option ${optValue[i]} not found in registry ${opt.registry}`);
       }
     }
 
@@ -123,12 +112,9 @@ function formatMediaItem(
   } else if (typeof optValue === 'string') {
     const resolvedValue = reg.getObjectByID(optValue);
     if (resolvedValue == null) {
-      errorLog('Error initialising option', opt.label, 'from', init, '- value', optValue, 'not found in', opt.registry, 'registry');
-      return false;
+      throw new DeserialisationError(init, `Option ${optValue} not found in registry ${opt.registry}`);
     }
 
     opts[opt.localID] = resolvedValue;
   }
-
-  return true;
 }

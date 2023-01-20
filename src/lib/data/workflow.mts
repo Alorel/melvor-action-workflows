@@ -1,59 +1,76 @@
 import {BehaviorSubject} from 'rxjs';
-import AutoIncrement from '../decorators/auto-increment.mjs';
-import PersistClassName from '../decorators/PersistClassName.mjs';
-import type {CompressedJsonArray} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
-import {FormatToJsonArrayCompressed} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
-import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
-import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
 import type {ReadonlyBehaviorSubject} from '../registries/workflow-registry.mjs';
 import WorkflowRegistry from '../registries/workflow-registry.mjs';
+import AutoIncrement from '../util/decorators/auto-increment.mjs';
+import PersistClassName from '../util/decorators/PersistClassName.mjs';
+import {DeserialisationError, toJsonMapper} from '../util/to-json.mjs';
 import {WorkflowStep} from './workflow-step.mjs';
 
-type Init = Partial<Pick<Workflow, 'name' | 'rm' | 'steps'>>;
+type Init = Partial<Pick<Workflow, 'name' | 'steps'>>;
 
-export interface WorkflowJson extends Pick<Workflow, 'name'> {
-  steps: CompressedJsonArray<WorkflowStep>;
-}
+export type WorkflowJson = ReturnType<Workflow['toJSON']>
 
 @PersistClassName('Workflow')
-@Serialisable<Workflow, Init | undefined>({
-  from(init) {
-    if (init?.steps?.length && init.name && init.steps.every(s => (s as any) instanceof WorkflowStep)) {
-      return new Workflow(init);
-    }
-  },
-})
 export class Workflow {
-
-  /** @internal */
-  public static fromJSON: FromJSON<Workflow>['fromJSON'];
 
   @AutoIncrement()
   public readonly listId!: number;
 
-  @JsonProp()
   public name: string;
-
-  @JsonProp()
-  public rm: boolean;
 
   public readonly steps$: ReadonlyBehaviorSubject<WorkflowStep[]>;
 
   private readonly _steps$: BehaviorSubject<WorkflowStep[]>;
 
-  public constructor({name, rm, steps}: Init = {}) {
+  public constructor({name, steps}: Init = {}) {
     this.name = name ?? '';
-    this.rm = rm ?? false;
     this.steps$ = this._steps$ = new BehaviorSubject<WorkflowStep[]>(steps?.length ? steps : [new WorkflowStep()]);
-  }
-
-  /** Reset the steps array to its defaults state */
-  public resetSteps(): void {
-    this._steps$.next([new WorkflowStep()]);
   }
 
   public get canRemoveSteps(): boolean {
     return this.steps.length > 1;
+  }
+
+  public get steps(): WorkflowStep[] {
+    return this._steps$.value;
+  }
+
+  public static fromJSON(input: WorkflowJson): Workflow {
+    if (!Array.isArray(input)) {
+      throw new DeserialisationError(input, 'Workflow input not an array');
+    }
+
+    const [
+      name,
+      stepsJson,
+    ] = input;
+
+    if (typeof (name as unknown) !== 'string') {
+      throw new DeserialisationError(input, 'Workflow name not a string');
+    }
+    if (!Array.isArray(stepsJson)) {
+      throw new DeserialisationError(input, `${name} workflow steps not an array`);
+    }
+
+    return new Workflow({
+      name,
+      steps: stepsJson.map((stepJson, i) => {
+        try {
+          return WorkflowStep.fromJSON(stepJson);
+        } catch (e) {
+          throw new DeserialisationError(input, `Failed to deserialise ${name} workflow step at index ${i}:
+=====
+${(e as Error).stack}
+===`);
+        }
+      }),
+    });
+  }
+
+  public addStep(idx: number = this.steps.length): void {
+    const out = [...this.steps];
+    out.splice(idx, 0, new WorkflowStep());
+    this._steps$.next(out);
   }
 
   /**
@@ -67,20 +84,14 @@ export class Workflow {
       && this.steps.every(s => s.isValid);
   }
 
-  @JsonProp({format: FormatToJsonArrayCompressed(WorkflowStep.fromJSON)})
-  public get steps(): WorkflowStep[] {
-    return this._steps$.value;
-  }
-
-  public addStep(idx: number = this.steps.length): void {
-    const out = [...this.steps];
-    out.splice(idx, 0, new WorkflowStep());
-    this._steps$.next(out);
-  }
-
   /** Trigger a change on the steps observable */
   public markStepsChanged(): void {
     this._steps$.next([...this.steps]);
+  }
+
+  /** Reset the steps array to its defaults state */
+  public resetSteps(): void {
+    this._steps$.next([new WorkflowStep()]);
   }
 
   public rmStep(idx: number): void {
@@ -92,7 +103,11 @@ export class Workflow {
     out.splice(idx, 1);
     this._steps$.next(out);
   }
-}
 
-export interface Workflow extends ToJSON<WorkflowJson> {
+  public toJSON() { // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
+    return [
+      this.name,
+      this.steps.map(toJsonMapper),
+    ] as const;
+  }
 }

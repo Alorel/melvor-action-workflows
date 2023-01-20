@@ -6,12 +6,13 @@ import type {MonoTypeOperatorFunction, Observer, Subscription, TeardownLogic} fr
 import {BehaviorSubject, concat, EMPTY, filter, from, Observable, of, startWith, takeUntil, tap} from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
 import type {WorkflowExecutionCtx} from '../../public_api';
+import {ConfigCheckboxKey} from '../../ui/components/config-checkbox';
 import type ActionConfigItem from '../data/action-config-item.mjs';
 import type {WorkflowStep} from '../data/workflow-step.mjs';
 import type {Workflow} from '../data/workflow.mjs';
-import AutoIncrement from '../decorators/auto-increment.mjs';
-import PersistClassName from '../decorators/PersistClassName.mjs';
 import WorkflowRegistry from '../registries/workflow-registry.mjs';
+import AutoIncrement from '../util/decorators/auto-increment.mjs';
+import PersistClassName from '../util/decorators/PersistClassName.mjs';
 import {debugLog, errorLog} from '../util/log.mjs';
 import {nextTickEnd$} from '../util/next-tick.mjs';
 import prependErrorWith from '../util/rxjs/prepend-error-with.mjs';
@@ -171,7 +172,8 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       }
     }
 
-    if (this.workflow.rm) {
+    if (shouldRemoveWorkflowOnCompletion()) {
+      unsetRemoveWorkflowOnCompletion();
       WorkflowRegistry.inst.rmByListId(this.workflow.listId);
     } else {
       this.patchOnInitEventsOnEnd();
@@ -366,4 +368,12 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   private whileStepIs<T>(idx: number): MonoTypeOperatorFunction<T> {
     return takeUntil(this._activeStepIdx$.pipe(filter(i => i !== idx)));
   }
+}
+
+function shouldRemoveWorkflowOnCompletion(): boolean {
+  return Boolean(ctx.accountStorage.getItem(ConfigCheckboxKey.RM_WORKFLOW_ON_COMPLETE));
+}
+
+function unsetRemoveWorkflowOnCompletion(): void {
+  ctx.accountStorage.removeItem(ConfigCheckboxKey.RM_WORKFLOW_ON_COMPLETE);
 }

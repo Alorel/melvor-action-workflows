@@ -1,6 +1,6 @@
 import type {Subscriber} from 'rxjs';
 import {Observable} from 'rxjs';
-import PersistClassName from '../decorators/PersistClassName.mjs';
+import PersistClassName from './decorators/PersistClassName.mjs';
 
 /**
  * An observable class that functions a bit like `shareReplay()`

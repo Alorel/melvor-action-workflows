@@ -27,7 +27,6 @@ const WorkflowEditorHeaderBlock = memo<WorkflowEditorHeaderBlockProps>(
       <div className={EDITOR_SECTION_CLASS}>
         <BorderedBlock kind={'agility'} size={2}>
           <WorkflowNameEditor permitDupeName={permitDupeName}/>
-          <WorkflowRemovableEditor/>
 
           <div className={'text-right mt-3'}>
             {children}
@@ -72,29 +71,6 @@ const WorkflowNameEditor = memo<Pick<WorkflowEditorHeaderBlockProps, 'permitDupe
           required/>
         {touched && err && <div class={'text-danger'}>{err}</div>}
       </div>
-    </div>
-  );
-});
-
-const WorkflowRemovableEditor = memo(function WorkflowRemovableEditor() {
-  const workflow$ = useWorkflow();
-  const reRender = useReRender();
-
-  const onChange = useCallback((e: Event): void => {
-    workflow$.peek().rm = (e.target as HTMLInputElement).checked;
-    reRender();
-  }, [workflow$]);
-
-  return (
-    <div class={'row mt-1'}>
-      <label class={'col-auto font-weight-normal'}>
-        <input type={'checkbox'}
-          class={'mr-1'}
-          checked={workflow$.value.rm}
-          onChange={onChange}
-          required/>
-        <span>Delete workflow on completion</span>
-      </label>
     </div>
   );
 });

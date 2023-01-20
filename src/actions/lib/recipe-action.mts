@@ -2,7 +2,7 @@ import {nextComplete} from '@aloreljs/rxutils';
 import {noop} from 'lodash-es';
 import type {GatheringSkill} from 'melvor';
 import {Observable} from 'rxjs';
-import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
+import PersistClassName from '../../lib/util/decorators/PersistClassName.mjs';
 import type {Obj} from '../../public_api';
 import type {SkillActionInit} from './skill-action.mjs';
 import SkillAction from './skill-action.mjs';
