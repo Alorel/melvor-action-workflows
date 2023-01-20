@@ -1,4 +1,5 @@
 import {logError} from '@aloreljs/rxutils/operators';
+import {noop} from 'lodash-es';
 import {from, Observable} from 'rxjs';
 import type {Obj, TriggerDefinitionContext as ITriggerDefinitionContext, TriggerNodeDefinition} from '../../public_api';
 import PersistClassName from '../decorators/PersistClassName.mjs';
@@ -28,12 +29,12 @@ export class TriggerDefinitionContext<T extends object = {}>
   private readonly _listeners: Set<TriggerListener<T>> = new Set();
 
   public listen(data: T): Observable<void> {
-    const listeners = this._listeners;
-
     return new Observable<void>(subscriber => {
-      const listener = new TriggerListener(this, data, subscriber);
       debugLog(`Starting trigger listener ${this.id} with`, data);
-      listeners.add(listener);
+
+      this.init();
+      const listener = new TriggerListener(this, data, subscriber);
+      this._listeners.add(listener);
 
       if (listener.check()) {
         listener.notify();
@@ -51,7 +52,7 @@ export class TriggerDefinitionContext<T extends object = {}>
 
       return () => {
         debugLog(`Stopping trigger listener ${this.id} with`, data);
-        listeners.delete(listener);
+        this._listeners.delete(listener);
         sub?.unsubscribe();
       };
     });
@@ -62,6 +63,13 @@ export class TriggerDefinitionContext<T extends object = {}>
     for (const listener of filteredListeners(filter, this._listeners.values())) {
       listener.notify();
     }
+  }
+
+  /** A run-once method calling the definition's init function if it exists */
+  private init(): void {
+    this.def.init?.();
+    this.init = noop;
+    debugLog('Initialised trigger', this.id);
   }
 }
 
