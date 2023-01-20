@@ -73,4 +73,5 @@ function OptsTable({action, opts}: OptsTableProps): VNode {
     </div>
   );
 }
+
 OptsTable.displayName = 'ActionConfigOptsTable';

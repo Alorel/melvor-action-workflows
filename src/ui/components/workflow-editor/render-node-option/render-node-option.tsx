@@ -59,6 +59,7 @@ function Inner({option: opt, otherValues, spec, value, onChange: onChangeOut}: I
     </ProvideNodeValidationCtx>
   );
 }
+
 Inner.displayName = 'RenderNodeOptionInner';
 
 function Label(opt: NodeOption): VNode {
@@ -70,6 +71,7 @@ function Label(opt: NodeOption): VNode {
     </Td>
   );
 }
+
 Label.displayName = 'RenderNodeOptionLabel';
 
 function Errors({errors}: {errors: string[]}): VNode {
@@ -79,6 +81,7 @@ function Errors({errors}: {errors: string[]}): VNode {
     </div>
   );
 }
+
 Errors.displayName = 'RenderNodeOptionErrors';
 
 export function NodeOptionDesc({description}: Pick<NodeOption, 'description'>): VNode {
@@ -90,4 +93,5 @@ export function NodeOptionDesc({description}: Pick<NodeOption, 'description'>): 
 function Err({type}: Pick<NodeOption, 'type'>): VNode {
   return (<td colSpan={2} class={'text-danger'}>{`Unregistered option type: ${String(type)}`}</td>);
 }
+
 Err.displayName = 'RenderNodeOptionErr';

@@ -4,6 +4,7 @@ import {EMPTY_ARR, isFalsy} from '../../../lib/util.mjs';
 
 interface Props {
   children: ComponentChildren;
+
   heading: string;
 }
 

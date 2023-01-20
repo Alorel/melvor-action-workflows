@@ -20,7 +20,8 @@ export const DefSection = memo<SectionProps>(function DefSection({config, node, 
 
   return (
     <Fragment>
-      <div class={mkClass('text-center font-size-sm font-w600', !compact && type === 'action' && 'ActionWorkflowsCore-underdot')}>
+      <div
+        class={mkClass('text-center font-size-sm font-w600', !compact && type === 'action' && 'ActionWorkflowsCore-underdot')}>
         <RenderNodeMedia label={compact || node.label} media={node.media}/>
       </div>
       {hasOpts && !compact && <DefSectionOptions opts={node.options!} config={config}/>}
