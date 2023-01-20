@@ -28,17 +28,24 @@ defineLocalTrigger<Data>({
   check: ({triggers}) => triggers.every(triggerPasses),
   label: 'And',
   listen({triggers}) {
-    if (!triggers.length) {
-      return NEVER; // EMPTY won't work as it we're listening for completion and it completes immediately
+    switch (triggers.length) {
+      case 0:
+        return NEVER; // EMPTY won't work as it we're listening for completion and it completes immediately;
+      case 1: {
+        const trigger = triggers[0];
+
+        return trigger.listen().pipe(filter(() => trigger.check()));
+      }
+      default: {
+        const src$ = triggers.map(trigger => trigger.listen());
+
+        return combineLatest(src$).pipe(
+
+          // Check that every trigger passes
+          filter(() => triggers.every(triggerPasses))
+        );
+      }
     }
-
-    const src$ = triggers.map(trigger => trigger.listen());
-
-    return combineLatest(src$).pipe(
-
-      // Check that every trigger passes
-      filter(() => triggers.every(triggerPasses))
-    );
   },
   localID: 'and',
   media: 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.8.0/src/ui/assets/and.png',
