@@ -7,7 +7,7 @@
   "repository": "https://github.com/Alorel/melvor-action-workflows.git",
   "types": "index.d.ts",
   "typings": "index.d.ts",
-  "author": "Arturas Molcanovas <a.molcanovas@gmail.com>",
+  "author": "Alorel <amolc@pm.me>",
   "license": "MIT",
   "scripts": {
     "rollup": "rollup --bundleConfigAsCjs -c",

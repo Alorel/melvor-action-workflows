@@ -41,6 +41,7 @@ interface MultiProps {
 
   items: RenderNodeMediaProps[];
 }
+
 const RenderViewMulti = ({items, icon}: MultiProps): VNode => (
   <Fragment>
     {items.map(item => (

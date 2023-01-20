@@ -1,9 +1,7 @@
-import type {Workflow} from './data/workflow.mjs';
-import update0001 from './updates/update-0001.mjs';
+import update0001 from './updates/0001-dedupe-names.mjs';
+import update0002 from './updates/0002-compress-json.mjs';
 
-export interface SerialisedWorkflow extends Pick<Workflow, 'name' | 'rm'> {
-  steps: [string[], any[][]];
-}
+export type SerialisedWorkflow = any;
 
 export type DataUpdateFn = (workflows: SerialisedWorkflow[]) => void;
 
@@ -16,9 +14,16 @@ export interface RunUpdatesResult {
   update: number;
 }
 
-function getUpdatesArray(): DataUpdateFn[] {
+/**
+ * @return [number of deleted/obsolete scripts, updates array]
+ */
+function getUpdatesArray(): [number, DataUpdateFn[]] {
   return [
-    update0001,
+    0,
+    [
+      update0001,
+      update0002,
+    ],
   ];
 }
 
@@ -28,21 +33,23 @@ function getUpdatesArray(): DataUpdateFn[] {
  * @param data The raw loaded data
  * @return Whether at least one update got applied or not
  */
-export function runUpdates(dataVersion: number, data: SerialisedWorkflow[]): RunUpdatesResult {
-  const updateFns = getUpdatesArray();
+export function runUpdates(dataVersion: number, data: any[]): RunUpdatesResult {
+  const [skipped, updateFns] = getUpdatesArray();
 
   // The version defaults to -1 - add 1 to get array index 0
-  const firstIdx = dataVersion + 1;
+  const firstIdx = dataVersion + 1 - skipped;
   for (let i = firstIdx; i < updateFns.length; ++i) {
     updateFns[i](data);
   }
 
   return {
     applied: firstIdx < updateFns.length,
-    update: updateFns.length - 1,
+    update: updateFns.length - 1 + skipped,
   };
 }
 
 export function getUpdateNumber(): number {
-  return getUpdatesArray().length - 1;
+  const [add, arr] = getUpdatesArray();
+
+  return arr.length - 1 + add;
 }

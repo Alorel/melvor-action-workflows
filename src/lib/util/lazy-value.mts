@@ -1,5 +1,5 @@
 import {LazyGetter} from 'lazy-get-decorator';
-import PersistClassName from '../decorators/PersistClassName.mjs';
+import PersistClassName from './decorators/PersistClassName.mjs';
 
 /** Compute the value lazily */
 @PersistClassName('LazyValue')

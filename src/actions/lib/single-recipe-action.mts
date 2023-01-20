@@ -1,6 +1,6 @@
 import type {ArtisanSkill, GatheringSkill, SingleProductArtisanSkillRecipe} from 'melvor';
 import {concat, Observable} from 'rxjs';
-import PersistClassName from '../../lib/decorators/PersistClassName.mjs';
+import PersistClassName from '../../lib/util/decorators/PersistClassName.mjs';
 import type {RecipeActionBuilder, RecipeOf} from './recipe-action.mjs';
 import {RecipeAction} from './recipe-action.mjs';
 import type {SkillActionInit} from './skill-action.mjs';

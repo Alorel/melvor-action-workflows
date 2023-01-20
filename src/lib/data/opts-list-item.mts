@@ -1,15 +1,16 @@
 import type {NodeOption, Obj} from '../../public_api';
-import AutoIncrement from '../decorators/auto-increment.mjs';
-import PersistClassName from '../decorators/PersistClassName.mjs';
-import {FormatDeepToJsonObject} from '../decorators/to-json-formatters/format-deep-to-json-object.mjs';
-import {JsonProp} from '../decorators/to-json.mjs';
 import {OPTION_REGISTRY} from '../registries/option-registry.mjs';
 import {EMPTY_ARR} from '../util.mjs';
+import AutoIncrement from '../util/decorators/auto-increment.mjs';
+import PersistClassName from '../util/decorators/PersistClassName.mjs';
+import {DeserialisationError} from '../util/to-json.mjs';
 import {validateNodeOption} from '../util/validate-workflow.mjs';
 
 interface Init {
   opts?: Obj<any>;
 }
+
+type CommonJson = readonly [string, Obj<any>];
 
 @PersistClassName('OptsListItem')
 export default abstract class OptsListItem {
@@ -19,8 +20,7 @@ export default abstract class OptsListItem {
   public readonly listId!: number;
 
   /** Option values */
-  @JsonProp({format: FormatDeepToJsonObject()})
-  public opts!: Obj<any>;
+  public opts!: Obj<any>; // Gets set in extending classes' constructors
 
   public constructor({opts}: Init) {
     if (opts) {
@@ -45,5 +45,37 @@ export default abstract class OptsListItem {
     return true;
   }
 
+  protected static parseCommonJson<T extends CommonJson>(input: T): T {
+    if (!Array.isArray(input)) {
+      throw new DeserialisationError(input, `${this.name} input not an array`);
+    }
+
+    const opts = input[1];
+
+    if (opts && (typeof opts !== 'object' || Array.isArray(opts))) {
+      throw new DeserialisationError(input, `Malformed ${this.name} options`);
+    }
+
+    return input;
+  }
+
   protected abstract getOptions(): NodeOption[] | undefined;
+
+  protected jsonifyOptions(): Obj<any> {
+    return Object.fromEntries(
+      Object.entries(this.opts)
+        .map(([k, v]) => [k, jsonifyOption(v)])
+    );
+  }
 }
+
+function jsonifyOption(val: any): any {
+  return val == null
+    ? null
+    : val instanceof NamespacedObject
+      ? val.id
+      : Array.isArray(val)
+        ? val.map(jsonifyOption)
+        : val;
+}
+

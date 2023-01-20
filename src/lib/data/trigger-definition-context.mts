@@ -1,32 +1,28 @@
 import {logError} from '@aloreljs/rxutils/operators';
 import {noop} from 'lodash-es';
 import {from, Observable} from 'rxjs';
-import type {Obj, TriggerDefinitionContext as ITriggerDefinitionContext, TriggerNodeDefinition} from '../../public_api';
-import PersistClassName from '../decorators/PersistClassName.mjs';
-import type {FromJSON} from '../decorators/to-json.mjs';
-import {Serialisable} from '../decorators/to-json.mjs';
+import type {TriggerDefinitionContext as ITriggerDefinitionContext, TriggerNodeDefinition} from '../../public_api';
 import {NamespacedDefinition} from '../namespaced-definition.mjs';
 import {TRIGGER_REGISTRY, TriggerListener} from '../registries/trigger-registry.mjs';
+import PersistClassName from '../util/decorators/PersistClassName.mjs';
 import {debugLog} from '../util/log.mjs';
-import {getFromRegistryOrLog} from '../util/registry-utils/get-from-registry-or-log.mjs';
+import {DeserialisationError} from '../util/to-json.mjs';
 
 @PersistClassName('TriggerDefinitionContext')
-@Serialisable<TriggerDefinitionContext<any>, string | undefined>({
-  from(id) {
-    if (typeof id === 'string') {
-      return getFromRegistryOrLog(TRIGGER_REGISTRY, id, 'TriggerDefinitionContext');
-    }
-  },
-  override: true,
-})
 export class TriggerDefinitionContext<T extends object = {}>
   extends NamespacedDefinition<TriggerNodeDefinition<T>>
   implements ITriggerDefinitionContext<T> {
 
-  /** @internal */
-  public static fromJSON: FromJSON<TriggerDefinitionContext<Obj<any>>>['fromJSON'];
-
   private readonly _listeners: Set<TriggerListener<T>> = new Set();
+
+  public static fromJSON<T extends object = {}>(id: string): TriggerDefinitionContext<T> {
+    const out = TRIGGER_REGISTRY.getObjectByID(id);
+    if (!out) {
+      throw new DeserialisationError(id, `No trigger with such ID: ${id}`);
+    }
+
+    return out;
+  }
 
   public listen(data: T): Observable<void> {
     return new Observable<void>(subscriber => {

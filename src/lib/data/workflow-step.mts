@@ -1,40 +1,22 @@
-import AutoIncrement from '../decorators/auto-increment.mjs';
-import PersistClassName from '../decorators/PersistClassName.mjs';
-import {FormatToJsonArrayCompressed} from '../decorators/to-json-formatters/format-to-json-array-compressed.mjs';
-import {FormatToJson} from '../decorators/to-json-formatters/format-to-json.mjs';
-import type {FromJSON, ToJSON} from '../decorators/to-json.mjs';
-import {JsonProp, Serialisable} from '../decorators/to-json.mjs';
 import {EMPTY_OBJ} from '../util.mjs';
+import AutoIncrement from '../util/decorators/auto-increment.mjs';
+import PersistClassName from '../util/decorators/PersistClassName.mjs';
+import {DeserialisationError, toJsonMapper} from '../util/to-json.mjs';
 import ActionConfigItem from './action-config-item.mjs';
-import type {WorkflowTriggerJson} from './workflow-trigger.mjs';
 import {WorkflowTrigger} from './workflow-trigger.mjs';
 
 type Init = Partial<Pick<WorkflowStep, 'actions' | 'trigger'>>;
 
-export interface WorkflowStepJson {
-  actions: WorkflowTriggerJson[];
-}
+export type WorkflowStepJson = ReturnType<WorkflowStep['toJSON']>;
 
 @PersistClassName('Workflow')
-@Serialisable<WorkflowStep, Partial<Init> | undefined>({
-  from(init) {
-    if (init?.actions?.length && init.trigger && init.actions.every(a => (a as any) instanceof ActionConfigItem)) {
-      return new WorkflowStep(init);
-    }
-  },
-})
 export class WorkflowStep {
 
-  /** @internal */
-  public static fromJSON: FromJSON<WorkflowStep>['fromJSON'];
-
-  @JsonProp({format: FormatToJsonArrayCompressed(ActionConfigItem.fromJSON)})
   public actions: ActionConfigItem[];
 
   @AutoIncrement()
   public readonly listId!: number;
 
-  @JsonProp({format: FormatToJson(WorkflowTrigger.fromJSON)})
   public trigger: WorkflowTrigger;
 
   public constructor(init: Init = EMPTY_OBJ) {
@@ -47,10 +29,55 @@ export class WorkflowStep {
       && this.actions.every(a => a?.isValid);
   }
 
+  public static fromJSON(input: WorkflowStepJson): WorkflowStep {
+    if (!Array.isArray(input)) {
+      throw new DeserialisationError(input, 'Step input not an array');
+    }
+
+    const [
+      triggerJson,
+      actionsJson,
+    ] = input;
+
+    if (!Array.isArray(actionsJson)) {
+      throw new DeserialisationError(input, 'Actions not an array');
+    }
+    if (!actionsJson.length) {
+      throw new DeserialisationError(input, 'Actions array empty');
+    }
+
+    let trigger: WorkflowTrigger;
+    try {
+      trigger = WorkflowTrigger.fromJSON(triggerJson);
+    } catch (e) {
+      throw new DeserialisationError(input, `Failed deserialising step trigger:\n=====${(e as Error).stack}\n===`);
+    }
+
+    const actions = actionsJson.map((actionJson, i) => {
+      try {
+        return ActionConfigItem.fromJSON(actionJson);
+      } catch (e) {
+        throw new DeserialisationError(input, `Failed to deserialise step action at index ${i}:
+=====
+${(e as Error).stack}
+===`);
+      }
+    });
+
+    return new WorkflowStep({
+      actions,
+      trigger,
+    });
+  }
+
   public addAction(): void {
     this.actions.push(new ActionConfigItem());
   }
-}
 
-export interface WorkflowStep extends ToJSON <WorkflowStepJson> {
+  public toJSON() { // eslint-disable-line @typescript-eslint/explicit-module-boundary-types
+    return [
+      this.trigger.toJSON(),
+      this.actions.map(toJsonMapper),
+    ] as const;
+  }
 }
