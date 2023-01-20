@@ -25,10 +25,10 @@ export class TriggerDefinitionContext<T extends object = {}>
   /** @internal */
   public static fromJSON: FromJSON<TriggerDefinitionContext<Obj<any>>>['fromJSON'];
 
-  readonly #listeners: Set<TriggerListener<T>> = new Set();
+  private readonly _listeners: Set<TriggerListener<T>> = new Set();
 
   public listen(data: T): Observable<void> {
-    const listeners = this.#listeners;
+    const listeners = this._listeners;
 
     return new Observable<void>(subscriber => {
       const listener = new TriggerListener(this, data, subscriber);
@@ -59,7 +59,7 @@ export class TriggerDefinitionContext<T extends object = {}>
 
   /** @inheritDoc */
   public notifyListeners(filter: (listenerData: Readonly<T>) => any = this.def.check): void {
-    for (const listener of filteredListeners(filter, this.#listeners.values())) {
+    for (const listener of filteredListeners(filter, this._listeners.values())) {
       listener.notify();
     }
   }
