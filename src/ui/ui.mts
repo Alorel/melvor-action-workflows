@@ -1,4 +1,5 @@
 import {startCase} from 'lodash-es';
+import {githubAsset} from '../lib/util.mjs';
 import {namespace} from '../manifest.json';
 import type {Obj} from '../public_api';
 import './assets/styles.scss';
@@ -16,7 +17,7 @@ interface BaseCat {
 
 // Init package
 {
-  const mainIcon = 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.4.2/src/ui/assets/icon.png';
+  const mainIcon = githubAsset('src/ui/assets/icon.png', '0.5.0');
 
   const cat = <T extends object = {}>(config?: T): T & BaseCat => ({
     categoryID: '',

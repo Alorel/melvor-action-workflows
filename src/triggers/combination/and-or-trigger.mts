@@ -1,6 +1,7 @@
 import {combineLatest, filter, merge, NEVER} from 'rxjs';
 import {WorkflowTrigger} from '../../lib/data/workflow-trigger.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {githubAsset} from '../../lib/util.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import type {TriggerNodeDefinition} from '../../public_api';
 
@@ -48,7 +49,7 @@ defineLocalTrigger<Data>({
     }
   },
   localID: 'and',
-  media: 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.8.0/src/ui/assets/and.png',
+  media: githubAsset('src/ui/assets/and.png', '0.8.0'),
 });
 
 defineLocalTrigger<Data>({
@@ -61,7 +62,7 @@ defineLocalTrigger<Data>({
       : NEVER;
   },
   localID: 'or',
-  media: 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.8.0/src/ui/assets/or.png',
+  media: githubAsset('src/ui/assets/or.png', '0.8.0'),
 });
 
 function triggerPasses(trigger: WorkflowTrigger): boolean {
