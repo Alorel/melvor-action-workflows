@@ -3,6 +3,7 @@ import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   pet: Pet;
@@ -21,18 +22,18 @@ const triggerCtx = defineLocalTrigger<Data>({
       <span>{' unlocked'}</span>
     </Fragment>
   ),
+  id: TriggerId.CorePetUnlocked,
   init() {
     ctx.patch(PetManager, 'unlockPet').after(() => {
       triggerCtx.notifyListeners(check);
     });
   },
   label: 'Pet unlocked',
-  localID: 'petUnlocked',
   media: game.pets.getObjectByID('melvorD:CoolRock')!.media,
   options: [
     {
+      id: 'pet',
       label: 'Pet',
-      localID: 'pet',
       registry: 'pets',
       required: true,
       type: 'MediaItem',

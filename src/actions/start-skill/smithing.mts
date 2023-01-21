@@ -1,17 +1,18 @@
 import type {Smithing} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<Smithing>({
       category: InternalCategory.START_SKILL,
-      localID: 'startSmithing',
+      id: ActionId.StartSkillSmithing,
       options: [
         {
+          id: 'recipe',
           label: 'Item',
-          localID: 'recipe',
           registry: ['smithing', 'actions'],
           required: true,
           type: 'MediaItem',

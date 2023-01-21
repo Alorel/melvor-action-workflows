@@ -35,7 +35,7 @@ export default abstract class OptsListItem {
         continue;
       }
 
-      const value = this.opts[opt.localID];
+      const value = this.opts[opt.id];
       const spec = OPTION_REGISTRY.get(opt.type)!;
       if (validateNodeOption(value, spec, opt, this.opts).length) {
         return false;

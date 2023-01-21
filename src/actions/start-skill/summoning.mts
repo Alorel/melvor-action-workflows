@@ -1,26 +1,27 @@
 import type {Summoning, SummoningRecipe} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import type {AltRecipeData, SingleRecipeData} from '../lib/single-recipe-action.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<AltRecipeData<Summoning>, Summoning>({
       category: InternalCategory.START_SKILL,
-      localID: 'startSummmon',
+      id: ActionId.StartSkillSummoning,
       options: [
         {
+          id: 'recipe',
           label: 'Creature',
-          localID: 'recipe',
           registry: ['summoning', 'actions'],
           required: true,
           type: 'MediaItem',
         },
         {
           getAltCostItems: (recipe: SummoningRecipe) => recipe.nonShardItemCosts,
+          id: 'alt',
           label: 'Recipe',
-          localID: 'alt',
           recipeOption: 'recipe',
           required: true,
           showIf: ({recipe}: SingleRecipeData<Summoning>) => Boolean(recipe?.nonShardItemCosts.length),

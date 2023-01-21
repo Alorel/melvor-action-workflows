@@ -5,6 +5,7 @@ import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-compare.mjs';
 import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import TriggerId from '../trigger-id.mjs';
 
 export interface ItemQuantityTriggerData {
   comparator: NumComparator;
@@ -24,6 +25,7 @@ const triggerCtx = defineLocalTrigger<ItemQuantityTriggerData>({
       <BigNum num={qty}/>
     </Fragment>
   ),
+  id: TriggerId.CoreItemQty,
   init() {
     function patcher(_returnValue: any, {id}: TItem) {
       const liveQty = game.bank.getQty(game.items.getObjectByID(id));
@@ -36,26 +38,25 @@ const triggerCtx = defineLocalTrigger<ItemQuantityTriggerData>({
   },
   initOptions: () => ({comparator: NumComparator.GTE}),
   label: 'Item Quantity (bank)',
-  localID: 'itemQty',
   media: game.pages.getObjectByID('melvorD:Bank')!.media,
   options: [
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       registry: 'items',
       required: true,
       type: 'MediaItem',
     },
     {
       enum: NUM_COMPARE_ENUM,
+      id: 'comparator',
       label: 'Comparator',
-      localID: 'comparator',
       required: true,
       type: String,
     },
     {
+      id: 'qty',
       label: 'Quantity',
-      localID: 'qty',
       min: 0,
       required: true,
       type: Number,

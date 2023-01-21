@@ -37,8 +37,8 @@ function DefSectionOptions({opts, config}: DefProps): VNode {
   return (
     <table class={'font-size-sm w-100'}>
       <tbody>
-        {opts.map(opt => (<RenderNodeOptionValue key={opt.localID}
-          value={config[opt.localID]}
+        {opts.map(opt => (<RenderNodeOptionValue key={opt.id}
+          value={config[opt.id]}
           option={opt}
           otherValues={config}/>))}
       </tbody>

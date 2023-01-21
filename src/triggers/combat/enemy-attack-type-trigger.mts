@@ -3,6 +3,7 @@ import type {Enemy} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import type {Obj} from '../../public_api';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   type: Enemy['attackType'];
@@ -11,6 +12,7 @@ interface Data {
 const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.COMBAT,
   check: d => game.combat.isActive && game.combat.enemy.attackType === d.type,
+  id: TriggerId.CombatEnemyAtkType,
   init() {
     ctx.patch(CombatManager, 'spawnEnemy').after(() => {
       const ty = game.combat.enemy.attackType;
@@ -19,7 +21,6 @@ const triggerCtx = defineLocalTrigger<Data>({
   },
   initOptions: () => ({type: AttackTypeID[AttackTypeID.melee] as Enemy['attackType']}),
   label: 'Monster attack type in combat',
-  localID: 'mobAtkType',
   media: cdnMedia('assets/media/skills/combat/combat.svg'),
   options: [
     {
@@ -33,8 +34,8 @@ const triggerCtx = defineLocalTrigger<Data>({
           },
           {}
         ),
+      id: 'type',
       label: 'Type',
-      localID: 'type',
       required: true,
       type: String,
     },

@@ -4,6 +4,7 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import ActionId from '../action-id.mjs';
 
 interface Data {
   item: TFoodItem;
@@ -33,13 +34,13 @@ defineLocalAction<Data>({
 
     game.combat.player.equipFood(item, Math.min(qty ?? bankQty, bankQty));
   },
+  id: ActionId.CoreEquipFood,
   label: 'Equip food',
-  localID: 'equipFood',
   media: game.items.getObjectByID('melvorD:Anglerfish')!.media,
   options: [
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       mediaFilter: item => item instanceof FoodItem,
       registry: 'items',
       required: true,
@@ -47,8 +48,8 @@ defineLocalAction<Data>({
     },
     {
       description: 'Leave empty to equip all',
+      id: 'qty',
       label: 'Quantity',
-      localID: 'qty',
       min: 1,
       type: Number,
     },

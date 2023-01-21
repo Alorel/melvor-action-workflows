@@ -7,6 +7,7 @@ import {EMPTY_ARR} from '../../lib/util.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import type {ActionNodeDefinition, NodeOption} from '../../public_api';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   area: CombatArea;
@@ -15,8 +16,10 @@ interface Props {
   mob?: number;
 }
 
-interface Init extends Omit<ActionNodeDefinition<Props>, 'namespace' | 'category' | 'options' | 'execContext'> {
+interface Init extends Omit<ActionNodeDefinition<Props>, 'id' | 'category' | 'options' | 'execContext'> {
   extraOpts?: NodeOption[];
+
+  id: ActionId;
 
   optionLabel: string;
 
@@ -43,8 +46,8 @@ const mkAction = ({extraOpts, registry, optionLabel, ...init}: Init) => {
     category: InternalCategory.COMBAT,
     options: [
       {
+        id: 'area',
         label: optionLabel,
-        localID: 'area',
         registry,
         required: true,
         type: 'MediaItem',
@@ -65,8 +68,8 @@ const mkAction = ({extraOpts, registry, optionLabel, ...init}: Init) => {
 
 const areaMobOption: [NodeOption] = [{
   getAltCostItems: (area: CombatArea) => area.monsters as any[] || EMPTY_ARR,
+  id: 'mob',
   label: 'Monster',
-  localID: 'mob',
   recipeOption: 'area',
   required: true,
   showIf: ({area}: Props) => Boolean(area),
@@ -77,8 +80,8 @@ mkAction({
   compactRender: renderMob,
   execute: execMob,
   extraOpts: areaMobOption,
+  id: ActionId.CombatStartCombatStd,
   label: 'Start Combat Area',
-  localID: 'startCombatStd',
   media: game.combat.media,
   optionLabel: 'Area',
   registry: 'combatAreas',
@@ -88,8 +91,8 @@ mkAction({
   compactRender: renderMob,
   execute: execMob,
   extraOpts: areaMobOption,
+  id: ActionId.CombatStartCombatSlayer,
   label: 'Start Slayer Area',
-  localID: 'startCombatSlayer',
   media: game.slayer.media,
   optionLabel: 'Area',
   registry: 'slayerAreas',
@@ -105,8 +108,8 @@ mkAction({
   execute({area}) {
     game.combat.selectDungeon(area as Dungeon);
   },
+  id: ActionId.CombatStartCombatDungeon,
   label: 'Start Dungeon',
-  localID: 'startCombatDung',
   media: cdnMedia('assets/media/skills/combat/dungeon.svg'),
   optionLabel: 'Dungeon',
   registry: 'dungeons',

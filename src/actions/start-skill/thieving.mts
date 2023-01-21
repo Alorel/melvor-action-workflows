@@ -1,7 +1,8 @@
 import type {Thieving, ThievingArea, ThievingNPC} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import LazyValue from '../../lib/util/lazy-value.mjs';
+import ActionId from '../action-id.mjs';
 import {segmentSkillAreasAndRecipes} from '../lib/segment-skill-areas-and-recipes.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
@@ -9,15 +10,15 @@ const npcAreaMap = new LazyValue(() => (
   segmentSkillAreasAndRecipes<ThievingArea, ThievingNPC>(game.thieving.areas, 'npcs')
 ));
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<Thieving>({
       category: InternalCategory.START_SKILL,
-      localID: 'startThieving',
+      id: ActionId.StartSkillThieving,
       options: [
         {
+          id: 'recipe',
           label: 'NPC',
-          localID: 'recipe',
           registry: ['thieving', 'actions'],
           required: true,
           type: 'MediaItem',

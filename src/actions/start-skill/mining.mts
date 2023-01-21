@@ -1,17 +1,18 @@
 import type {Mining} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<Mining>({
       category: InternalCategory.START_SKILL,
-      localID: 'startMining',
+      id: ActionId.StartSkillMining,
       options: [
         {
+          id: 'recipe',
           label: 'Rock',
-          localID: 'recipe',
           registry: ['mining', 'actions'],
           required: true,
           type: 'MediaItem',

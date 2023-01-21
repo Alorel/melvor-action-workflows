@@ -7,7 +7,7 @@ import type {Observable} from 'rxjs';
 import {AsyncSubject, EMPTY, map, switchMap, takeUntil} from 'rxjs';
 import './actions/actions.mjs';
 import {WorkflowEventType} from './lib/execution/workflow-event.mjs';
-import WorkflowRegistry from './lib/registries/workflow-registry.mjs';
+import WorkflowRegistry, {loadPrimaryExecution} from './lib/registries/workflow-registry.mjs';
 import {debugLog, errorLog} from './lib/util/log.mjs';
 import './option-types/option-types.mjs';
 import './triggers/index.mjs';
@@ -23,8 +23,14 @@ let sidenavIconContainer: Signal<HTMLSpanElement | null>;
 let reg: WorkflowRegistry;
 const interfaceReady$ = new AsyncSubject<void>();
 
-ctx.onCharacterLoaded(() => {
+// Start applying updates ASAP
+ctx.onCharacterSelectionLoaded(() => {
   reg = WorkflowRegistry.inst;
+});
+
+ctx.onCharacterLoaded(() => {
+  // Load primary execution
+  reg.setLoadedPrimaryExecution(loadPrimaryExecution(reg.workflows));
 
   // Start listening on the primary execution to enable offline support
   reg.monitorPrimaryExecutionState();

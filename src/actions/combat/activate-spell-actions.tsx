@@ -6,6 +6,7 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import type {ActionNodeDefinition} from '../../public_api';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   spell: CombatSpell;
@@ -15,7 +16,9 @@ type Key = keyof SpellSelection;
 type ToggleMethod = TypedKeys<Player, (spell: CombatSpell) => void>;
 type This = ActionNodeDefinition<Props> & Pick<Init, 'spellSelection' | 'toggleMethod'>;
 
-interface Init extends Omit<ActionNodeDefinition<Props>, 'namespace' | 'category' | 'options' | 'execute' | 'execContext'> {
+interface Init extends Omit<ActionNodeDefinition<Props>, 'category' | 'options' | 'execute' | 'execContext' | 'id'> {
+  id: ActionId;
+
   registry: TypedKeys<Game, NamespaceRegistry<CombatSpell>>;
 
   spellSelection: Key;
@@ -46,8 +49,8 @@ const mkAction = ({media, registry, ...init}: Init): void => {
     execute,
     media: cdnMedia(`assets/media/skills/${media}`),
     options: [{
+      id: 'spell',
       label: 'Spell',
-      localID: 'spell',
       registry,
       required: true,
       type: 'MediaItem',
@@ -61,8 +64,8 @@ const mkAction = ({media, registry, ...init}: Init): void => {
 };
 
 mkAction({
+  id: ActionId.CombatCastSpellStd,
   label: 'Cast Standard spell',
-  localID: 'castStdSpell',
   media: 'combat/spellbook.svg',
   registry: 'standardSpells',
   spellSelection: 'standard',
@@ -70,8 +73,8 @@ mkAction({
 });
 
 mkAction({
+  id: ActionId.CombatCastSpellAncient,
   label: 'Cast Ancient spell',
-  localID: 'castAncientSpell',
   media: 'combat/ancient.svg',
   registry: 'ancientSpells',
   spellSelection: 'ancient',
@@ -79,8 +82,8 @@ mkAction({
 });
 
 mkAction({
+  id: ActionId.CombatCastSpellArchaic,
   label: 'Cast Archaic spell',
-  localID: 'castArchaicSpell',
   media: 'magic/archaic_book.svg',
   registry: 'archaicSpells',
   spellSelection: 'archaic',
@@ -88,8 +91,8 @@ mkAction({
 });
 
 mkAction({
+  id: ActionId.CombatCastSpellAurora,
   label: 'Cast Aurora',
-  localID: 'castAurora',
   media: 'combat/ancient.svg',
   registry: 'auroraSpells',
   spellSelection: 'aurora',
@@ -97,8 +100,8 @@ mkAction({
 });
 
 mkAction({
+  id: ActionId.CombatCastSpellCurse,
   label: 'Cast Curse',
-  localID: 'castCurse',
   media: 'combat/curses.svg',
   registry: 'curseSpells',
   spellSelection: 'curse',

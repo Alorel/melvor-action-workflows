@@ -1,6 +1,7 @@
 import type {Item} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   items: Item[];
@@ -16,14 +17,14 @@ defineLocalAction<Props>({
       }
     }
   },
+  id: ActionId.CoreSellItem,
   initOptions: () => ({items: [undefined as any]}),
   label: 'Sell items',
-  localID: 'sellItem',
   media: game.pages.getObjectByID('melvorD:Shop')!.media,
   options: [
     {
+      id: 'items',
       label: 'Items',
-      localID: 'items',
       multi: true,
       registry: 'items',
       required: true,

@@ -2,6 +2,7 @@ import type {ActivePrayer} from 'melvor';
 import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   prayers?: ActivePrayer[];
@@ -29,14 +30,14 @@ defineLocalAction<Props>({
       }
     }
   },
+  id: ActionId.CombatActivatePrayers,
   label: 'Activate prayers',
-  localID: 'activatePrayers',
   media: game.prayer.media,
   options: [
     {
       description: 'Leave empty to disable all prayers',
+      id: 'prayers',
       label: 'Prayers',
-      localID: 'prayers',
       multi: {
         maxLength: 2,
       },

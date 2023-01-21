@@ -1,17 +1,18 @@
 import type {Firemaking} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<Firemaking>({
       category: InternalCategory.START_SKILL,
-      localID: 'startFiremaking',
+      id: ActionId.StartSkillFiremaking,
       options: [
         {
+          id: 'recipe',
           label: 'Logs',
-          localID: 'recipe',
           registry: ['firemaking', 'actions'],
           required: true,
           type: 'MediaItem',

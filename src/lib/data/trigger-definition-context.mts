@@ -16,7 +16,7 @@ export class TriggerDefinitionContext<T extends object = {}>
   private readonly _listeners: Set<TriggerListener<T>> = new Set();
 
   public static fromJSON<T extends object = {}>(id: string): TriggerDefinitionContext<T> {
-    const out = TRIGGER_REGISTRY.getObjectByID(id);
+    const out = TRIGGER_REGISTRY.get(id);
     if (!out) {
       throw new DeserialisationError(id, `No trigger with such ID: ${id}`);
     }

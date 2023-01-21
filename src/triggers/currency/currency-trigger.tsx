@@ -6,6 +6,7 @@ import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-compare.mjs';
 import type {TriggerNodeDefinition} from '../../public_api';
 import {BigNum} from '../../ui/components/big-num';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   amount: number;
@@ -19,14 +20,14 @@ const base = {
   options: [
     {
       enum: NUM_COMPARE_ENUM,
+      id: 'comparator',
       label: 'Comparator',
-      localID: 'comparator',
       required: true,
       type: String,
     },
     {
+      id: 'amount',
       label: 'Amount',
-      localID: 'amount',
       min: 0,
       required: true,
       type: Number,
@@ -37,6 +38,7 @@ const base = {
 const makeTrigger = (
   key: TypedKeys<Game, Currency>,
   clazz: Class<Currency>,
+  id: TriggerId,
   icon: string,
   label: string
 ): void => {
@@ -51,16 +53,16 @@ const makeTrigger = (
         <BigNum num={amount}/>
       </Fragment>
     ),
+    id,
     init() {
       ctx.patch(clazz, 'onAmountChange').after(() => {
         triggerCtx.notifyListeners(check);
       });
     },
     label,
-    localID: key,
     media: cdnMedia(`assets/media/main/${icon}.svg`),
   });
 };
 
-makeTrigger('gp', GP, 'coins', 'GP');
-makeTrigger('slayerCoins', SlayerCoins, 'slayer_coins', 'Slayer Coins');
+makeTrigger('gp', GP, TriggerId.CurrencyGold, 'coins', 'GP');
+makeTrigger('slayerCoins', SlayerCoins, TriggerId.CurrencySlayer, 'slayer_coins', 'Slayer Coins');

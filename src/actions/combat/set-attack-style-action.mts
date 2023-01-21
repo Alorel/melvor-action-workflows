@@ -4,6 +4,7 @@ import type {AttackStyle as TAttackStyle} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import type {Obj} from '../../public_api';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   style: string;
@@ -17,8 +18,8 @@ defineLocalAction<Props>({
 
     player.setAttackStyle(style.attackType, style);
   },
+  id: ActionId.CombatSetAttackStyle,
   label: 'Set attack style',
-  localID: 'setAtkStyle',
   media: game.attack.media,
   options: [
     {
@@ -28,8 +29,8 @@ defineLocalAction<Props>({
 
           return acc;
         })),
+      id: 'style',
       label: 'Style',
-      localID: 'style',
       required: true,
       type: String,
     },

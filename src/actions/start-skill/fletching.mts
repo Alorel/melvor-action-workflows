@@ -1,6 +1,7 @@
 import type {Fletching, FletchingAlternativeCosts, FletchingRecipe, Item} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import type {AltRecipeData, SingleRecipeData} from '../lib/single-recipe-action.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
@@ -8,23 +9,23 @@ function mapAltCost(altCost: FletchingAlternativeCosts): Item {
   return altCost.itemCosts[0].item;
 }
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<AltRecipeData<Fletching>, Fletching>({
       category: InternalCategory.START_SKILL,
-      localID: 'startFletching',
+      id: ActionId.StartSkillFletching,
       options: [
         {
+          id: 'recipe',
           label: 'Item',
-          localID: 'recipe',
           registry: ['fletching', 'actions'],
           required: true,
           type: 'MediaItem',
         },
         {
           getAltCostItems: (recipe: FletchingRecipe) => recipe.alternativeCosts?.map(mapAltCost) ?? [],
+          id: 'alt',
           label: 'Logs',
-          localID: 'alt',
           recipeOption: 'recipe',
           required: true,
           showIf: ({recipe}: SingleRecipeData<Fletching>) => Boolean(recipe?.alternativeCosts?.length),

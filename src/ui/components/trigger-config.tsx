@@ -44,11 +44,11 @@ const TriggerConfig = memo<Props>(
 
               return show !== false && (
                 <RenderNodeOption
-                  key={`${opt.localID}@${triggerId}`}
+                  key={`${opt.id}@${triggerId}`}
                   onChange={newVal => {
                     const newOpts = {
                       ...opts,
-                      [opt.localID]: newVal,
+                      [opt.id]: newVal,
                     };
                     opt.resets?.forEach(prop => {
                       delete newOpts[prop];
@@ -58,7 +58,7 @@ const TriggerConfig = memo<Props>(
                   }}
                   option={opt}
                   otherValues={opts}
-                  value={opts[opt.localID]}/>
+                  value={opts[opt.id]}/>
               );
             })}
           </tbody>

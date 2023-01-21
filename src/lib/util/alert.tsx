@@ -9,12 +9,26 @@ const baseOpts: Partial<SweetAlertOptions> = {
 };
 
 /** Make an error alert message */
-export function alertError(text: string, title = 'Confirmation'): void {
+export function alertError(text: string, title = 'Uh oh'): void {
   Swal
     .fire({
       ...baseOpts,
       cancelButtonText: 'Oh no',
       confirmButtonText: 'OK',
+      showConfirmButton: false,
+      text,
+      title,
+    })
+    .catch(console.error);
+}
+
+/** Make an error info message */
+export function alertInfo(text: string, title = 'Action Workflows'): void {
+  Swal
+    .fire({
+      ...baseOpts,
+      showCancelButton: false,
+      showCloseButton: true,
       showConfirmButton: false,
       text,
       title,
