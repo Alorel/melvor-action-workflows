@@ -106,11 +106,12 @@ function ExportAll(): VNode {
 }
 
 function alertDone() {
-  Swal // eslint-disable-line @typescript-eslint/no-floating-promises
+  Swal
     .fire({
       confirmButtonText: 'OK',
       showCancelButton: false,
       showConfirmButton: true,
       text: 'Done!',
-    });
+    })
+    .catch(console.error);
 }

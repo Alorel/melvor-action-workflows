@@ -11,14 +11,15 @@ export function showExportModal(title: string, contents: any): void {
   html.textContent = JSON.stringify(contents);
   html.readOnly = true;
 
-  Swal // eslint-disable-line @typescript-eslint/no-floating-promises
+  Swal
     .fire({
       confirmButtonText: 'OK',
       html,
       showCancelButton: false,
       showConfirmButton: true,
       title,
-    });
+    })
+    .catch(console.error);
 }
 
 /** @return Pasted JSON */

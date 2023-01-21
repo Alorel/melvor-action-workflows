@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {AttackStyle, AttackTypeID, CombatSpell, FoodItem, NamespacedObject} from 'melvor';
 import type {EquipmentItem, Item} from './item';
 

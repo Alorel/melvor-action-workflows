@@ -9,7 +9,7 @@ export interface RenderNodeMediaProps extends Pick<NodeDefinition, 'media'> {
 export function RenderNodeMedia({label, media}: RenderNodeMediaProps): VNode {
   return (
     <Fragment>
-      <img class={'ActionWorkflowsCore-font-sized mr-1'} src={media}/>
+      <img class={'ActionWorkflowsCore-font-sized mr-1'} src={media} alt={'Icon'}/>
       <span>{label}</span>
     </Fragment>
   );

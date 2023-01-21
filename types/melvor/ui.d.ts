@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 export interface SidebarContext {
   category(id: string, config?: CategoryConfig, builder?: (cat: Category) => void): Category;
 }

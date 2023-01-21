@@ -50,7 +50,7 @@ function RenderBtn<T extends MediaSelectable>({icon = true, value, onChange}: Bt
 
   return (
     <Btn kind={'primary'} size={'sm'} onClick={unselect}>
-      {icon && <img class={'ActionWorkflowsCore-font-sized mr-1'} src={value.media}/>}
+      {icon && <img class={'ActionWorkflowsCore-font-sized mr-1'} src={value.media} alt={'Icon'}/>}
       <span>{value.name}</span>
     </Btn>
   );

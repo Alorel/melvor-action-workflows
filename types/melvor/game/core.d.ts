@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {ActivePrayer, CombatArea, CombatSpell, Dungeon, Pet, PetManager, SlayerArea, SpecialAttack} from 'melvor';
 import type {Monster} from './combat';
 import {Attack, AttackStyle} from './combat';

@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import type {Class, InstanceOf} from 'mod-util/class';
 
 export interface ModContext {

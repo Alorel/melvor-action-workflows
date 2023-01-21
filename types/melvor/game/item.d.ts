@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import type {PotionReuseTarget} from './misc';
 import type {EquipSlotType} from './toon';
 

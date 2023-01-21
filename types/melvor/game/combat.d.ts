@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {BaseSpell, NamespacedObject} from './core';
 import {Skill} from './skilling';
 import type {Character} from './toon';

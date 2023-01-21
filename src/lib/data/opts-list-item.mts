@@ -22,7 +22,7 @@ export default abstract class OptsListItem {
   /** Option values */
   public opts!: Obj<any>; // Gets set in extending classes' constructors
 
-  public constructor({opts}: Init) {
+  protected constructor({opts}: Init) {
     if (opts) {
       this.opts = opts;
     }

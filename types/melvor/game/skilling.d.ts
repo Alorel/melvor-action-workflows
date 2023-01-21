@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import type {BaseSpell, Game, NamespaceRegistry, RuneRequirement} from './core';
 import type {Item} from './item';
 import type {ItemCost, ShopPurchase} from './misc';

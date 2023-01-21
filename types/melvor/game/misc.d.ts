@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {CombatArea, Dungeon, Enemy, Monster} from 'melvor/game/combat';
 import type {NamespaceRegistry} from './core';
 import type {Item, PotionItem} from './item';
