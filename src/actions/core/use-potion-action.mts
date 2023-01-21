@@ -1,6 +1,7 @@
 import type {Item, PotionItem as TPotionItem} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   potion: TPotionItem;
@@ -26,14 +27,14 @@ defineLocalAction<Props>({
       mgr.usePotion(potion);
     }
   },
+  id: ActionId.CoreUsePotion,
   initOptions: () => ({reuse: true}),
   label: 'Use potion',
-  localID: 'usePotion',
   media: cdnMedia('assets/media/bank/deadly_toxins_potion.png'),
   options: [
     {
+      id: 'potion',
       label: 'Potion',
-      localID: 'potion',
       mediaFilter: (item: Item) => item.type === 'Potion',
       registry: 'items',
       required: true,
@@ -41,8 +42,8 @@ defineLocalAction<Props>({
     },
     {
       description: 'Auto Re-use Potions for this Skill?',
+      id: 'reuse',
       label: 'Re-use',
-      localID: 'reuse',
       type: Boolean,
     },
   ],

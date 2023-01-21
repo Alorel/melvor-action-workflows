@@ -1,5 +1,6 @@
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   set: number;
@@ -10,14 +11,14 @@ defineLocalAction<Props>({
   execute({set}) {
     game.combat.player.changeEquipmentSet(set);
   },
+  id: ActionId.CoreSwitchEquipmentSets,
   initOptions: () => ({set: 0}),
   label: 'Equip set',
-  localID: 'equipSet',
   media: game.items.getObjectByID('melvorD:Black_Platebody_T_G')!.media,
   options: [
     {
+      id: 'set',
       label: 'Set',
-      localID: 'set',
       required: true,
       type: 'EquipmentSet',
     },

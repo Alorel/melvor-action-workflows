@@ -5,6 +5,7 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   item: TEquipmentItem;
@@ -44,13 +45,13 @@ defineLocalAction<Props>({
     player.changeEquipToSet(player.selectedEquipmentSet);
     player.equipItem(item, player.equipToSet, slot || 'Default', qty ?? bankQty);
   },
+  id: ActionId.CoreEquipItem,
   label: 'Equip item',
-  localID: 'equipItem',
   media: game.items.getObjectByID('melvorD:Black_Platebody')!.media,
   options: [
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       mediaFilter: item => item instanceof EquipmentItem,
       registry: 'items',
       required: true,
@@ -59,15 +60,15 @@ defineLocalAction<Props>({
     {
       description: 'Leave empty to use the item\'s default, e.g. a ring with a passive effect would get equipped to the ring slot. If you\'re equipping two summons, specify the slot for each.',
       enum: ({item}: Props) => objectFromArray(item.validSlots),
+      id: 'slot',
       label: 'Slot',
-      localID: 'slot',
       showIf: ({item}: Partial<Props>) => (item?.validSlots?.length ?? 0) > 1,
       type: String,
     },
     {
       description: 'Equips however much you have in the bank if unspecified & supported.',
+      id: 'qty',
       label: 'Quantity',
-      localID: 'qty',
       min: 1,
       showIf: ({item}: Partial<Props>) => SLOTS_WITH_QTY.has(item?.validSlots[0] as EquipSlotType),
       type: Number,

@@ -3,6 +3,7 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {githubAsset} from '../../lib/util.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {tickEnd$} from '../../lib/util/next-tick.mjs';
+import TriggerId from '../trigger-id.mjs';
 
 function check(): boolean {
   return !game.activeAction;
@@ -19,6 +20,7 @@ function filterFn([a, b]: boolean[]): boolean {
 defineLocalTrigger({
   category: InternalCategory.CORE,
   check,
+  id: TriggerId.CoreIdle,
   label: 'Idle',
   listen() {
     return tickEnd$.value
@@ -29,6 +31,5 @@ defineLocalTrigger({
         filter(filterFn)
       );
   },
-  localID: 'idle',
   media: githubAsset('src/ui/assets/lazy-peon.png', '0.12.0'),
 });

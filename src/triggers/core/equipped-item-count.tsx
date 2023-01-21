@@ -6,6 +6,7 @@ import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-compare.mjs';
 import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   comparator: NumComparator;
@@ -26,6 +27,7 @@ const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.CORE,
   check,
   compactRender: EquippedItemCountCompactRender,
+  id: TriggerId.CoreEquippedItemCount,
   init() {
     function patch() {
       triggerCtx.notifyListeners(check);
@@ -38,12 +40,11 @@ const triggerCtx = defineLocalTrigger<Data>({
   },
   initOptions: () => ({comparator: NumComparator.GTE}),
   label: 'Item Quantity (equipped)',
-  localID: 'equippedQty',
   media: cdnMedia('assets/media/bank/armour_helmet.png'),
   options: [
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       mediaFilter: item => item instanceof EquipmentItem,
       registry: 'items',
       required: true,
@@ -51,14 +52,14 @@ const triggerCtx = defineLocalTrigger<Data>({
     },
     {
       enum: NUM_COMPARE_ENUM,
+      id: 'comparator',
       label: 'Comparator',
-      localID: 'comparator',
       required: true,
       type: String,
     },
     {
+      id: 'qty',
       label: 'Quantity',
-      localID: 'qty',
       min: 0,
       required: true,
       type: Number,

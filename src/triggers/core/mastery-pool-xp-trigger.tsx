@@ -3,6 +3,7 @@ import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   pool: number;
@@ -20,26 +21,26 @@ const triggerCtx = defineLocalTrigger<Data>({
       <span class={'text-primary'}>{`${pool}%`}</span>
     </Fragment>
   ),
+  id: TriggerId.CoreMasteryPool,
   init() {
     ctx.patch(SkillWithMastery, 'addMasteryPoolXP').after(function () {
       triggerCtx.notifyListeners();
     });
   },
   label: 'Mastery pool %',
-  localID: 'masteryPool',
   media: cdnMedia('assets/media/main/mastery_pool.svg'),
   options: [
     {
+      id: 'skill',
       label: 'Skill',
-      localID: 'skill',
       mediaFilter: (skill: Skill) => skill.hasMastery,
       registry: 'skills',
       required: true,
       type: 'MediaItem',
     },
     {
+      id: 'pool',
       label: '%',
-      localID: 'pool',
       max: ({skill}: Partial<Data>) => Math.max(125, skill?.masteryPoolCapPercent ?? 0), // eslint-disable-line @typescript-eslint/no-magic-numbers
       min: 0,
       required: true,

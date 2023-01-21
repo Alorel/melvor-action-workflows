@@ -1,7 +1,7 @@
-import type {NamespaceRegistry} from 'melvor';
 import type {ComponentChildren, VNode} from 'preact';
 import {useCallback} from 'preact/compat';
 import type {NamespacedDefinition} from '../../../../lib/namespaced-definition.mjs';
+import type {StdRegistryKey} from '../../../../lib/registries/registries.mjs';
 import type {CategorisedObject} from '../../../../lib/util/categorise-registry-objects.mjs';
 import {errorLog} from '../../../../lib/util/log.mjs';
 import type {Referenceable} from '../../../../public_api';
@@ -15,7 +15,7 @@ interface Props<T> {
 
   clearable?: boolean;
 
-  registry: NamespaceRegistry<T>;
+  registry: Map<StdRegistryKey, T>;
 
   value: T | undefined;
 
@@ -64,21 +64,31 @@ function useClear<T>(value: T, onChange: () => void): () => void {
 function useOnSelectChange<T extends Def>(
   selectedId: string | undefined,
   onChange: (value?: T) => void,
-  registry: NamespaceRegistry<T>,
+  registry: Map<StdRegistryKey, T>,
   values: Array<CategorisedObject<T>>
 ): (e: Event) => void {
   const firstItem = values[0].items[0];
 
   return useCallback((e: Event) => {
     const newId = (e.target as HTMLSelectElement).value;
+
     if (newId) {
-      const out = registry.getObjectByID(newId);
+      let out = registry.get(newId);
+
+      // Account for numeric IDs coming from within this mod
+      if (!out) {
+        const asNum = parseInt(newId);
+        if (!isNaN(asNum)) {
+          out = registry.get(asNum);
+        }
+      }
+
       if (out) {
         onChange(out);
         return;
       }
-      errorLog(`Somehow got ${newId} in <select>, but not in the registry`);
 
+      errorLog('Somehow got', newId, 'in <select>, but not in the registry');
     }
 
     if (selectedId !== firstItem.id) {

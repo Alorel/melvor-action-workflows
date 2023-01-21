@@ -30,7 +30,7 @@ export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefini
    */
   check(data: T): boolean;
 
-  /** Called when the mod gets enabled */
+  /** Called we start listening to the trigger for the first time */
   init?(): void;
 
   /**

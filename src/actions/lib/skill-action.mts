@@ -2,25 +2,28 @@ import type {Game, GatheringSkill, Skill} from 'melvor';
 import type {TypedKeys} from 'mod-util/typed-keys';
 import type {ObservableInput} from 'rxjs';
 import PersistClassName from '../../lib/util/decorators/PersistClassName.mjs';
-import {namespace} from '../../manifest.json';
 import type {ActionNodeDefinition, NodeOption, Obj} from '../../public_api';
+import type ActionId from '../action-id.mjs';
 import type {RecipeOf} from './recipe-action.mjs';
 
 export interface SkillActionInit<T extends object>
-  extends Pick<ActionNodeDefinition<T>, | 'options' | 'localID' | 'initOptions'>,
+  extends Pick<ActionNodeDefinition<T>, | 'options' | 'initOptions'>,
     Partial<Pick<ActionNodeDefinition<T>, | 'media' | 'label'>>,
     Required<Pick<ActionNodeDefinition<T>, | 'category'>> {
+
+  id: ActionId;
 
   skillKey: string & TypedKeys<Game, Skill>;
 }
 
 @PersistClassName('SkillAction')
 export default abstract class SkillAction<T extends object, S extends GatheringSkill<any>>
-  extends NamespacedObject
-  implements ActionNodeDefinition<T> {
+implements ActionNodeDefinition<T> {
 
   /** @inheritDoc */
   public readonly category: string;
+
+  public readonly id: string;
 
   /** @inheritDoc */
   public readonly initOptions?: () => Obj<any>;
@@ -36,8 +39,8 @@ export default abstract class SkillAction<T extends object, S extends GatheringS
 
   public readonly skill: S;
 
-  public constructor({localID, label, category, media, options, initOptions, skillKey}: SkillActionInit<T>) {
-    super({name: namespace}, localID);
+  public constructor({id, label, category, media, options, initOptions, skillKey}: SkillActionInit<T>) {
+    this.id = id as unknown as string;
     this.category = category;
     this.skill = game[skillKey] as any;
     this.media = media ?? this.skill.media;

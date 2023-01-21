@@ -3,6 +3,7 @@ import type {NamespaceRegistry} from 'melvor';
 import isMediaItemOption from '../../../option-types/media-item-option.mjs';
 import {isTriggerRefOption} from '../../../option-types/trigger-ref/is-trigger-ref-option.mjs';
 import type {MediaItemNodeOption, NodeOption, Obj, TriggerRefOption} from '../../../public_api';
+import type {WorkflowTriggerJson} from '../../data/workflow-trigger.mjs';
 import {WorkflowTrigger} from '../../data/workflow-trigger.mjs';
 import {TRIGGER_REGISTRY} from '../../registries/trigger-registry.mjs';
 import {DeserialisationError} from '../to-json.mjs';
@@ -37,44 +38,42 @@ function formatTriggerRef(
   init: Obj<any>,
   opts: Obj<any>
 ): void {
-  type PartialTrigger = Pick<WorkflowTrigger, 'id' | 'opts'>;
-  const optValue: PartialTrigger | Array<PartialTrigger | null> | null = opts[opt.localID];
+  const optValue: WorkflowTriggerJson | WorkflowTriggerJson[] | null = opts[opt.id];
 
-  if (Array.isArray(optValue)) {
+  if (!optValue) {
+    return;
+  } else if (Array.isArray(optValue[0])) {
     const mapped: Array<WorkflowTrigger | null> = Array(optValue.length);
-    for (let i = 0; i < optValue.length; ++i) {
-      const currOptValue = optValue[i];
-      if (!currOptValue) {
-        mapped[i] = null;
-        continue;
-      }
 
-      const trigger = TRIGGER_REGISTRY.getObjectByID(currOptValue.id);
+    for (let i = 0; i < optValue.length; ++i) {
+      const [id, triggerOpts] = optValue[i] as WorkflowTriggerJson;
+
+      const trigger = TRIGGER_REGISTRY.get(id);
 
       if (!trigger) {
-        throw new DeserialisationError(init, `No trigger with the given ID: ${currOptValue.id}`);
+        throw new DeserialisationError(init, `No trigger with the given ID: ${id}`);
       }
 
-      formatOptionDefinitions(currOptValue.opts, trigger.def.options, currOptValue.opts);
+      formatOptionDefinitions(init, trigger.def.options, triggerOpts);
 
-      mapped[i] = new WorkflowTrigger({opts: currOptValue.opts, trigger});
+      mapped[i] = new WorkflowTrigger({opts: triggerOpts, trigger});
     }
 
-    opts[opt.localID] = mapped;
-  } else {
-    if (!optValue) {
-      return;
-    }
+    opts[opt.id] = mapped;
 
-    const trigger = TRIGGER_REGISTRY.getObjectByID(optValue.id);
-    if (!trigger) {
-      throw new DeserialisationError(init, `No trigger with the given ID: ${optValue.id}`);
-    }
-
-    formatOptionDefinitions(optValue.opts, trigger.def.options, optValue.opts);
-
-    opts[opt.localID] = trigger;
+    return;
   }
+
+  const [id, triggerOpts] = optValue as WorkflowTriggerJson;
+
+  const trigger = TRIGGER_REGISTRY.get(id);
+  if (!trigger) {
+    throw new DeserialisationError(init, `No trigger with the given ID: ${id}`);
+  }
+
+  formatOptionDefinitions(init, trigger.def.options, triggerOpts);
+
+  opts[opt.id] = new WorkflowTrigger({opts: triggerOpts, trigger});
 }
 
 function formatMediaItem(
@@ -93,7 +92,7 @@ function formatMediaItem(
     throw new DeserialisationError(init, `Registry ${opt.registry} not found`);
   }
 
-  const optValue = opts[opt.localID];
+  const optValue = opts[opt.id];
 
   if (Array.isArray(optValue)) {
     if (!optValue.every(v => typeof v === 'string')) {
@@ -108,13 +107,13 @@ function formatMediaItem(
       }
     }
 
-    opts[opt.localID] = mapped;
+    opts[opt.id] = mapped;
   } else if (typeof optValue === 'string') {
     const resolvedValue = reg.getObjectByID(optValue);
     if (resolvedValue == null) {
       throw new DeserialisationError(init, `Option ${optValue} not found in registry ${opt.registry}`);
     }
 
-    opts[opt.localID] = resolvedValue;
+    opts[opt.id] = resolvedValue;
   }
 }

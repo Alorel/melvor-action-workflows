@@ -1,17 +1,18 @@
 import type {Astrology} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<Astrology>({
       category: InternalCategory.START_SKILL,
-      localID: 'startAstro',
+      id: ActionId.StartSkillAstrology,
       options: [
         {
+          id: 'recipe',
           label: 'Constellation',
-          localID: 'recipe',
           registry: ['astrology', 'actions'],
           required: true,
           type: 'MediaItem',

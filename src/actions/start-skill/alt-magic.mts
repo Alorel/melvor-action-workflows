@@ -1,7 +1,7 @@
 import type {AltMagicSpell, FoodItem, Item, SingleProductArtisanSkillRecipe} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
-import {namespace} from '../../manifest.json';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 
 const magic = game.altMagic;
 
@@ -19,7 +19,7 @@ interface Props {
   superGem?: Item;
 }
 
-defineAction<Props>({
+defineLocalAction<Props>({
   category: InternalCategory.START_SKILL,
   execute({bar, food, junk, item, recipe, superGem}) {
     magic.selectSpellOnClick(recipe);
@@ -44,21 +44,20 @@ defineAction<Props>({
 
     magic.castButtonOnClick();
   },
+  id: ActionId.StartSkillAltMagic,
   label: 'Start Alt. Magic',
-  localID: 'startAltMagic',
   media: magic.media,
-  namespace,
   options: [
     {
+      id: 'recipe',
       label: 'Spell',
-      localID: 'recipe',
       registry: 'altMagic.actions',
       required: true,
       type: 'MediaItem',
     },
     {
+      id: 'bar',
       label: 'Bar',
-      localID: 'bar',
       mediaFilter: ({category}: SingleProductArtisanSkillRecipe) => category.id === 'melvorD:Bars',
       registry: 'smithing.actions',
       required: true,
@@ -71,8 +70,8 @@ defineAction<Props>({
       type: 'MediaItem',
     },
     {
+      id: 'junk',
       label: 'Item',
-      localID: 'junk',
       mediaFilter: ({type}: Item) => type === 'Junk',
       registry: 'items',
       required: true,
@@ -80,16 +79,16 @@ defineAction<Props>({
       type: 'MediaItem',
     },
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       registry: 'items',
       required: true,
       showIf: ({recipe}: Props) => recipe?.specialCost.type === AltMagicConsumptionID.AnyItem,
       type: 'MediaItem',
     },
     {
+      id: 'superGem',
       label: 'Gem',
-      localID: 'superGem',
       mediaFilter: ({type}: Item) => type === 'Superior Gem',
       registry: 'items',
       required: true,
@@ -97,8 +96,8 @@ defineAction<Props>({
       type: 'MediaItem',
     },
     {
+      id: 'food',
       label: 'Food',
-      localID: 'food',
       mediaFilter: ({localID, type}: Item) => type === 'Food' && !localID.endsWith('_Perfect'),
       registry: 'items',
       required: true,

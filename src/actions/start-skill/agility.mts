@@ -1,7 +1,8 @@
 import type {Agility} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import PersistClassName from '../../lib/util/decorators/PersistClassName.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import SkillAction from '../lib/skill-action.mjs';
 
 @PersistClassName('AgilityAction')
@@ -13,8 +14,8 @@ class AgilityAction extends SkillAction<{}, Agility> {
   }
 }
 
-defineAction(new AgilityAction({
+defineLocalAction(new AgilityAction({
   category: InternalCategory.START_SKILL,
-  localID: 'startAgility',
+  id: ActionId.StartSkillAgility,
   skillKey: 'agility',
 }));

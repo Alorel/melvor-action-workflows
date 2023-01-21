@@ -1,20 +1,21 @@
 import type {ObservableInput, Subscriber} from 'rxjs';
 import type {TriggerDefinitionContext} from '../data/trigger-definition-context.mjs';
 import PersistClassName from '../util/decorators/PersistClassName.mjs';
+import type {StdRegistryKey} from './registries.mjs';
 
 /** All possible triggers */
-export const TRIGGER_REGISTRY = new NamespaceRegistry<TriggerDefinitionContext<any>>(game.registeredNamespaces);
+export const TRIGGER_REGISTRY = new Map<StdRegistryKey, TriggerDefinitionContext<any>>();
 
 @PersistClassName('TriggerListener')
 export class TriggerListener<T extends object = {}> {
-  readonly #sub: Subscriber<void>;
+  private readonly _sub: Subscriber<void>;
 
   public constructor(
     public readonly ctx: TriggerDefinitionContext<T>,
     public readonly data: T,
     sub: Subscriber<void>
   ) {
-    this.#sub = sub;
+    this._sub = sub;
   }
 
   /** Check if the trigger's condition currently passes */
@@ -29,6 +30,6 @@ export class TriggerListener<T extends object = {}> {
 
   /** Notify the subscriber about the trigger firing */
   public notify(): void {
-    this.#sub.next();
+    this._sub.next();
   }
 }

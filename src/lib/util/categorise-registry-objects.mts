@@ -1,4 +1,3 @@
-import type {NamespaceRegistry} from 'melvor';
 import type {NodeDefinition} from '../../public_api';
 import type {NamespacedDefinition} from '../namespaced-definition.mjs';
 import {LazyMap} from './lazy-map.mjs';
@@ -11,13 +10,13 @@ export interface CategorisedObject<T> {
 
 /** Split the items in this registry into categories */
 export default function categoriseRegistryObjects<T extends NodeDefinition<any>, D extends NamespacedDefinition<T>>(
-  registry: NamespaceRegistry<D>
+  registry: Map<any, D>
 ): Array<CategorisedObject<D>> {
   let out: Array<CategorisedObject<D>>;
 
   {
     const map = new LazyMap<string, D[]>(() => []);
-    for (const item of registry.registeredObjects.values()) {
+    for (const item of registry.values()) {
       map.ensureGet(item.def.category ?? '').push(item);
     }
 

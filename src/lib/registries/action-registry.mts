@@ -2,6 +2,7 @@ import type {ActionNodeDefinition} from '../../public_api';
 import {NamespacedDefinition} from '../namespaced-definition.mjs';
 import PersistClassName from '../util/decorators/PersistClassName.mjs';
 import {DeserialisationError} from '../util/to-json.mjs';
+import type {StdRegistryKey} from './registries.mjs';
 
 /** Some predefined categories to avoid typos */
 export const enum InternalCategory {
@@ -18,7 +19,7 @@ export class ActionNodeDefinitionImpl<T extends object> extends NamespacedDefini
 
   /** @internal */
   public static fromJSON<T extends object>(id: string): ActionNodeDefinitionImpl<T> {
-    const out = ACTION_REGISTRY.getObjectByID(id);
+    const out = ACTION_REGISTRY.get(id);
     if (!out) {
       throw new DeserialisationError(id, `No action registered with the ID ${id}`);
     }
@@ -28,4 +29,4 @@ export class ActionNodeDefinitionImpl<T extends object> extends NamespacedDefini
 }
 
 /** All possible actions */
-export const ACTION_REGISTRY = new NamespaceRegistry<ActionNodeDefinitionImpl<any>>(game.registeredNamespaces);
+export const ACTION_REGISTRY = new Map<StdRegistryKey, ActionNodeDefinitionImpl<any>>();

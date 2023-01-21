@@ -4,7 +4,7 @@ import type {
   TriggerNodeDefinition
 } from '../public_api';
 import {TriggerDefinitionContext} from './data/trigger-definition-context.mjs';
-import {isActionNodeDefinition, isTriggerNodeDefinition} from './public-api-validation.mjs';
+import {checkLocallyDefinedId, isActionNodeDefinition, isTriggerNodeDefinition} from './public-api-validation.mjs';
 import {ACTION_REGISTRY, ActionNodeDefinitionImpl} from './registries/action-registry.mjs';
 import {TRIGGER_REGISTRY} from './registries/trigger-registry.mjs';
 
@@ -12,8 +12,9 @@ export function defineAction<T extends object = {}>(definition: ActionNodeDefini
   if (!isActionNodeDefinition(definition)) {
     throw new Error('Invalid action node definition');
   }
+  checkLocallyDefinedId(definition);
 
-  ACTION_REGISTRY.registerObject(new ActionNodeDefinitionImpl(definition));
+  ACTION_REGISTRY.set(definition.id, new ActionNodeDefinitionImpl(definition));
 }
 
 export function defineTrigger<T extends object = {}>(
@@ -22,10 +23,10 @@ export function defineTrigger<T extends object = {}>(
   if (!isTriggerNodeDefinition(definition)) {
     throw new Error('Invalid trigger node definition');
   }
+  checkLocallyDefinedId(definition);
 
   const inst = new TriggerDefinitionContext<T>(definition);
-  TRIGGER_REGISTRY.registerObject(inst);
+  TRIGGER_REGISTRY.set(definition.id, inst);
 
   return inst;
 }
-

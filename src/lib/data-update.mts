@@ -1,5 +1,20 @@
 import update0001 from './updates/0001-dedupe-names.mjs';
 import update0002 from './updates/0002-compress-json.mjs';
+import update0003 from './updates/0003-compress-ids.mjs';
+
+/**
+ * @return [number of deleted/obsolete scripts, updates array]
+ */
+function getUpdatesArray(): [number, DataUpdateFn[]] {
+  return [
+    0,
+    [
+      update0001,
+      update0002,
+      update0003,
+    ],
+  ];
+}
 
 export type SerialisedWorkflow = any;
 
@@ -12,19 +27,6 @@ export interface RunUpdatesResult {
 
   /** The data version for this mod version */
   update: number;
-}
-
-/**
- * @return [number of deleted/obsolete scripts, updates array]
- */
-function getUpdatesArray(): [number, DataUpdateFn[]] {
-  return [
-    0,
-    [
-      update0001,
-      update0002,
-    ],
-  ];
 }
 
 /**

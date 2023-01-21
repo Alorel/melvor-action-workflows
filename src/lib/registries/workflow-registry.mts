@@ -9,7 +9,7 @@ import {alertError} from '../util/alert';
 import PersistClassName from '../util/decorators/PersistClassName.mjs';
 import {errorLog, warnLog} from '../util/log.mjs';
 
-const enum StorageKey {
+export const enum StorageKey {
   WORKFLOWS = 'workflows:v2',
 
   DATA_VERSION = 'dataVersion',
@@ -104,7 +104,7 @@ export default class WorkflowRegistry {
       }
     }
 
-    const registryOut = new WorkflowRegistry(workflowsOut, loadPrimaryExecution(workflowsOut));
+    const registryOut = new WorkflowRegistry(workflowsOut);
     if (updateResult.applied) {
       registryOut.save();
       storeDataVersion(updateResult.update);
@@ -198,6 +198,12 @@ export default class WorkflowRegistry {
     store(this.workflows);
   }
 
+  public setLoadedPrimaryExecution(exec?: WorkflowExecution): void {
+    if (exec || this.primaryExecution) {
+      this._primaryExecution$.next(exec);
+    }
+  }
+
   public setPrimaryExecution(workflow?: Workflow, force = false): void {
     if (force || workflow?.listId !== this.primaryExecution?.workflow.listId) {
       this._primaryExecution$.next(workflow ? new WorkflowExecution(workflow) : undefined);
@@ -211,7 +217,7 @@ export default class WorkflowRegistry {
   }
 }
 
-function loadPrimaryExecution(liveWorkflows: Workflow[]): WorkflowExecution | undefined {
+export function loadPrimaryExecution(liveWorkflows: Workflow[] | readonly Workflow[]): WorkflowExecution | undefined {
   const execRef = ctx.characterStorage.getItem<PrimaryExecutionRef>(StorageKey.PRIMARY_EXECUTION);
   if (!execRef) {
     return;

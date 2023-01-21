@@ -13,15 +13,7 @@ export class NamespacedDefinition<T extends Referenceable> {
   }
 
   public get id(): string {
-    return `${this.namespace}:${this.localID}`;
-  }
-
-  public get localID(): string {
-    return this.def.localID;
-  }
-
-  public get namespace(): string {
-    return this.def.namespace;
+    return this.def.id;
   }
 
   public toJSON(): string {

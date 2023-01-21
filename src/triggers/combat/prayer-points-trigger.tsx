@@ -3,6 +3,7 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-compare.mjs';
 import {BigNum} from '../../ui/components/big-num';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   amount: number;
@@ -23,6 +24,7 @@ const triggerCtx = defineLocalTrigger<Data>({
       <BigNum num={amount}/>
     </Fragment>
   ),
+  id: TriggerId.CombatPrayerPoints,
   init() {
     function notify() {
       triggerCtx.notifyListeners(check);
@@ -33,19 +35,18 @@ const triggerCtx = defineLocalTrigger<Data>({
   },
   initOptions: () => ({comparator: NumComparator.LTE}),
   label: 'Prayer Points',
-  localID: 'prayerPoints',
   media: game.prayer.media,
   options: [
     {
       enum: NUM_COMPARE_ENUM,
+      id: 'comparator',
       label: 'Comparator',
-      localID: 'comparator',
       required: true,
       type: String,
     },
     {
+      id: 'amount',
       label: 'Amount',
-      localID: 'amount',
       min: 0,
       required: true,
       type: Number,

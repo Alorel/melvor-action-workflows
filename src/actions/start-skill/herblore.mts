@@ -1,17 +1,18 @@
 import type {Herblore} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import {SingleRecipeAction} from '../lib/single-recipe-action.mjs';
 
-defineAction(
+defineLocalAction(
   SingleRecipeAction
     .new<Herblore>({
       category: InternalCategory.START_SKILL,
-      localID: 'startHerblore',
+      id: ActionId.StartSkillHerblore,
       options: [
         {
+          id: 'recipe',
           label: 'Item',
-          localID: 'recipe',
           registry: ['herblore', 'actions'],
           required: true,
           type: 'MediaItem',

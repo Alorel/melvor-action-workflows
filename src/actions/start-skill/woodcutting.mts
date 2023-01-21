@@ -1,22 +1,23 @@
 import type {Woodcutting as TWoodcutting, WoodcuttingTree} from 'melvor';
-import {defineAction} from '../../lib/api.mjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import ActionId from '../action-id.mjs';
 import {RecipeAction} from '../lib/recipe-action.mjs';
 
 export interface StartWoodcuttingData {
   recipes: WoodcuttingTree[];
 }
 
-defineAction(
+defineLocalAction(
   RecipeAction
     .base<StartWoodcuttingData, TWoodcutting>({
       category: InternalCategory.START_SKILL,
+      id: ActionId.StartSkillWoodcutting,
       initOptions: () => ({recipes: [undefined as any]}),
-      localID: 'startWoodcutting',
       options: [
         {
+          id: 'recipes',
           label: 'Trees',
-          localID: 'recipes',
           multi: {
             maxLength: 2,
           },

@@ -11,23 +11,11 @@ import type {
 } from '../public_api';
 import type {OptionDefinition} from './define-option.mjs';
 import {OPTION_REGISTRY} from './registries/option-registry.mjs';
+import {IS_LOCALLY_DEFINED} from './util/define-local.mjs';
+import {errorLog} from './util/log.mjs';
 import {isUndefinedOr, typeIs} from './util/type-is.mjs';
 
 type IsBase = NodeOptionBase & Obj<any>;
-
-function isNodeOptionBase(v: any): v is IsBase {
-  return isReferenceableNoNamespace(v)
-    && isUndefinedOr(v.showIf, 'function')
-    && isUndefinedOr(v.compactRender, 'function')
-    && isUndefinedOr(v.required, 'boolean')
-    && isUndefinedOr(v.description, 'string')
-    && (Array.isArray(v.resets) || typeof v.resets === 'undefined');
-}
-
-function isNodeOption(v: any): v is NodeOption {
-  return isNodeOptionBase(v)
-    && new AwesomeIter(OPTION_REGISTRY.values()).consume(some(opt => opt.is(v)));
-}
 
 export function isActionNodeDefinition<T extends object = {}>(v: any): v is ActionNodeDefinition<T> {
   if (!isNodeDefinition(v)) {
@@ -53,11 +41,24 @@ export function isTriggerNodeDefinition(v: any): v is TriggerNodeDefinition {
 }
 
 export function isOptionDefinition(v: any): v is OptionDefinition<unknown, NodeOptionBase> {
-  return typeof v?.is === 'function'
-    && 'token' in v
-    && typeof v.renderEdit === 'function'
-    && typeof v.renderView === 'function'
-    && isUndefinedOr(v.hasLabel, 'boolean');
+  if (!v || !('token' in v)) {
+    return false;
+  }
+
+  const {is, renderEdit, renderView, hasLabel} = v as Partial<OptionDefinition<any, any>>;
+
+  return typeof is === 'function'
+    && typeof renderEdit === 'function'
+    && typeof renderView === 'function'
+    && isUndefinedOr(hasLabel, 'boolean');
+}
+
+/** Only permit the base mod to have numeric IDs */
+export function checkLocallyDefinedId<T extends Referenceable>(obj: T): void {
+  if (!obj[IS_LOCALLY_DEFINED] && typeof (obj.id as unknown) === 'number') {
+    errorLog('Error defining object', obj);
+    throw new Error(`Only the base mod may have numeric IDs; received ${obj.id}`);
+  }
 }
 
 function isNodeDefinition(v: any): v is (NodeDefinition & Obj<any>) {
@@ -72,10 +73,26 @@ function isNodeDefinition(v: any): v is (NodeDefinition & Obj<any>) {
 }
 
 function isReferenceable(v: any): v is (Referenceable & Obj<any>) {
-  return isReferenceableNoNamespace(v) && typeof v.namespace === 'string';
+  if (!v) {
+    return false;
+  }
+
+  const {label, id} = v as Partial<Referenceable>;
+
+  return typeIs(label, 'string', 'function')
+    && typeIs(id, 'string', 'number');
 }
 
-function isReferenceableNoNamespace(v: any): v is (Omit<Referenceable, 'namespace'> & Obj<any>) {
-  return typeof v?.localID === 'string'
-    && typeIs(v.label, 'string', 'function');
+function isNodeOptionBase(v: any): v is IsBase {
+  return isReferenceable(v)
+    && isUndefinedOr(v.showIf, 'function')
+    && isUndefinedOr(v.compactRender, 'function')
+    && isUndefinedOr(v.required, 'boolean')
+    && isUndefinedOr(v.description, 'string')
+    && (Array.isArray(v.resets) || typeof v.resets === 'undefined');
+}
+
+function isNodeOption(v: any): v is NodeOption {
+  return isNodeOptionBase(v)
+    && new AwesomeIter(OPTION_REGISTRY.values()).consume(some(opt => opt.is(v)));
 }

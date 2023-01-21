@@ -2,6 +2,7 @@ import type {FoodItem as TFoodItem} from 'melvor';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {NUM_COMPARE_ENUM, NumComparator, numCompare} from '../../lib/util/num-compare.mjs';
+import TriggerId from '../trigger-id.mjs';
 import {EquippedItemCountCompactRender} from './equipped-item-count';
 
 interface Data {
@@ -26,6 +27,7 @@ const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.CORE,
   check,
   compactRender: EquippedItemCountCompactRender,
+  id: TriggerId.CoreEquippedFoodCount,
   init() {
     function patch() {
       triggerCtx.notifyListeners(check);
@@ -37,12 +39,11 @@ const triggerCtx = defineLocalTrigger<Data>({
   },
   initOptions: () => ({comparator: NumComparator.GTE}),
   label: 'Equipped Food Quantity',
-  localID: 'equippedFoodQty',
   media: game.items.getObjectByID('melvorD:Beef_Pie')!.media,
   options: [
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       mediaFilter: item => item instanceof FoodItem,
       registry: 'items',
       required: true,
@@ -50,14 +51,14 @@ const triggerCtx = defineLocalTrigger<Data>({
     },
     {
       enum: NUM_COMPARE_ENUM,
+      id: 'comparator',
       label: 'Comparator',
-      localID: 'comparator',
       required: true,
       type: String,
     },
     {
+      id: 'qty',
       label: 'Quantity',
-      localID: 'qty',
       min: 0,
       required: true,
       type: Number,

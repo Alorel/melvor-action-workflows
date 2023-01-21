@@ -4,6 +4,7 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   charges: number;
@@ -26,26 +27,26 @@ const triggerCtx = defineLocalTrigger<Data>({
       <RenderNodeMedia label={item.name} media={item.media}/>
     </Fragment>
   ),
+  id: TriggerId.CoreItemCharges,
   init() {
     ctx.patch(Player, 'consumeEquipmentCharges').after(() => {
       triggerCtx.notifyListeners(check);
     });
   },
   label: 'Item charges left',
-  localID: 'itemCharges',
   media: game.items.getObjectByID('melvorD:Gem_Gloves')!.media,
   options: [
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       mediaFilter: item => item instanceof EquipmentItem,
       registry: 'items',
       required: true,
       type: 'MediaItem',
     },
     {
+      id: 'charges',
       label: 'Charges',
-      localID: 'charges',
       min: 0,
       required: true,
       type: Number,

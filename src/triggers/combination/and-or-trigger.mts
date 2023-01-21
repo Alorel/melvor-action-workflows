@@ -4,19 +4,20 @@ import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {githubAsset} from '../../lib/util.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import type {TriggerNodeDefinition} from '../../public_api';
+import TriggerId from '../trigger-id.mjs';
 
 interface Data {
   triggers: WorkflowTrigger[];
 }
 
-const baseDef: Omit<TriggerNodeDefinition<Data>, 'namespace' | 'label' | 'localID' | 'check' | 'media'> = {
+const baseDef: Omit<TriggerNodeDefinition<Data>, 'id' | 'label' | 'check' | 'media'> = {
   canBeDefault: false,
   category: InternalCategory.COMBINATION,
   initOptions: () => ({triggers: [new WorkflowTrigger()]}),
   options: [
     {
+      id: 'triggers',
       label: 'Triggers',
-      localID: 'triggers',
       multi: true,
       required: true,
       type: 'TriggerRef',
@@ -27,6 +28,7 @@ const baseDef: Omit<TriggerNodeDefinition<Data>, 'namespace' | 'label' | 'localI
 defineLocalTrigger<Data>({
   ...baseDef,
   check: ({triggers}) => triggers.every(triggerPasses),
+  id: TriggerId.CombinationAnd,
   label: 'And',
   listen({triggers}) {
     switch (triggers.length) {
@@ -48,20 +50,19 @@ defineLocalTrigger<Data>({
       }
     }
   },
-  localID: 'and',
   media: githubAsset('src/ui/assets/and.png', '0.8.0'),
 });
 
 defineLocalTrigger<Data>({
   ...baseDef,
   check: ({triggers}) => triggers.some(triggerPasses),
+  id: TriggerId.CombinationOr,
   label: 'Or',
   listen({triggers}) {
     return triggers.length
       ? merge(...triggers.map(trigger => trigger.listen()))
       : NEVER;
   },
-  localID: 'or',
   media: githubAsset('src/ui/assets/or.png', '0.8.0'),
 });
 

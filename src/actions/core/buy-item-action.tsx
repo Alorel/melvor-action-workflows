@@ -3,6 +3,7 @@ import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
+import ActionId from '../action-id.mjs';
 
 interface Props {
   item: ShopPurchase;
@@ -26,13 +27,13 @@ defineLocalAction<Props>({
     game.shop.buyQuantity = item.allowQuantityPurchase ? (qty ?? 1) : 1;
     game.shop.buyItemOnClick(item, true);
   },
+  id: ActionId.CoreBuyItem,
   label: 'Buy item',
-  localID: 'BuyItem',
   media: cdnMedia('assets/media/main/coins.svg'),
   options: [
     {
+      id: 'item',
       label: 'Item',
-      localID: 'item',
       mediaFilter: passesLimitCount,
       registry: 'shop.purchases',
       required: true,
@@ -40,8 +41,8 @@ defineLocalAction<Props>({
       validateIgnoreMediaFilter: true,
     },
     {
+      id: 'qty',
       label: 'Quantity',
-      localID: 'qty',
       min: 1,
       placeholder: '1',
       showIf: ({item}: Partial<Props>) => item?.allowQuantityPurchase === true,

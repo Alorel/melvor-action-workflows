@@ -66,9 +66,7 @@ export interface NodeDefinition<T extends object = {}> extends Referenceable {
 export interface Referenceable {
   label: string;
 
-  localID: string;
-
-  namespace: string;
+  id: string;
 }
 
 /**
