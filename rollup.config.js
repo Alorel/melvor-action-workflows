@@ -71,11 +71,12 @@ export default function (opts) {
             from: [
               'manifest.json',
               // 'public_api.d.ts',
-            ]
+            ],
+            opts: {glob: {cwd: 'src'}}
           },
+          {from: 'LICENSE'},
         ],
         defaultOpts: {
-          glob: {cwd: 'src'},
           emitNameKind: 'fileName',
         },
         watch,
