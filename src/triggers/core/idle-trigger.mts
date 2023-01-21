@@ -1,5 +1,6 @@
 import {distinctUntilChanged, filter, map, pairwise} from 'rxjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
+import {githubAsset} from '../../lib/util.mjs';
 import {defineLocalTrigger} from '../../lib/util/define-local.mjs';
 import {tickEnd$} from '../../lib/util/next-tick.mjs';
 
@@ -29,5 +30,5 @@ defineLocalTrigger({
       );
   },
   localID: 'idle',
-  media: 'https://raw.githubusercontent.com/Alorel/melvor-action-workflows/0.12.0/src/ui/assets/lazy-peon.png',
+  media: githubAsset('src/ui/assets/lazy-peon.png', '0.12.0'),
 });
