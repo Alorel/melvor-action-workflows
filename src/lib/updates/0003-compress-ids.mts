@@ -8,10 +8,6 @@ import type {WorkflowJson} from '../data/workflow.mjs';
 import {errorLog} from '../util/log.mjs';
 
 const update0003: DataUpdateFn = (workflows: WorkflowJson[]) => {
-  if (!workflows.length) {
-    return; // Good stuff
-  }
-
   const mkId = (baseId: string): string => `ActionWorkflows:${baseId}`;
 
   // Trigger map
@@ -52,7 +48,7 @@ const update0003: DataUpdateFn = (workflows: WorkflowJson[]) => {
     [mkId('equipFood'), ActionId.CoreEquipFood],
     [mkId('equipItem'), ActionId.CoreEquipItem],
     [mkId('sellItem'), ActionId.CoreSellItem],
-    [mkId('setStepIdx'), ActionId.CoreSetStepIdx],
+    [mkId('setStepIdx'), ActionId.WorkflowSetStepIdx],
     [mkId('equipSet'), ActionId.CoreSwitchEquipmentSets],
     [mkId('usePotion'), ActionId.CoreUsePotion],
     [mkId('startAgility'), ActionId.StartSkillAgility],

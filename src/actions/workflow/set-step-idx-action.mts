@@ -7,12 +7,12 @@ interface Props {
 }
 
 defineLocalAction<Props>({
-  category: InternalCategory.CORE,
+  category: InternalCategory.WORKFLOW,
   execContext: true,
   execute({idx}, ctx) {
     ctx!.setActiveStepIdx(idx);
   },
-  id: ActionId.CoreSetStepIdx,
+  id: ActionId.WorkflowSetStepIdx,
   label: 'Jump to step',
   media: cdnMedia('assets/media/bank/Mask_of_Madness.png'),
   options: [

@@ -64,9 +64,38 @@ export interface NodeDefinition<T extends object = {}> extends Referenceable {
 
 /** Something that can be referenced */
 export interface Referenceable {
-  label: string;
-
   id: string;
+
+  label: string;
+}
+
+export interface ActionRef {
+  readonly id: string;
+
+  /** Get a shallow clone of the action's option values */
+  get opts(): Obj<any>;
+}
+
+export interface StepRef {
+  /** The step trigger's ID */
+  readonly triggerId: string;
+
+  /** Get an action by its `id` */
+  findActionByActionId(id: string): ActionRef | undefined;
+
+  /** Listen for the trigger to trigger */
+  listen(): Observable<void>;
+}
+
+export interface WorkflowRef {
+  readonly name: string;
+
+  /** Number of steps in the workflow */
+  readonly numSteps: number;
+
+  getEmbeddedWorkflow(name: string): WorkflowRef | undefined;
+
+  stepAt(idx: number): StepRef | undefined;
 }
 
 /**
@@ -74,18 +103,21 @@ export interface Referenceable {
  * Requires {@link ActionNodeDefinition#execContext} to be set to `true`.
  */
 export interface WorkflowExecutionCtx {
+  /** The currently running step index. */
+  readonly activeStepIdx: number;
+
   /**
    * The currently running step index.
    * This will emit the first result on the same tick and will be the same as {@link #stepIdx} if subscribed to
    * immediately.
    */
-  activeStepIdx$: Observable<number>;
-
-  /** The number of steps in the workflow */
-  numSteps: number;
+  readonly activeStepIdx$: Observable<number>;
 
   /** This step's index in the steps array */
-  stepIdx: number;
+  readonly stepIdx: number;
+
+  /** The associated workflow */
+  readonly workflow: WorkflowRef;
 
   /** Set the currently executed step index. */
   setActiveStepIdx(idx: number): void;

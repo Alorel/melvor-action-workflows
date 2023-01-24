@@ -67,7 +67,7 @@ function RenderEnumOpts({
   const [onBlur, onInp] = useInput(onChange);
   const clear = useCallback(() => {
     onChange(undefined);
-  }, []);
+  }, EMPTY_ARR);
 
   const enumOpts = resolveDynamicOptionObject(rawEnumOpts!, otherValues);
 

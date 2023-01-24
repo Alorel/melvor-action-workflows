@@ -7,7 +7,7 @@ import {of, switchMap} from 'rxjs';
 import type {Workflow} from '../../lib/data/workflow.mjs';
 import WorkflowRegistry from '../../lib/registries/workflow-registry.mjs';
 import swapElements from '../../lib/util/swap-elements.mjs';
-import {BorderedBlock} from '../components/block';
+import {BlockDiv, BorderedBlock} from '../components/block';
 import Btn from '../components/btn';
 import PageContainer from '../components/page-container';
 import {UncaughtErrorBoilerplate} from '../components/uncaught-error-boilerplate';
@@ -49,13 +49,9 @@ function WithWorkflows({workflows}: Pick<EditorProps, 'workflows'>): VNode {
 export default function WorkflowsDashboard(): VNode {
   return (
     <PageContainer id={WORKFLOWS_DASHBOARD_ID}>
-      <div className={'row'}>
-        <div className={'col-12 col-xl-11 m-auto'}>
-          <div className={'block block-rounded'}>
-            <div className={'block-content'}>
-              <Inner/>
-            </div>
-          </div>
+      <div class={'row'}>
+        <div class={'col-12 col-xl-11 m-auto'}>
+          <Inner/>
         </div>
       </div>
     </PageContainer>
@@ -106,17 +102,18 @@ function DashboardShell({workflows}: EditorProps): VNode {
   return (
     <ProvideActiveStepIdx>
       <ProvideWorkflow>
-        <div className={'row'}>
-          <ActiveWorkflowSelect workflows={workflows}/>
-          <div class={'col-xs-12 text-center col-md-auto'}>
-            {
-              hasWorkflow
-                ? <SelectedWorkflowBtns refresh={reRender}/>
-                : 'Select a workflow to get started'
-            }
+        <BlockDiv>
+          <div className={'row'}>
+            <ActiveWorkflowSelect workflows={workflows}/>
+            <div className={'col-xs-12 text-center col-md-auto'}>
+              {
+                hasWorkflow
+                  ? <SelectedWorkflowBtns refresh={reRender}/>
+                  : 'Select a workflow to get started'
+              }
+            </div>
           </div>
-
-        </div>
+        </BlockDiv>
 
         {hasWorkflow && <RenderSteps/>}
       </ProvideWorkflow>

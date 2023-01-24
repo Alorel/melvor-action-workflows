@@ -13,7 +13,7 @@ export class TriggerDefinitionContext<T extends object = {}>
   extends NamespacedDefinition<TriggerNodeDefinition<T>>
   implements ITriggerDefinitionContext<T> {
 
-  private readonly _listeners: Set<TriggerListener<T>> = new Set();
+  readonly #listeners: Set<TriggerListener<T>> = new Set();
 
   public static fromJSON<T extends object = {}>(id: string): TriggerDefinitionContext<T> {
     const out = TRIGGER_REGISTRY.get(id);
@@ -25,12 +25,14 @@ export class TriggerDefinitionContext<T extends object = {}>
   }
 
   public listen(data: T): Observable<void> {
+    const listeners = this.#listeners;
+
     return new Observable<void>(subscriber => {
       debugLog(`Starting trigger listener ${this.id} with`, data);
 
-      this.init();
+      this._init();
       const listener = new TriggerListener(this, data, subscriber);
-      this._listeners.add(listener);
+      listeners.add(listener);
 
       if (listener.check()) {
         listener.notify();
@@ -48,7 +50,7 @@ export class TriggerDefinitionContext<T extends object = {}>
 
       return () => {
         debugLog(`Stopping trigger listener ${this.id} with`, data);
-        this._listeners.delete(listener);
+        listeners.delete(listener);
         sub?.unsubscribe();
       };
     });
@@ -56,15 +58,15 @@ export class TriggerDefinitionContext<T extends object = {}>
 
   /** @inheritDoc */
   public notifyListeners(filter: (listenerData: Readonly<T>) => any = this.def.check): void {
-    for (const listener of filteredListeners(filter, this._listeners.values())) {
+    for (const listener of filteredListeners(filter, this.#listeners.values())) {
       listener.notify();
     }
   }
 
   /** A run-once method calling the definition's init function if it exists */
-  private init(): void {
+  private _init(): void {
     this.def.init?.();
-    this.init = noop;
+    this._init = noop;
     debugLog('Initialised trigger', this.id);
   }
 }

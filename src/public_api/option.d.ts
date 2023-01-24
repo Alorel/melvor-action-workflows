@@ -9,6 +9,7 @@ export type NodeOption = AltRecipeCostNodeOption
   | MediaItemNodeOption
   | TriggerRefOption
   | StepRefNodeOption
+  | EmbeddedWorkflowOption
   | EquipmentSetOption
   | BooleanNodeOption;
 
@@ -16,6 +17,10 @@ export type NodeOption = AltRecipeCostNodeOption
 
 export interface StepRefNodeOption extends NodeOptionBase {
   type: 'StepRef';
+}
+
+export interface EmbeddedWorkflowOption extends NodeOptionBase {
+  type: 'EmbeddedWorkflow';
 }
 
 export interface StringNodeOption extends NodeOptionBase {

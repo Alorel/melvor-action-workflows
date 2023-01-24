@@ -91,7 +91,7 @@ export default {
         },
       });
 
-      console.log('OK');
+      console.log('OK', new Date().toLocaleString());
       console.log(data.version);
       console.log(data.download.binary_url);
     } catch (e) {
