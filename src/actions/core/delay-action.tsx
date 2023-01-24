@@ -1,6 +1,5 @@
-import {noop} from 'lodash-es';
 import {Fragment} from 'preact';
-import {map, timer} from 'rxjs';
+import {timer} from 'rxjs';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
 import ActionId from '../action-id.mjs';
@@ -17,7 +16,7 @@ defineLocalAction<Props>({
       <span class={'text-primary'}>{`${duration.toLocaleString()}ms`}</span>
     </Fragment>
   ),
-  execute: ({duration}) => timer(duration).pipe(map(noop)),
+  execute: ({duration}) => timer(duration),
   id: ActionId.CoreDelay,
   label: 'Wait',
   media: cdnMedia('assets/media/main/timer.svg'),

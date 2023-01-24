@@ -15,10 +15,10 @@ interface BaseCat {
   itemID: string;
 }
 
+export const mainIcon = githubAsset('src/ui/assets/icon.png', '0.5.0');
+
 // Init package
 {
-  const mainIcon = githubAsset('src/ui/assets/icon.png', '0.5.0');
-
   const cat = <T extends object = {}>(config?: T): T & BaseCat => ({
     categoryID: '',
     itemID: startCase(namespace),

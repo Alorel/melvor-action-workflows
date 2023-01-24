@@ -23,7 +23,7 @@ export interface StringNodeOption extends NodeOptionBase {
    * Render a `<select/>` of these options instead of an `<input type="text"/>`.
    * key = model value, value = display label
    */
-  enum?: DynamicOption<Obj<string> | undefined>;
+  enum?: DynamicOption<Obj<string>>;
 
   /** The `placeholder` attribute for the `<input/>` element */
   placeholder?: string;
