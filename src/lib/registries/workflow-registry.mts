@@ -84,7 +84,7 @@ export default class WorkflowRegistry {
   private static fromStorage(): WorkflowRegistry {
     // Get workflows from storage
     const raw = ctx.accountStorage.getItem<WorkflowJson[]>(StorageKey.WORKFLOWS);
-    if (!raw) {
+    if (!raw?.length) {
       storeDataVersion();
 
       return new WorkflowRegistry();

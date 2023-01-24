@@ -15,7 +15,7 @@ const enum ActionId {
   CoreEquipFood = 13,
   CoreEquipItem = 14,
   CoreSellItem = 15,
-  CoreSetStepIdx = 16,
+  WorkflowSetStepIdx = 16,
   CoreSwitchEquipmentSets = 17,
   CoreUsePotion = 18,
   StartSkillAgility = 19,
@@ -34,6 +34,7 @@ const enum ActionId {
   StartSkillThieving = 32,
   StartSkillWoodcutting = 33,
   ExecWorkflow = 34,
+  ExecEmbeddedWorkflow = 35,
 }
 
 export default ActionId;

@@ -6,12 +6,14 @@ import type {StdRegistryKey} from './registries.mjs';
 
 /** Some predefined categories to avoid typos */
 export const enum InternalCategory {
-  START_SKILL = 'Start skill',
   COMBAT = 'Combat',
   COMBINATION = 'Combination',
   CORE = 'Core',
 
   CURRENCY = 'Currency',
+  START_SKILL = 'Start skill',
+
+  WORKFLOW = 'Workflow',
 }
 
 @PersistClassName('ActionNodeDefinitionImpl')

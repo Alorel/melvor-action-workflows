@@ -5,7 +5,6 @@ import {logError} from '@aloreljs/rxutils/operators';
 import type {MonoTypeOperatorFunction, Observer, Subscription, TeardownLogic} from 'rxjs';
 import {BehaviorSubject, concat, EMPTY, filter, from, Observable, of, startWith, takeUntil, tap} from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
-import type {WorkflowExecutionCtx} from '../../public_api';
 import {ConfigCheckboxKey} from '../../ui/components/config-checkbox';
 import type ActionConfigItem from '../data/action-config-item.mjs';
 import type {WorkflowStep} from '../data/workflow-step.mjs';
@@ -25,6 +24,7 @@ import type {
   WorkflowEvent
 } from './workflow-event.mjs';
 import {WorkflowEventType} from './workflow-event.mjs';
+import {WorkflowExecutionCtxImpl} from './workflow-execution-ctx-impl.mjs';
 
 type Out = WorkflowEvent;
 
@@ -127,6 +127,15 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   /** Set the currently executed step index. */
   @BoundMethod()
   public setActiveStepIdx(v: number): void {
+    if (v === this.activeStepIdx) {
+      return;
+    }
+
+    this.next({
+      type: WorkflowEventType.WORKFLOW_RESET,
+      workflow: this.workflow,
+    });
+
     this.incrementActiveStep = false;
     this.activeStepIdxManual = true;
     try {
@@ -203,7 +212,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
 
       const def = action.action.def;
       const result = def
-        .execute(action.opts, def.execContext ? this.makeExecCtx(stepIdx) : undefined);
+        .execute(action.opts, def.execContext ? new WorkflowExecutionCtxImpl(this, stepIdx) : undefined);
 
       const successEvent = this.makeSuccessEvent(action, step);
       if (result == null) {
@@ -312,16 +321,6 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
         sub.unsubscribe();
       };
     });
-  }
-
-  /** Create a {@link WorkflowExecutionCtx} for the current step */
-  private makeExecCtx(stepIdx: number): WorkflowExecutionCtx {
-    return {
-      activeStepIdx$: this.activeStepIdx$,
-      numSteps: this.workflow.steps.length,
-      setActiveStepIdx: this.setActiveStepIdx,
-      stepIdx,
-    };
   }
 
   @BoundMethod()

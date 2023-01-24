@@ -1,7 +1,7 @@
 import type {VNode} from 'preact';
 import PageContainer from '../components/page-container';
 import autoId from '../util/id-gen.mjs';
-import {LoopsHelp, OfflineHelp, SettingUpHelp} from './help-page/help-pages';
+import {EmbeddedWorkflowsHelp, LoopsHelp, OfflineHelp, SettingUpHelp} from './help-page/help-pages';
 
 export const HELP_PAGE_ID = autoId();
 
@@ -12,6 +12,7 @@ export default function HelpPage(): VNode {
         <SettingUpHelp/>
         <OfflineHelp/>
         <LoopsHelp/>
+        <EmbeddedWorkflowsHelp/>
       </div>
     </PageContainer>
   );

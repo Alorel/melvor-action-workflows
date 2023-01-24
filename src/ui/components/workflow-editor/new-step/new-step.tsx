@@ -13,7 +13,7 @@ import {BorderedBlock} from '../../block';
 import Btn from '../../btn';
 import {BinSvg, ChevronLeftSvg, ChevronRightSvg} from '../../svg';
 import ActionConfig from '../action-config';
-import {EDITOR_SECTION_CLASS, useStep, useStepHost} from '../editor-contexts';
+import {useStep, useStepHost} from '../editor-contexts';
 import NewStepHeader from './header-block';
 
 interface Props {
@@ -36,39 +36,36 @@ const NewStep = memo<Props>(function NewStep({children, step: stepIn}) {
   const lastActionIdx = actions.length - 1;
 
   return (
-    <div class={EDITOR_SECTION_CLASS}>
-      <BorderedBlock kind={'summoning'} size={4}>
-        <ProvideStep>
-          <NewStepHeader/>
+    <BorderedBlock kind={'summoning'} size={4} class={'col-12'}>
+      <ProvideStep>
+        <NewStepHeader/>
+        <BorderedBlock kind={'thieving'}>
+          <div class={'font-size-sm font-w600 mb-1'}>Actions</div>
 
-          <BorderedBlock kind={'thieving'}>
-            <div class={'font-size-sm font-w600 mb-1'}>Actions</div>
+          <div class={'row row-deck'}>
+            {actions.map((action, i) => (
+              <div class={'col-xs-12 col-xl-6'} key={action.listId}>
+                <ActionConfig action={action}>
+                  {canMvActions && (
+                    <ActionMvBtns i={i}
+                      lastActionIdx={lastActionIdx}
+                      reRender={reRender}/>
+                  )}
 
-            <div class={'row row-deck'}>
-              {actions.map((action, i) => (
-                <div class={'col-xs-12 col-xl-6'} key={action.listId}>
-                  <ActionConfig action={action}>
-                    {canMvActions && (
-                      <ActionMvBtns i={i}
-                        lastActionIdx={lastActionIdx}
-                        reRender={reRender}/>
-                    )}
-
-                  </ActionConfig>
-                </div>
-              ))}
-            </div>
-
-            <div class={'text-right'}>
-              <div class={'btn-group btn-group-sm'}>
-                {children}
-                <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
+                </ActionConfig>
               </div>
+            ))}
+          </div>
+
+          <div class={'text-right'}>
+            <div class={'btn-group btn-group-sm'}>
+              {children}
+              <Btn kind={'success'} onClick={addAction}>{'Add action'}</Btn>
             </div>
-          </BorderedBlock>
-        </ProvideStep>
-      </BorderedBlock>
-    </div>
+          </div>
+        </BorderedBlock>
+      </ProvideStep>
+    </BorderedBlock>
   );
 });
 

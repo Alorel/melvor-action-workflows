@@ -2,7 +2,7 @@ import type {WorkflowStep} from '../../../lib/data/workflow-step.mjs';
 import type {Workflow} from '../../../lib/data/workflow.mjs';
 import {signalContext} from '../../util/signal-context';
 
-export const EDITOR_SECTION_CLASS = 'col-12 col-xl-11 m-auto';
+export const EDITOR_SECTION_CLASS = 'col-12 col-xl-11 ml-auto mr-auto';
 
 const [useWorkflow, useWorkflowHost, WorkflowContext] = signalContext<Workflow>('workflow');
 const [useTouched, useTouchedHost] = signalContext<boolean>('touched', false);

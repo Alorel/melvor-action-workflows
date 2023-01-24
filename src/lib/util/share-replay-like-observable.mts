@@ -32,7 +32,10 @@ export default abstract class ShareReplayLike<T> extends Observable<T> {
 
   /** Emitted event history */
   protected get events(): T[] {
-    return this.events = [...this.getOnInitEvents()]; // eslint-disable-line no-return-assign
+    const events = [...this.getOnInitEvents()];
+    this.events = events;
+
+    return events;
   }
 
   /** Emitted event history */

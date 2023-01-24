@@ -1,26 +1,13 @@
-import type {ComponentChildren, VNode} from 'preact';
-import {useCallback, useState} from 'preact/hooks';
-import {EMPTY_ARR, isFalsy} from '../../../lib/util.mjs';
+import type {VNode} from 'preact';
+import type {HideableSectionProps} from '../../components/hideable-section';
+import HideableSection from '../../components/hideable-section';
 
-interface Props {
-  children: ComponentChildren;
-
-  heading: string;
-}
+type Props = Omit<HideableSectionProps, 'startOpen'>;
 
 export default function HelpPageSection({children, heading}: Props): VNode {
-  const [showing, setShowing] = useState(false);
-  const toggleShowing = useCallback(() => {
-    setShowing(isFalsy);
-  }, EMPTY_ARR);
-
   return (
     <div class={'list-group-item'}>
-      <div class={'mb-1 font-size-lg ActionWorkflowsCore-point'} onClick={toggleShowing}>
-        <i class={`fa mr-1 ${showing ? 'fa-eye' : 'fa-eye-slash'}`}/>
-        <span>{heading}</span>
-      </div>
-      {showing && children}
+      <HideableSection heading={heading}>{children}</HideableSection>
     </div>
   );
 }
