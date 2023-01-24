@@ -3,6 +3,7 @@ import {EquipSlotType} from 'melvor';
 import {Fragment} from 'preact';
 import {InternalCategory} from '../../lib/registries/action-registry.mjs';
 import {defineLocalAction} from '../../lib/util/define-local.mjs';
+import {objectFromArray} from '../../lib/util/obj-from-array.mjs';
 import {BigNum} from '../../ui/components/big-num';
 import {RenderNodeMedia} from '../../ui/pages/workflows-dashboard/render-node-media';
 import ActionId from '../action-id.mjs';
@@ -75,15 +76,6 @@ defineLocalAction<Props>({
     },
   ],
 });
-
-function objectFromArray<T extends string>(values: T[]): Record<T, T> {
-  const out: Record<T, T> = {} as any;
-  for (const v of values) {
-    out[v] = v;
-  }
-
-  return out;
-}
 
 const SLOTS_WITH_QTY = new Set<EquipSlotType>([
   EquipSlotType.Consumable,

@@ -38,6 +38,9 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   @AutoIncrement()
   public readonly id!: number;
 
+  /** Set to true when it's run as part of, e.g. the exec workflow action */
+  public isEmbeddedRun = false;
+
   /** Currently executed step index */
   private readonly _activeStepIdx$: BehaviorSubject<number>;
 
@@ -116,6 +119,11 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
     return this.workflow.steps[this.activeStepIdx];
   }
 
+  /** Should this workflow be removed on completion? */
+  private get shouldRm(): boolean {
+    return !this.isEmbeddedRun && Boolean(ctx.accountStorage.getItem(ConfigCheckboxKey.RM_WORKFLOW_ON_COMPLETE));
+  }
+
   /** Set the currently executed step index. */
   @BoundMethod()
   public setActiveStepIdx(v: number): void {
@@ -172,7 +180,7 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
       }
     }
 
-    if (shouldRemoveWorkflowOnCompletion()) {
+    if (this.shouldRm) {
       unsetRemoveWorkflowOnCompletion();
       WorkflowRegistry.inst.rmByListId(this.workflow.listId);
     } else {
@@ -368,10 +376,6 @@ export class WorkflowExecution extends ShareReplayLike<Out> {
   private whileStepIs<T>(idx: number): MonoTypeOperatorFunction<T> {
     return takeUntil(this._activeStepIdx$.pipe(filter(i => i !== idx)));
   }
-}
-
-function shouldRemoveWorkflowOnCompletion(): boolean {
-  return Boolean(ctx.accountStorage.getItem(ConfigCheckboxKey.RM_WORKFLOW_ON_COMPLETE));
 }
 
 function unsetRemoveWorkflowOnCompletion(): void {
