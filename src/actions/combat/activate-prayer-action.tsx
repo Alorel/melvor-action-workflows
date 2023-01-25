@@ -15,6 +15,7 @@ defineLocalAction<Props>({
       return <Fragment>Deactivate prayers</Fragment>;
     }
   },
+  description: 'Activates/deactivates prayers',
   execute({prayers}) {
     const player = game.combat.player;
     player.disableActivePrayers();

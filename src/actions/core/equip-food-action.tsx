@@ -26,6 +26,7 @@ defineLocalAction<Data>({
       <RenderNodeMedia label={item.name} media={item.media}/>
     </Fragment>
   ),
+  description: 'Equip food to the first free slot',
   execute({item, qty}) {
     const bankQty = game.bank.getQty(item);
     if (!bankQty) {

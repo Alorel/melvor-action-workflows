@@ -24,6 +24,7 @@ const triggerCtx = defineLocalTrigger<Data>({
       <span>{atk?.name}</span>
     </Fragment>
   ),
+  description: 'Fires when the monster is casting this special attack',
   id: TriggerId.CombatSpecialAttack,
   init() {
     ctx.patch(Enemy, 'queueNextAction').after(() => {

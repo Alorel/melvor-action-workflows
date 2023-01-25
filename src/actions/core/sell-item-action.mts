@@ -9,6 +9,7 @@ interface Props {
 
 defineLocalAction<Props>({
   category: InternalCategory.CORE,
+  description: 'This will sell the whole stack',
   execute({items}) {
     for (const item of items) {
       const qty = game.bank.getQty(item);

@@ -8,6 +8,7 @@ interface Props {
 
 defineLocalAction<Props>({
   category: InternalCategory.WORKFLOW,
+  description: 'Forcibly make the workflow jump to another step to repeat the whole (or part of the) workflow. Note that the step cannot jump to itself.',
   execContext: true,
   execute({idx}, ctx) {
     ctx!.setActiveStepIdx(idx);

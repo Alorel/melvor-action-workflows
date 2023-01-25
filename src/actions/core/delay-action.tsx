@@ -16,6 +16,8 @@ defineLocalAction<Props>({
       <span class={'text-primary'}>{`${duration.toLocaleString()}ms`}</span>
     </Fragment>
   ),
+  deprecated: 'Deprecated and will be removed soon™. It was a hacky workaround to begin with.',
+  description: 'Delay the execution of subsequent actions & triggers by n milliseconds',
   execute: ({duration}) => timer(duration),
   id: ActionId.CoreDelay,
   label: 'Wait',

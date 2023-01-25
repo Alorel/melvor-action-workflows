@@ -53,6 +53,7 @@ const base = {
 
 defineLocalAction<Props>({
   ...base,
+  description: 'Run another workflow as an action!',
   execute({name, stop}, ctx) {
     const workflow = WorkflowRegistry.inst.workflows
       .find(wf => wf.name === name);
@@ -76,6 +77,7 @@ defineLocalAction<Props>({
 
 defineLocalAction<Props>({
   ...base,
+  description: 'Similar to "Run workflow", but runs one of the workflows defined at the bottom of the page.',
   execute({name, stop}, ctx) {
     const workflow: Workflow | undefined = (ctx!.workflow as WorkflowRefImpl)
       .getEmbeddedWorkflow(name)

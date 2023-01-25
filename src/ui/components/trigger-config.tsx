@@ -1,9 +1,8 @@
-import type {VNode} from 'preact';
+import {Fragment} from 'preact';
 import {memo} from 'preact/compat';
 import {useCallback} from 'preact/hooks';
 import type {TriggerDefinitionContext} from '../../lib/data/trigger-definition-context.mjs';
 import type {Obj} from '../../public_api';
-import Td from './td';
 import {TriggerSelect} from './workflow-editor/categorised-node-select/categorised-node-select-impl';
 import RenderNodeOption from './workflow-editor/render-node-option/render-node-option';
 
@@ -33,56 +32,44 @@ const TriggerConfig = memo<Props>(
     const {opts, trigger} = value;
     const triggerId = trigger?.id;
 
+    const options = trigger?.def.options;
+
     return (
-      <div class={'table-responsive'}>
-        <table class={'table table-sm font-size-sm'}>
-          <tbody>
-            <Trigger value={trigger} onChange={onTriggerInput}/>
+      <Fragment>
+        <TriggerSelect value={trigger} onChange={onTriggerInput}/>
+        {options && (
+          <div className={'table-responsive'}>
+            <table className={'table table-sm font-size-sm'}>
+              <tbody>
+                {options.map(opt => {
+                  const show = opt.showIf?.(opts);
 
-            {trigger?.def.options?.map(opt => {
-              const show = opt.showIf?.(opts);
+                  return show !== false && (
+                    <RenderNodeOption
+                      key={`${opt.id}@${triggerId}`}
+                      onChange={newVal => {
+                        const newOpts = {
+                          ...opts,
+                          [opt.id]: newVal,
+                        };
+                        opt.resets?.forEach(prop => {
+                          delete newOpts[prop];
+                        });
 
-              return show !== false && (
-                <RenderNodeOption
-                  key={`${opt.id}@${triggerId}`}
-                  onChange={newVal => {
-                    const newOpts = {
-                      ...opts,
-                      [opt.id]: newVal,
-                    };
-                    opt.resets?.forEach(prop => {
-                      delete newOpts[prop];
-                    });
-
-                    onChange({...value, opts: newOpts});
-                  }}
-                  option={opt}
-                  otherValues={opts}
-                  value={opts[opt.id]}/>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                        onChange({...value, opts: newOpts});
+                      }}
+                      option={opt}
+                      otherValues={opts}
+                      value={opts[opt.id]}/>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Fragment>
     );
   }
 );
 
 export default TriggerConfig;
-
-interface TriggerProps {
-  value: TriggerConfigValue['trigger'] | undefined;
-
-  onChange(val: TriggerConfigValue['trigger']): void;
-}
-
-const Trigger = memo<TriggerProps>(function Trigger({value, onChange}): VNode {
-  return (
-    <tr>
-      <Td class={'font-w600'}>{'Trigger'}</Td>
-      <Td>
-        <TriggerSelect value={value} onChange={onChange}/>
-      </Td>
-    </tr>
-  );
-});
