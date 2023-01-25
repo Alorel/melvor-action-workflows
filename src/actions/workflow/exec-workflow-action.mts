@@ -60,7 +60,7 @@ defineLocalAction<Props>({
 
     return executeWorkflowActionCommon(workflow, stop, ctx!);
   },
-  id: ActionId.ExecWorkflow,
+  id: ActionId.WorkflowExecWorkflow,
   label: 'Run workflow',
   media: mainIcon,
   options: [
@@ -85,7 +85,7 @@ defineLocalAction<Props>({
 
     return executeWorkflowActionCommon(workflow, stop, ctx!);
   },
-  id: ActionId.ExecEmbeddedWorkflow,
+  id: ActionId.WorkflowExecEmbeddedWorkflow,
   label: 'Run embedded workflow',
   media: githubAsset('src/ui/assets/matryoshka.png', '0.14.0'),
   options: [
