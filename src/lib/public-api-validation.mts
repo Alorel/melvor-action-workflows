@@ -66,9 +66,10 @@ function isNodeDefinition(v: any): v is (NodeDefinition & Obj<any>) {
     return false;
   }
 
-  const {media, options} = v as NodeDefinition;
+  const {compactRender, media, options} = v as Partial<NodeDefinition>;
 
-  return typeof (media as any) === 'string'
+  return typeof media === 'string'
+    && isUndefinedOr(compactRender, 'function')
     && (options === undefined || (Array.isArray(options) && options.every(isNodeOption)));
 }
 
@@ -86,7 +87,6 @@ function isReferenceable(v: any): v is (Referenceable & Obj<any>) {
 function isNodeOptionBase(v: any): v is IsBase {
   return isReferenceable(v)
     && isUndefinedOr(v.showIf, 'function')
-    && isUndefinedOr(v.compactRender, 'function')
     && isUndefinedOr(v.required, 'boolean')
     && isUndefinedOr(v.description, 'string')
     && (Array.isArray(v.resets) || typeof v.resets === 'undefined');
