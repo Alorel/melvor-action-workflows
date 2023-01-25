@@ -78,9 +78,11 @@ ${(e as Error).stack}
    * a workflow, so the workflow's original name should be provided on edits so it can be used as an exception.
    */
   public isValid(editedName?: string): boolean {
-    return this.name.trim().length !== 0
+    const thisName = this.name;
+
+    return thisName.length !== 0
       && this.steps.length !== 0
-      && (editedName === this.name || !WorkflowRegistry.inst.workflows.some(w => w.name === editedName))
+      && (editedName === thisName || !WorkflowRegistry.inst.workflows.some(w => w.name === thisName))
       && this.steps.every(s => s.isValid);
   }
 
