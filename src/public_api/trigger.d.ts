@@ -17,12 +17,6 @@ export class TriggerDefinitionContext<T extends object = {}> {
 
 /** Definition of a trigger */
 export interface TriggerNodeDefinition<T extends object = {}> extends NodeDefinition<T> {
-  /**
-   * Some triggers, e.g. and/or, can cause infinite recursion in the UI if selected as the initial/default trigger.
-   * Such triggers should have this prop set to `false`.
-   * @default true
-   */
-  canBeDefault?: boolean;
 
   /**
    * Check if the given data passes the trigger. Called when a trigger node activates.

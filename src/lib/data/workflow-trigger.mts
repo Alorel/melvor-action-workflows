@@ -1,6 +1,6 @@
 import type {Observable} from 'rxjs';
 import type {NodeOption, Obj} from '../../public_api';
-import {defaultTrigger} from '../../ui/components/workflow-editor/categorised-node-select/categorised-node-select-impl';
+import {noopTrigger} from '../../triggers/core/noop-trigger.mjs';
 import {EMPTY_ARR, EMPTY_OBJ} from '../util.mjs';
 import PersistClassName from '../util/decorators/PersistClassName.mjs';
 import {formatOptionDefinitions} from '../util/registry-utils/format-option-definitions.mjs';
@@ -18,7 +18,7 @@ export class WorkflowTrigger extends OptsListItem {
 
   public constructor(init: Init = EMPTY_OBJ) {
     super(init);
-    this.trigger = init.trigger ?? defaultTrigger.value;
+    this.trigger = init.trigger ?? noopTrigger;
     if (!this.opts) {
       this.resetOpts();
     }

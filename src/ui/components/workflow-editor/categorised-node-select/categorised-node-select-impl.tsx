@@ -14,12 +14,6 @@ export const allTriggerSelectGroups = new LazyValue(() => categoriseRegistryObje
 
 export const defaultAction = new LazyValue(() => allActions.value[0].items[0]);
 
-export const defaultTrigger = new LazyValue(() => (
-  allTriggerSelectGroups.value
-    .flatMap(cat => cat.items)
-    .find(trigger => trigger.def.canBeDefault !== false)!
-));
-
 export function ActionSelect(props: Props<ActionNodeDefinitionImpl<any>>): VNode {
   return <CategorisedNodeSelect registry={ACTION_REGISTRY} values={allActions.value} {...props}/>;
 }

@@ -10,8 +10,7 @@ interface Data {
   triggers: WorkflowTrigger[];
 }
 
-const baseDef: Omit<TriggerNodeDefinition<Data>, 'id' | 'label' | 'check' | 'media'> = {
-  canBeDefault: false,
+const baseDef = {
   category: InternalCategory.COMBINATION,
   initOptions: () => ({triggers: [new WorkflowTrigger()]}),
   options: [
@@ -23,7 +22,7 @@ const baseDef: Omit<TriggerNodeDefinition<Data>, 'id' | 'label' | 'check' | 'med
       type: 'TriggerRef',
     },
   ],
-};
+} satisfies Partial<TriggerNodeDefinition<Data>>;
 
 defineLocalTrigger<Data>({
   ...baseDef,
