@@ -147,6 +147,10 @@ export default class WorkflowRegistry {
         })
       )
       .subscribe(state => {
+        if (loadingOfflineProgress) {
+          return;
+        }
+
         const storage = ctx.characterStorage;
         if (state) {
           try {
