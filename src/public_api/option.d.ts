@@ -9,14 +9,18 @@ export type NodeOption = AltRecipeCostNodeOption
   | MediaItemNodeOption
   | TriggerRefOption
   | StepRefNodeOption
+  | BlueprintRefOption
   | EmbeddedWorkflowOption
   | EquipmentSetOption
   | BooleanNodeOption;
 
 /** An `<input type="text"/>` or `<select>` */
-
 export interface StepRefNodeOption extends NodeOptionBase {
   type: 'StepRef';
+}
+
+export interface BlueprintRefOption extends NodeOptionBase {
+  type: 'BlueprintRef';
 }
 
 export interface EmbeddedWorkflowOption extends NodeOptionBase {

@@ -35,6 +35,7 @@ const enum ActionId {
   StartSkillWoodcutting = 33,
   ExecWorkflow = 34,
   ExecEmbeddedWorkflow = 35,
+  CoreLoadAgilityBlueprint = 36,
 }
 
 export default ActionId;
