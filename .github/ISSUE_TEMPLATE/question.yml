@@ -11,6 +11,7 @@ body:
         - Question about the UI or terminology
         - Question about an Action
         - Question about a Trigger
+        - Question about option types
         - Question about workflows
 #        - Question about the mod API
         - Something else
