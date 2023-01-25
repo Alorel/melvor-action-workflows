@@ -9,6 +9,7 @@ interface Props {
 
 defineLocalAction<Props>({
   category: InternalCategory.CORE,
+  description: 'Loads an agility blueprint. Make sure you have enough resources & currency!',
   execute({idx}) {
     const agi = game.agility;
     const blueprint = agi.blueprints.get(idx);

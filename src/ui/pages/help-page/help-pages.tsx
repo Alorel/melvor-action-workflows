@@ -32,11 +32,3 @@ export function OfflineHelp(): VNode {
     </HelpPageSection>
   );
 }
-
-export function EmbeddedWorkflowsHelp(): VNode {
-  return (
-    <HelpPageSection heading={'How do embedded workflows work?'}>
-      {'They\'re for use with the "Run embedded workflow" action - they\'re essentially the same as normal workflows, but are only usable within the workflow they\'re defined in'}
-    </HelpPageSection>
-  );
-}

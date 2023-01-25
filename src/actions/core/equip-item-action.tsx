@@ -36,6 +36,7 @@ defineLocalAction<Props>({
       )}
     </Fragment>
   ),
+  description: 'Equip an item. You can set a slot & the equip amount when applicable.',
   execute({item, qty, slot}) {
     const bankQty = game.bank.getQty(item);
     if (!bankQty) {

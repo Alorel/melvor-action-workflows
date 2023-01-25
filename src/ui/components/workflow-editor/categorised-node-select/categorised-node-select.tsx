@@ -1,14 +1,16 @@
 import type {ComponentChildren, VNode} from 'preact';
-import {useCallback} from 'preact/compat';
+import {memo, useCallback} from 'preact/compat';
 import type {NamespacedDefinition} from '../../../../lib/namespaced-definition.mjs';
 import type {StdRegistryKey} from '../../../../lib/registries/registries.mjs';
 import type {CategorisedObject} from '../../../../lib/util/categorise-registry-objects.mjs';
 import {errorLog} from '../../../../lib/util/log.mjs';
 import type {Referenceable} from '../../../../public_api';
+import useTippy from '../../../hooks/tippy.mjs';
+import {mkClass} from '../../../util/mk-class.mjs';
 import Btn from '../../btn';
 import {BinSvg} from '../../svg';
 
-type Def = NamespacedDefinition<Referenceable>;
+type Def = NamespacedDefinition<CategorisedNode>;
 
 interface Props<T> {
   children?: ComponentChildren;
@@ -26,6 +28,12 @@ interface Props<T> {
 
 export {Props as CategorisedNodeSelectProps};
 
+export interface CategorisedNode extends Referenceable {
+  deprecated?: true | string;
+
+  description?: string;
+}
+
 /** Common select for actions & triggers */
 export default function CategorisedNodeSelect<T extends Def>({
   children,
@@ -35,21 +43,35 @@ export default function CategorisedNodeSelect<T extends Def>({
   value,
   values,
 }: Props<T>): VNode {
-
   const selectedId = value?.id;
   const clear = useClear(value, onChange);
   const onSelectChange = useOnSelectChange(selectedId, onChange, registry, values);
 
+  const {description, deprecated} = value?.def ?? {} as Partial<CategorisedNode>;
+
   return (
-    <div class={'input-group'}>
+    <div className={'input-group'}>
       {children}
       {clearable && <Btn size={'sm'} kind={'default'} onClick={clear}><BinSvg/></Btn>}
-      <select class={'form-control form-control-sm'} value={selectedId} onChange={onSelectChange}>
+      <select className={'form-control form-control-sm'} value={selectedId} onChange={onSelectChange}>
         {values.map(optGroupMapper)}
       </select>
+      {description && <InfoBubble text={description}/>}
+      {deprecated && (
+        <InfoBubble clazz={'text-warning'}
+          text={deprecated === true ? 'This feature is deprecated and will be removed soon' : deprecated}/>
+      )}
     </div>
   );
 }
+
+const InfoBubble = memo<{clazz?: string; text: string;}>(
+  function InfoBubble({clazz, text}) {
+    const ref = useTippy(text);
+
+    return <i class={mkClass('fa fa-info-circle align-self-center ml-1', clazz)} ref={ref}/>;
+  }
+);
 
 function useClear<T>(value: T, onChange: () => void): () => void {
   const isClearable = value != null;

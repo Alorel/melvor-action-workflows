@@ -20,6 +20,7 @@ defineLocalAction<Props>({
       <RenderNodeMedia label={item.name} media={item.media}/>
     </Fragment>
   ),
+  description: 'Buy an item from the shop',
   execute({item, qty}) {
     if (!passesLimitCount(item)) {
       return;

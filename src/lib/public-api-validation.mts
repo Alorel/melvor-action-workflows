@@ -66,9 +66,17 @@ function isNodeDefinition(v: any): v is (NodeDefinition & Obj<any>) {
     return false;
   }
 
-  const {compactRender, media, options} = v as Partial<NodeDefinition>;
+  const {
+    compactRender,
+    deprecated,
+    description,
+    media,
+    options,
+  } = v as Partial<NodeDefinition>;
 
   return typeof media === 'string'
+    && typeIs(deprecated, 'undefined', 'boolean', 'string')
+    && isUndefinedOr(description, 'string')
     && isUndefinedOr(compactRender, 'function')
     && (options === undefined || (Array.isArray(options) && options.every(isNodeOption)));
 }

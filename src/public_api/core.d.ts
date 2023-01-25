@@ -53,6 +53,12 @@ export interface NodeDefinition<T extends object = {}> extends Referenceable {
    */
   compactRender?: (props: T) => VNode | null | undefined;
 
+  /** Flag this node for deprecation. Optionally include a deprecation message */
+  deprecated?: true | string;
+
+  /** Node description */
+  description?: string;
+
   /** The icon */
   media: string;
 

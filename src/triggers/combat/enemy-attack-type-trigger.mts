@@ -12,6 +12,7 @@ interface Data {
 const triggerCtx = defineLocalTrigger<Data>({
   category: InternalCategory.COMBAT,
   check: d => game.combat.isActive && game.combat.enemy.attackType === d.type,
+  description: 'Fires when the monster has the given attack type',
   id: TriggerId.CombatEnemyAtkType,
   init() {
     ctx.patch(CombatManager, 'spawnEnemy').after(() => {
