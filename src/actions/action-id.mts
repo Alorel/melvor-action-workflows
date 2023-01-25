@@ -33,8 +33,8 @@ const enum ActionId {
   StartSkillSummoning = 31,
   StartSkillThieving = 32,
   StartSkillWoodcutting = 33,
-  ExecWorkflow = 34,
-  ExecEmbeddedWorkflow = 35,
+  WorkflowExecWorkflow = 34,
+  WorkflowExecEmbeddedWorkflow = 35,
   CoreLoadAgilityBlueprint = 36,
 }
 
