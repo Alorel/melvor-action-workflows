@@ -33,6 +33,8 @@ export class CombatManager {
   selectMonster(monster: Monster, area: CombatArea): void;
 
   spawnEnemy(): void;
+
+  onEnemyDeath(): void;
 }
 
 export interface PotionUse {
