@@ -18,6 +18,7 @@ const enum TriggerId {
   CurrencyGold = 16,
   CurrencySlayer = 17,
   CombatTotalMobKills = 18,
+  CoreNoop = 19,
 }
 
 export default TriggerId;
