@@ -26,15 +26,17 @@ export class CombatManager {
 
   player: Player;
 
+  selectedArea?: CombatArea;
+
   get media(): string;
+
+  onEnemyDeath(): void;
 
   selectDungeon(dungeon: Dungeon): void;
 
   selectMonster(monster: Monster, area: CombatArea): void;
 
   spawnEnemy(): void;
-
-  onEnemyDeath(): void;
 }
 
 export interface PotionUse {
