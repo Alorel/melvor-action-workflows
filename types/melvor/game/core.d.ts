@@ -155,6 +155,10 @@ export interface Namespace {
   name: string;
 }
 
+export class Statistics {
+  public monsterKillCount(mob: Monster): number;
+}
+
 export class Game {
 
   activeAction?: Skill;
@@ -242,6 +246,8 @@ export class Game {
   specialAttacks: NamespaceRegistry<SpecialAttack>;
 
   standardSpells: NamespaceRegistry<CombatSpell>;
+
+  stats: Statistics;
 
   summoning: Summoning;
 

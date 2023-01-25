@@ -17,6 +17,7 @@ const enum TriggerId {
   CorePetUnlocked = 15,
   CurrencyGold = 16,
   CurrencySlayer = 17,
+  CombatTotalMobKills = 18,
 }
 
 export default TriggerId;
