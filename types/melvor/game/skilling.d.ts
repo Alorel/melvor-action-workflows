@@ -1,6 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type {BaseSpell, Game, NamespaceRegistry, RuneRequirement} from './core';
+import {NamespacedObject} from './core';
 import type {Item} from './item';
 import type {ItemCost, ShopPurchase} from './misc';
 
@@ -87,7 +88,25 @@ export class Astrology extends GatheringSkill<AstrologyRecipe> {
   public studyConstellationOnClick(constellation: AstrologyRecipe): void;
 }
 
+export class MasteryAction extends NamespacedObject {
+}
+
+export class BaseAgilityObject extends MasteryAction {
+}
+
+export class AgilityObstacle extends BaseAgilityObject {
+}
+
+export interface AgilityBlueprint {
+  name: string;
+
+  obstacles: Map<number, AgilityObstacle>;
+}
+
 export class Agility extends GatheringSkill<object> {
+  public blueprints: Map<number, AgilityBlueprint>;
+
+  public replaceCourseWithBlueprint(blueprint: AgilityBlueprint): void;
 }
 
 export class HerbloreRecipe extends CategorizedArtisanRecipe {

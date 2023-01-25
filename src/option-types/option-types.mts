@@ -1,4 +1,5 @@
 import './alt-cost-option';
+import './blueprint-ref-option';
 import './boolean-option';
 import './embedded-workflow-option';
 import './equipment-set-option';
