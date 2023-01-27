@@ -27,11 +27,7 @@ interface Init extends Omit<ActionNodeDefinition<Props>, 'id' | 'category' | 'op
 }
 
 function execMob({area, mob}: Props): void {
-  const mobObj = area.monsters[mob!];
-
-  if (!game.combat.isActive || mobObj.id !== game.combat.enemy.monster?.id) {
-    game.combat.selectMonster(area.monsters[mob!], area);
-  }
+  game.combat.selectMonster(area.monsters[mob!], area);
 }
 
 function renderMob({area, mob: mobIdx}: Props): VNode | null {
@@ -110,9 +106,7 @@ mkAction({
     </Fragment>
   ),
   execute({area}) {
-    if (!game.combat.isActive || game.combat.selectedArea?.id !== area.id) {
-      game.combat.selectDungeon(area as Dungeon);
-    }
+    game.combat.selectDungeon(area as Dungeon);
   },
   id: ActionId.CombatStartCombatDungeon,
   label: 'Start Dungeon',
