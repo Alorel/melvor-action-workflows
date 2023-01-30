@@ -10,7 +10,8 @@ registries:
     type: npm-registry
     url: https://npm.pkg.github.com
     username: alorel
-    password: ${{ github.token }}
+    password: ${{ secrets.GITHUB_TOKEN }}
+    replaces-base: true
 updates:
   - package-ecosystem: "npm"
     directory: "/"
