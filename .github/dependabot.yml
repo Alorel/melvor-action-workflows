@@ -15,10 +15,12 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     open-pull-requests-limit: 20
-    registries:
-      - npm-github
     schedule:
       interval: "weekly"
+    registries:
+      - npm-github
+    ignore:
+      - sweetalert2
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
