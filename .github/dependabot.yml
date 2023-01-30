@@ -20,7 +20,7 @@ updates:
     registries:
       - npm-github
     ignore:
-      - sweetalert2
+      - dependency-name: sweetalert2
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
