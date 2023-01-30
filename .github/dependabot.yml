@@ -6,9 +6,6 @@
 version: 2
 
 registries:
-  npm-npmjs:
-    type: npm-registry
-    url: https://registry.npmjs.org
   npm-github:
     type: npm-registry
     url: https://npm.pkg.github.com
@@ -19,8 +16,7 @@ updates:
     directory: "/"
     open-pull-requests-limit: 20
     registries:
-      - npm-npmjs
-      - npm-github
+      - "*"
     schedule:
       interval: "weekly"
   - package-ecosystem: "github-actions" # See documentation for possible values
