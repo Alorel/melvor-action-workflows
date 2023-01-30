@@ -15,8 +15,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     open-pull-requests-limit: 20
-    registries:
-      - "*"
+    registries: "*"
     schedule:
       interval: "weekly"
   - package-ecosystem: "github-actions" # See documentation for possible values
