@@ -5,6 +5,15 @@
 
 version: 2
 
+registries:
+  npm-npmjs:
+    type: npm-registry
+    url: https://registry.npmjs.org
+  npm-github-alorel:
+    type: npm-registry
+    url: https://npm.pkg.github.com
+    username: alorel
+    password: ${{ github.token }}
 updates:
   - package-ecosystem: "npm"
     directory: "/"
