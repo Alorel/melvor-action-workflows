@@ -31,7 +31,7 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.2",
     "@types/bluebird": "^3.5.38",
-    "@types/lodash-es": "^4.17.6",
+    "@types/lodash-es": "^4.17.7",
     "@types/node": "^18.14.0",
     "@types/semver": "^7.3.13",
     "@types/yargs": "^17.0.22",
