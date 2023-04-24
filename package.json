@@ -48,7 +48,7 @@
     "rollup": "^3.17.2",
     "rollup-plugin-typescript2": "^0.34.1",
     "sass": "^1.58.3",
-    "semver": "^7.3.8",
+    "semver": "^7.5.0",
     "sweetalert2": "11.4.8",
     "terser": "^5.16.4",
     "tippy.js": "^6.3.7",
